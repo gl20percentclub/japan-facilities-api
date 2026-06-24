@@ -3,6 +3,11 @@
 // 沖縄県BODIKオープンデータ（食品営業許可・届出）をクロールし、
 // geolonia/japanese-addresses と同じ思想の階層型静的JSONを生成する。
 //
+// 出力構造（都道府県 > 市区町村 > data.json）:
+//   api/facilities/index.json                都道府県名 → 市区町村名の配列
+//   api/facilities/{都道府県}/index.json      市区町村名 → 施設数
+//   api/facilities/{都道府県}/{市区町村}/data.json  施設オブジェクトの配列
+//
 // 使い方:
 //   node scripts/crawl.js            通常実行（ダウンロード→生成）
 //   node scripts/crawl.js --dry-run  ダウンロードをスキップしキャッシュを使う
@@ -75,6 +80,33 @@ const COLUMN_MAP = {
   '許可番号': 'license_no',
   '廃業年月日': 'close_date',
 };
+
+// ---------------------------------------------------------------------------
+// JIS都道府県コード（先頭2桁）→ 都道府県名
+// ---------------------------------------------------------------------------
+const PREFECTURE_BY_CODE = {
+  '01': '北海道', '02': '青森県', '03': '岩手県', '04': '宮城県', '05': '秋田県',
+  '06': '山形県', '07': '福島県', '08': '茨城県', '09': '栃木県', '10': '群馬県',
+  '11': '埼玉県', '12': '千葉県', '13': '東京都', '14': '神奈川県', '15': '新潟県',
+  '16': '富山県', '17': '石川県', '18': '福井県', '19': '山梨県', '20': '長野県',
+  '21': '岐阜県', '22': '静岡県', '23': '愛知県', '24': '三重県', '25': '滋賀県',
+  '26': '京都府', '27': '大阪府', '28': '兵庫県', '29': '奈良県', '30': '和歌山県',
+  '31': '鳥取県', '32': '島根県', '33': '岡山県', '34': '広島県', '35': '山口県',
+  '36': '徳島県', '37': '香川県', '38': '愛媛県', '39': '高知県', '40': '福岡県',
+  '41': '佐賀県', '42': '長崎県', '43': '熊本県', '44': '大分県', '45': '宮崎県',
+  '46': '鹿児島県', '47': '沖縄県',
+};
+
+// レコードから都道府県名を解決する。
+// 優先: 都道府県名カラム → 市区町村コードの先頭2桁 → '不明'
+function resolvePrefecture(rec) {
+  const name = (rec.prefecture_name || '').trim();
+  if (name) return name;
+  const code = String(rec.city_code || '').trim();
+  const m = code.match(/^(\d{2})/);
+  if (m && PREFECTURE_BY_CODE[m[1]]) return PREFECTURE_BY_CODE[m[1]];
+  return '不明';
+}
 
 // ---------------------------------------------------------------------------
 // 和暦 → 西暦 の日付正規化
@@ -314,23 +346,28 @@ async function main() {
       const rec = mapRecord(raw);
       const facility = toFacility(rec);
       if (facility) {
-        facilities.push({ ...facility, _city: rec.city_name || '不明' });
+        facilities.push({
+          ...facility,
+          _pref: resolvePrefecture(rec),
+          _city: rec.city_name || '不明',
+        });
       }
     }
   }
 
   console.log(`\n有効な施設: ${facilities.length}件`);
 
-  // 市区町村 → 業種 → 施設 の3階層ツリーを組み立て
-  const tree = new Map(); // city -> Map(businessType -> facility[])
+  // 都道府県 → 市区町村 → 施設 の3階層ツリーを組み立て
+  const tree = new Map(); // prefecture -> Map(city -> facility[])
   for (const f of facilities) {
+    const pref = f._pref;
     const city = f._city;
-    const bt = f.business_type || '不明';
+    delete f._pref;
     delete f._city;
-    if (!tree.has(city)) tree.set(city, new Map());
-    const byType = tree.get(city);
-    if (!byType.has(bt)) byType.set(bt, []);
-    byType.get(bt).push(f);
+    if (!tree.has(pref)) tree.set(pref, new Map());
+    const byCity = tree.get(pref);
+    if (!byCity.has(city)) byCity.set(city, []);
+    byCity.get(city).push(f);
   }
 
   // 出力ディレクトリをクリーンに作り直す
@@ -341,40 +378,41 @@ async function main() {
 
   const updated = Math.floor(Date.now() / 1000);
 
-  // トップレベル index.json
+  // トップレベル index.json（都道府県名 → 市区町村名の配列）
   const topData = {};
-  for (const [city, byType] of tree) {
-    topData[city] = [...byType.keys()].sort();
+  for (const [pref, byCity] of tree) {
+    topData[pref] = [...byCity.keys()].sort();
   }
   writeJSON(path.join(OUT_DIR, 'index.json'), {
     meta: { updated, source: META.source, license: META.license },
     data: topData,
   });
 
-  // 各市区町村のファイル群
-  for (const [city, byType] of tree) {
-    const cityDir = path.join(OUT_DIR, safeName(city));
+  let cityCount = 0;
+  for (const [pref, byCity] of tree) {
+    const prefDir = path.join(OUT_DIR, safeName(pref));
 
-    // 市区町村/index.json（業種名: 施設数）
+    // 都道府県/index.json（市区町村名 → 施設数）
     const counts = {};
-    for (const [bt, list] of byType) {
-      counts[bt] = list.length;
+    for (const [city, list] of byCity) {
+      counts[city] = list.length;
     }
-    writeJSON(path.join(cityDir, 'index.json'), {
+    writeJSON(path.join(prefDir, 'index.json'), {
       meta: { updated },
       data: counts,
     });
 
-    // 市区町村/業種.json（施設配列）
-    for (const [bt, list] of byType) {
-      writeJSON(path.join(cityDir, `${safeName(bt)}.json`), {
+    // 都道府県/市区町村/data.json（施設配列）
+    for (const [city, list] of byCity) {
+      cityCount++;
+      writeJSON(path.join(prefDir, safeName(city), 'data.json'), {
         meta: { updated },
         data: list,
       });
     }
   }
 
-  console.log(`\n✅ 生成完了: ${tree.size}市区町村 / ${facilities.length}施設`);
+  console.log(`\n✅ 生成完了: ${tree.size}都道府県 / ${cityCount}市区町村 / ${facilities.length}施設`);
   console.log(`   出力先: ${path.relative(ROOT, OUT_DIR)}`);
 }
 
