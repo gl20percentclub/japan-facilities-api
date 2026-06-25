@@ -1,4 +1,9 @@
 // api/ ディレクトリが正しく生成されたことを確認するバリデーションスクリプト
+//
+// 検証する構造（都道府県 > 市区町村 > data.json）:
+//   api/facilities/index.json                都道府県名 → 市区町村名の配列
+//   api/facilities/{都道府県}/index.json      市区町村名 → 施設数
+//   api/facilities/{都道府県}/{市区町村}/data.json  施設オブジェクトの配列
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,6 +27,10 @@ function readJSON(p) {
   return JSON.parse(fs.readFileSync(p, 'utf-8'));
 }
 
+function safeName(s) {
+  return String(s).replace(/[\\/:*?"<>|]/g, '_');
+}
+
 console.log('API バリデーション\n');
 
 // 1. トップレベル index.json が存在する
@@ -39,47 +48,68 @@ const top = readJSON(topPath);
 assert(typeof top.meta?.updated === 'number', 'トップ index.json に meta.updated (number) がある');
 assert(top.data && typeof top.data === 'object', 'トップ index.json に data オブジェクトがある');
 
-const cities = Object.keys(top.data);
-assert(cities.length >= 1, `少なくとも1つの市区町村がある (${cities.length}件)`);
+const prefectures = Object.keys(top.data);
+assert(prefectures.length >= 1, `少なくとも1つの都道府県がある (${prefectures.length}件)`);
 
-// 3. 少なくとも1つの市区町村ディレクトリとその index.json がある
+// 3. 都道府県ごとに index.json と各市区町村の data.json を検証
 let totalFacilities = 0;
+let totalCities = 0;
 let checkedFacilitySample = false;
 
-for (const city of cities) {
-  const cityDir = path.join(OUT_DIR, city.replace(/[\\/:*?"<>|]/g, '_'));
-  const cityIndexPath = path.join(cityDir, 'index.json');
-  if (!fs.existsSync(cityIndexPath)) {
-    console.error(`  ✗ ${city}/index.json が存在しない`);
+for (const pref of prefectures) {
+  const prefDir = path.join(OUT_DIR, safeName(pref));
+  const prefIndexPath = path.join(prefDir, 'index.json');
+  if (!fs.existsSync(prefIndexPath)) {
+    console.error(`  ✗ ${pref}/index.json が存在しない`);
     failures++;
     continue;
   }
-  const cityIndex = readJSON(cityIndexPath);
+  const prefIndex = readJSON(prefIndexPath);
 
-  // 業種.json をチェックし施設総数を集計
-  for (const [bt, count] of Object.entries(cityIndex.data || {})) {
-    totalFacilities += count;
-    const btPath = path.join(cityDir, `${bt.replace(/[\\/:*?"<>|]/g, '_')}.json`);
-    if (!fs.existsSync(btPath)) {
-      console.error(`  ✗ ${city}/${bt}.json が存在しない`);
+  // トップ index.json の市区町村一覧と、都道府県 index.json のキーが一致する
+  const citiesFromTop = [...top.data[pref]].sort();
+  const citiesFromIndex = Object.keys(prefIndex.data || {}).sort();
+  assert(
+    JSON.stringify(citiesFromTop) === JSON.stringify(citiesFromIndex),
+    `${pref}: トップ index と都道府県 index の市区町村一覧が一致する`,
+  );
+
+  for (const [city, count] of Object.entries(prefIndex.data || {})) {
+    totalCities++;
+    const dataPath = path.join(prefDir, safeName(city), 'data.json');
+    if (!fs.existsSync(dataPath)) {
+      console.error(`  ✗ ${pref}/${city}/data.json が存在しない`);
       failures++;
       continue;
     }
-    if (!checkedFacilitySample) {
-      const btJson = readJSON(btPath);
-      assert(btJson.meta && typeof btJson.meta === 'object', `施設JSONに meta がある (${city}/${bt})`);
-      assert(Array.isArray(btJson.data), `施設JSONの data が配列 (${city}/${bt})`);
-      const sample = btJson.data[0];
+    const cityData = readJSON(dataPath);
+    if (!Array.isArray(cityData.data)) {
+      console.error(`  ✗ ${pref}/${city}/data.json の data が配列でない`);
+      failures++;
+      continue;
+    }
+    totalFacilities += cityData.data.length;
+
+    // index.json の件数と data.json の要素数が一致する
+    if (cityData.data.length !== count) {
+      console.error(`  ✗ ${pref}/${city}: index の件数(${count})と data.json の要素数(${cityData.data.length})が不一致`);
+      failures++;
+    }
+
+    if (!checkedFacilitySample && cityData.data.length > 0) {
+      assert(cityData.meta && typeof cityData.meta === 'object', `施設JSONに meta がある (${pref}/${city})`);
+      const sample = cityData.data[0];
       assert(sample && 'name' in sample, '施設に name フィールドがある');
       assert(sample && 'address' in sample, '施設に address フィールドがある');
+      assert(sample && 'business_type' in sample, '施設に business_type フィールドがある');
       checkedFacilitySample = true;
     }
   }
 }
 
-assert(checkedFacilitySample, '少なくとも1つの施設JSONを検証した');
+assert(checkedFacilitySample, '少なくとも1つの施設サンプルを検証した');
 
-console.log(`\n施設総数: ${totalFacilities}件 / ${cities.length}市区町村`);
+console.log(`\n施設総数: ${totalFacilities}件 / ${totalCities}市区町村 / ${prefectures.length}都道府県`);
 
 if (failures > 0) {
   console.error(`\n❌ ${failures}件のチェックに失敗`);

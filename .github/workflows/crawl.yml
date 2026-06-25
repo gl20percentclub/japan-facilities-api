@@ -58,7 +58,7 @@ jobs:
       - name: Commit and push
         if: steps.changes.outputs.changed == 'true'
         run: |
-          CITY_COUNT=$(node -e "const d=require('./api/facilities/index.json');console.log(Object.keys(d.data).length)")
+          CITY_COUNT=$(node -e "const d=require('./api/facilities/index.json');console.log(Object.values(d.data).reduce((n,c)=>n+c.length,0))")
           UPDATED=$(node -e "const d=require('./api/facilities/index.json');console.log(new Date(d.meta.updated*1000).toISOString().slice(0,10))")
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
