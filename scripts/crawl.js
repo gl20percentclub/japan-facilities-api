@@ -8,17 +8,22 @@
 //   api/facilities/{都道府県}/index.json      市区町村名 → 施設数
 //   api/facilities/{都道府県}/{市区町村}/data.json  施設オブジェクトの配列
 //
+// 緯度経度の無い施設は @geolonia/normalize-japanese-addresses で住所から付与する。
+//
 // 使い方:
-//   node scripts/crawl.js            通常実行（ダウンロード→生成）
-//   node scripts/crawl.js --dry-run  ダウンロードをスキップしキャッシュを使う
+//   node scripts/crawl.js              通常実行（ダウンロード→ジオコーディング→生成）
+//   node scripts/crawl.js --dry-run    ダウンロードをスキップしキャッシュを使う
+//   node scripts/crawl.js --no-geocode ジオコーディングをスキップ
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { normalize, config as njaConfig } from '@geolonia/normalize-japanese-addresses';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const CACHE_DIR = path.join(ROOT, '.cache');
+const GEOCODE_CACHE_PATH = path.join(CACHE_DIR, 'geocode-cache.json');
 const OUT_DIR = path.join(ROOT, 'api', 'facilities');
 
 const CKAN_BASE = 'https://data.bodik.jp';
@@ -34,6 +39,11 @@ const META = {
 };
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const NO_GEOCODE = process.argv.includes('--no-geocode');
+
+// ジオコーディングの並列数。公開APIに優しくするため控えめにする。
+// （同一市区町村のデータはLRUキャッシュで再利用されるため過剰な並列は不要）
+const GEOCODE_CONCURRENCY = 8;
 
 // ---------------------------------------------------------------------------
 // カラムマッピング（元CSVヘッダー → 内部キー）
@@ -295,6 +305,9 @@ function toFacility(rec) {
     address,
     lat,
     lng,
+    // ジオコーディングで座標を補完した場合の精度レベル（point.level）。
+    // 元データに座標があった場合や補完できなかった場合は null。
+    geocoding_level: null,
     phone: rec.phone || '',
     license_no: rec.license_no || '',
     license_date: normalizeDate(rec.license_date),
@@ -318,6 +331,108 @@ function safeName(s) {
 function writeJSON(filePath, obj) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(obj, null, 2) + '\n');
+}
+
+// ---------------------------------------------------------------------------
+// ジオコーディング
+//   緯度経度が無い施設を、住所から @geolonia/normalize-japanese-addresses で補完する。
+//   結果は .cache/geocode-cache.json に永続化し、再実行・週次クロールを高速化する。
+// ---------------------------------------------------------------------------
+
+// 住所が都道府県名で始まっていなければ前置し、正規化の精度を上げる
+function geocodeQuery(facility) {
+  const addr = facility.address || '';
+  const pref = facility._pref || '';
+  return pref && !addr.startsWith(pref) ? `${pref}${addr}` : addr;
+}
+
+function loadGeocodeCache() {
+  try {
+    return JSON.parse(fs.readFileSync(GEOCODE_CACHE_PATH, 'utf-8'));
+  } catch {
+    return {};
+  }
+}
+
+function saveGeocodeCache(cache) {
+  fs.mkdirSync(CACHE_DIR, { recursive: true });
+  fs.writeFileSync(GEOCODE_CACHE_PATH, JSON.stringify(cache));
+}
+
+// 指定並列数でタスクを処理する単純なワーカープール
+async function runPool(items, concurrency, worker) {
+  let next = 0;
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (next < items.length) {
+      const idx = next++;
+      await worker(items[idx], idx);
+    }
+  });
+  await Promise.all(workers);
+}
+
+async function enrichWithGeocoding(facilities) {
+  const targets = facilities.filter((f) => (f.lat == null || f.lng == null) && f.address);
+  if (targets.length === 0) {
+    console.log('  座標補完が必要な施設はありません');
+    return;
+  }
+
+  const cache = loadGeocodeCache();
+  // 同一住所への重複リクエストを避けるためクエリ単位に集約
+  const uniqueQueries = [...new Set(targets.map(geocodeQuery))];
+  const toFetch = uniqueQueries.filter((q) => !(q in cache));
+
+  console.log(
+    `  座標補完が必要: ${targets.length}施設 / ユニーク住所 ${uniqueQueries.length}件` +
+      `（キャッシュ済 ${uniqueQueries.length - toFetch.length}件、新規 ${toFetch.length}件）`,
+  );
+
+  njaConfig.cacheSize = 2000;
+
+  let done = 0;
+  let failed = 0; // 住所として解決できなかった（恒久的な失敗）
+  let errored = 0; // ネットワーク障害・レート制限等の一過性エラー（キャッシュせず次回再試行）
+  await runPool(toFetch, GEOCODE_CONCURRENCY, async (query) => {
+    try {
+      const r = await normalize(query);
+      if (r && r.point && Number.isFinite(r.point.lat) && Number.isFinite(r.point.lng)) {
+        cache[query] = { lat: r.point.lat, lng: r.point.lng, level: r.point.level ?? null };
+      } else {
+        // 住所として解決できなかった恒久的な失敗。null を記録し再試行を避ける。
+        cache[query] = null;
+        failed++;
+      }
+    } catch {
+      // ネットワーク障害・レート制限・タイムアウト等の一過性エラー。
+      // 恒久的な失敗（null 記録）とは区別し、キャッシュには書かないことで
+      // 次回実行時（`!(q in cache)`）に再試行されるようにする。一時的な障害が
+      // キャッシュに焼き付いて座標が永久に null になるのを防ぐ。
+      errored++;
+    }
+    done++;
+    if (done % 1000 === 0) {
+      console.log(`    ...${done}/${toFetch.length}件 取得`);
+      saveGeocodeCache(cache);
+    }
+  });
+  saveGeocodeCache(cache);
+
+  // キャッシュの結果を施設へ反映
+  let filled = 0;
+  for (const f of targets) {
+    const hit = cache[geocodeQuery(f)];
+    if (hit) {
+      f.lat = hit.lat;
+      f.lng = hit.lng;
+      f.geocoding_level = hit.level;
+      filled++;
+    }
+  }
+  console.log(
+    `  座標を補完: ${filled}/${targets.length}施設` +
+      `（住所解決失敗 ${failed}件、一時エラーで未取得 ${errored}件は次回再試行）`,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -356,6 +471,14 @@ async function main() {
   }
 
   console.log(`\n有効な施設: ${facilities.length}件`);
+
+  // 緯度経度の無い施設を住所からジオコーディングして補完
+  if (NO_GEOCODE) {
+    console.log('\n▼ ジオコーディング: スキップ (--no-geocode)');
+  } else {
+    console.log('\n▼ ジオコーディング');
+    await enrichWithGeocoding(facilities);
+  }
 
   // 都道府県 → 市区町村 → 施設 の3階層ツリーを組み立て
   const tree = new Map(); // prefecture -> Map(city -> facility[])
