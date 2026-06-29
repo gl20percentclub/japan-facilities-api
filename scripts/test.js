@@ -112,6 +112,15 @@ for (const pref of prefectures) {
           withCoords++;
         }
       }
+
+      // geocoding_level は null または 1〜8 の整数であること
+      if (
+        f.geocoding_level != null &&
+        (!Number.isInteger(f.geocoding_level) || f.geocoding_level < 1 || f.geocoding_level > 8)
+      ) {
+        console.error(`  ✗ ${pref}/${city}: 不正な geocoding_level (${f.geocoding_level}) - ${f.name}`);
+        failures++;
+      }
     }
 
     if (!checkedFacilitySample && cityData.data.length > 0) {

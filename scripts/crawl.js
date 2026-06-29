@@ -391,19 +391,24 @@ async function enrichWithGeocoding(facilities) {
   njaConfig.cacheSize = 2000;
 
   let done = 0;
-  let failed = 0;
+  let failed = 0; // 住所として解決できなかった（恒久的な失敗）
+  let errored = 0; // ネットワーク障害・レート制限等の一過性エラー（キャッシュせず次回再試行）
   await runPool(toFetch, GEOCODE_CONCURRENCY, async (query) => {
     try {
       const r = await normalize(query);
       if (r && r.point && Number.isFinite(r.point.lat) && Number.isFinite(r.point.lng)) {
         cache[query] = { lat: r.point.lat, lng: r.point.lng, level: r.point.level ?? null };
       } else {
-        cache[query] = null; // 解決できなかった住所も記録し再試行を避ける
+        // 住所として解決できなかった恒久的な失敗。null を記録し再試行を避ける。
+        cache[query] = null;
         failed++;
       }
     } catch {
-      cache[query] = null;
-      failed++;
+      // ネットワーク障害・レート制限・タイムアウト等の一過性エラー。
+      // 恒久的な失敗（null 記録）とは区別し、キャッシュには書かないことで
+      // 次回実行時（`!(q in cache)`）に再試行されるようにする。一時的な障害が
+      // キャッシュに焼き付いて座標が永久に null になるのを防ぐ。
+      errored++;
     }
     done++;
     if (done % 1000 === 0) {
@@ -424,7 +429,10 @@ async function enrichWithGeocoding(facilities) {
       filled++;
     }
   }
-  console.log(`  座標を補完: ${filled}/${targets.length}施設（住所解決失敗 ${failed}件）`);
+  console.log(
+    `  座標を補完: ${filled}/${targets.length}施設` +
+      `（住所解決失敗 ${failed}件、一時エラーで未取得 ${errored}件は次回再試行）`,
+  );
 }
 
 // ---------------------------------------------------------------------------
