@@ -150,15 +150,17 @@ if (fs.existsSync(indexPath)) {
     'search-index の meta.schema が定義されている',
   );
   assert(idx.data.length > 0, `search-index に施設が存在する (${idx.data?.length ?? 0}件)`);
-  // 先頭の行を検証: [name, address, lat, lng, level]
-  const row = idx.data[0];
-  const [name, , lat, lng] = row;
-  assert(typeof name === 'string' && name !== '', 'search-index の行に施設名がある');
-  assert(
-    typeof lat === 'number' && typeof lng === 'number' &&
-      lat >= 20 && lat <= 46 && lng >= 122 && lng <= 154,
-    'search-index の座標が日本の範囲内である',
-  );
+  // 先頭の行を検証: [name, address, lat, lng, level]。空のときは assert が例外を
+  // 投げない都合で以降が undefined 分解になり落ちるため、行がある時だけ検証する。
+  if (idx.data.length > 0) {
+    const [name, , lat, lng] = idx.data[0];
+    assert(typeof name === 'string' && name !== '', 'search-index の行に施設名がある');
+    assert(
+      typeof lat === 'number' && typeof lng === 'number' &&
+        lat >= 20 && lat <= 46 && lng >= 122 && lng <= 154,
+      'search-index の座標が日本の範囲内である',
+    );
+  }
 }
 
 console.log(`\n施設総数: ${totalFacilities}件 / ${totalCities}市区町村 / ${prefectures.length}都道府県`);

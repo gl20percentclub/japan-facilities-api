@@ -39,11 +39,14 @@ export function generateSearchIndex() {
   const seen = new Set();
   let updated = 0;
 
-  for (const pref of fs.readdirSync(FACILITIES_DIR)) {
+  // readdirSync の列挙順は OS/ファイルシステム依存（macOS は名前順、Linux は
+  // 非ソート）。索引はコミット対象なので、環境に依らず安定した行順になるよう
+  // 都道府県・市区町村ともに名前順にソートしてから処理する。
+  for (const pref of fs.readdirSync(FACILITIES_DIR).sort()) {
     const prefDir = path.join(FACILITIES_DIR, pref);
     if (!fs.statSync(prefDir).isDirectory()) continue;
 
-    for (const city of fs.readdirSync(prefDir)) {
+    for (const city of fs.readdirSync(prefDir).sort()) {
       const dataPath = path.join(prefDir, city, 'data.json');
       if (!fs.existsSync(dataPath)) continue;
 
@@ -55,13 +58,18 @@ export function generateSearchIndex() {
         if (typeof f.lat !== 'number' || typeof f.lng !== 'number') continue;
         if (!f.name) continue;
 
+        // 出力する丸め後の座標で重複排除する（生値で判定すると、丸めると同一に
+        // なる同名施設が重複行として残り得るため、出力値でキーを作る）。
+        const lat = round6(f.lat);
+        const lng = round6(f.lng);
+
         // 同一施設が業種違いで複数行あるため、名前+座標で重複排除する。
-        const key = `${f.name}|${f.lat}|${f.lng}`;
+        const key = `${f.name}|${lat}|${lng}`;
         if (seen.has(key)) continue;
         seen.add(key);
 
         // schema: [name, address, lat, lng, level]
-        rows.push([f.name, f.address ?? '', round6(f.lat), round6(f.lng), f.geocoding_level ?? null]);
+        rows.push([f.name, f.address ?? '', lat, lng, f.geocoding_level ?? null]);
       }
     }
   }
