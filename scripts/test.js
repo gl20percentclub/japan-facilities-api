@@ -48,6 +48,12 @@ const top = readJSON(topPath);
 assert(typeof top.meta?.updated === 'number', 'トップ index.json に meta.updated (number) がある');
 assert(top.data && typeof top.data === 'object', 'トップ index.json に data オブジェクトがある');
 
+// 出典・免責のメタが各レスポンスに含まれる
+assert(typeof top.meta?.source === 'string' && top.meta.source !== '', 'トップ index.json に meta.source がある');
+assert(typeof top.meta?.license === 'string' && top.meta.license !== '', 'トップ index.json に meta.license がある');
+assert(typeof top.meta?.disclaimer === 'string' && top.meta.disclaimer !== '', 'トップ index.json に meta.disclaimer がある');
+assert(typeof top.meta?.attribution === 'string' && top.meta.attribution.includes('attribution.json'), 'トップ index.json に meta.attribution (出典情報への参照) がある');
+
 const prefectures = Object.keys(top.data);
 assert(prefectures.length >= 1, `少なくとも1つの都道府県がある (${prefectures.length}件)`);
 
@@ -161,6 +167,25 @@ if (fs.existsSync(indexPath)) {
       'search-index の座標が日本の範囲内である',
     );
   }
+}
+
+// 5. 出典・ライセンス・免責の api/attribution.json を検証
+const attrPath = path.join(ROOT, 'api', 'attribution.json');
+assert(fs.existsSync(attrPath), 'api/attribution.json が存在する');
+if (fs.existsSync(attrPath)) {
+  const attr = readJSON(attrPath);
+  assert(attr.service && typeof attr.service.name === 'string', 'attribution に service.name がある');
+  assert(typeof attr.disclaimer === 'string' && attr.disclaimer !== '', 'attribution に disclaimer がある');
+  assert(Array.isArray(attr.sources) && attr.sources.length >= 1, `attribution に sources がある (${attr.sources?.length ?? 0}件)`);
+  const s = attr.sources?.[0];
+  assert(s && typeof s.municipality === 'string' && s.municipality !== '', 'source に municipality (自治体名) がある');
+  assert(s && typeof s.datasetName === 'string', 'source に datasetName (データセット名) がある');
+  assert(s && typeof s.sourceUrl === 'string' && /^https?:\/\//.test(s.sourceUrl), 'source に sourceUrl (元データURL) がある');
+  assert(s && typeof s.license === 'string' && s.license !== '', 'source に license がある');
+  assert(s && 'sourceUpdatedAt' in s, 'source に sourceUpdatedAt (自治体側の最終更新日) がある');
+  assert(s && typeof s.retrievedAt === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.retrievedAt), 'source に retrievedAt (データ取得日) がある');
+  // 必須の免責トピックが揃っている
+  assert(attr.notices?.accuracy && attr.notices?.geocoding && attr.notices?.unofficial, 'attribution に免責（正確性・緯度経度・非公式）が揃っている');
 }
 
 console.log(`\n施設総数: ${totalFacilities}件 / ${totalCities}市区町村 / ${prefectures.length}都道府県`);
