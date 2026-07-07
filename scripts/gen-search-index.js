@@ -14,11 +14,29 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildFileMeta } from './meta.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const FACILITIES_DIR = path.join(ROOT, 'api', 'facilities');
 const INDEX_PATH = path.join(ROOT, 'api', 'search-index.json');
+const ATTRIBUTION_PATH = path.join(ROOT, 'api', 'attribution.json');
+
+// api/attribution.json から出典・ライセンスの要約を読み、索引の meta に載せる。
+// crawl.js は generateSearchIndex より前に attribution.json を書き出すため、
+// 通常はここで読める（単独実行時は既存ファイルを利用、無ければ省略）。
+function readSourceSummary() {
+  try {
+    const attr = JSON.parse(fs.readFileSync(ATTRIBUTION_PATH, 'utf-8'));
+    const sources = attr.sources ?? [];
+    return {
+      source: sources.map((s) => `${s.municipality}${s.datasetName ?? ''}`).join(', ') || undefined,
+      license: [...new Set(sources.map((s) => s.license).filter(Boolean))].join(', ') || undefined,
+    };
+  } catch {
+    return {};
+  }
+}
 
 /** 座標を 6 桁に丸めてサイズを削減する（約 0.1m 精度で十分）。 */
 function round6(n) {
@@ -74,9 +92,10 @@ export function generateSearchIndex() {
     }
   }
 
+  const { source, license } = readSourceSummary();
   const out = {
     meta: {
-      updated,
+      ...buildFileMeta({ updated, source, license }),
       count: rows.length,
       // 各要素の並び。利用側（BA-SHARE 等）はこの順で解釈する。
       schema: ['name', 'address', 'lat', 'lng', 'level'],

@@ -21,6 +21,10 @@ import { fileURLToPath } from 'node:url';
 import { normalize, config as njaConfig } from '@geolonia/normalize-japanese-addresses';
 import { generateSearchIndex } from './gen-search-index.js';
 import { generateReadmeStats } from './gen-readme-stats.js';
+import { generateNotice } from './gen-notice.js';
+import { buildFileMeta } from './meta.js';
+import { fetchResourceInfo, resolveSource, buildAttribution, writeAttribution } from './gen-attribution.js';
+import { DATASETS } from '../config/datasets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -28,17 +32,8 @@ const CACHE_DIR = path.join(ROOT, '.cache');
 const GEOCODE_CACHE_PATH = path.join(CACHE_DIR, 'geocode-cache.json');
 const OUT_DIR = path.join(ROOT, 'api', 'facilities');
 
-const CKAN_BASE = 'https://data.bodik.jp';
-
-// 対象リソースID。ここにIDを追加するだけで複数データを統合できる。
-const TARGET_RESOURCE_IDS = [
-  'c9bf82c1-0689-4354-aada-c422f052be5e',
-];
-
-const META = {
-  source: '沖縄県食品営業許可・届出',
-  license: 'CC BY 4.0',
-};
+// 対象データセットは config/datasets.js の master data で管理する。
+// resourceId を追加するだけで複数自治体のデータを 1 つのツリーに統合できる。
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const NO_GEOCODE = process.argv.includes('--no-geocode');
@@ -150,22 +145,6 @@ function normalizeDate(raw) {
   }
 
   return null;
-}
-
-// ---------------------------------------------------------------------------
-// CKAN API: リソース情報（URL・フォーマット）を取得
-// ---------------------------------------------------------------------------
-async function fetchResourceInfo(resourceId) {
-  const url = `${CKAN_BASE}/api/3/action/resource_show?id=${encodeURIComponent(resourceId)}`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`resource_show failed: ${res.status} ${res.statusText} (${resourceId})`);
-  }
-  const json = await res.json();
-  if (!json.success) {
-    throw new Error(`resource_show returned success=false (${resourceId})`);
-  }
-  return json.result; // { url, format, ... }
 }
 
 // ---------------------------------------------------------------------------
@@ -441,14 +420,28 @@ async function enrichWithGeocoding(facilities) {
 // メイン
 // ---------------------------------------------------------------------------
 async function main() {
-  console.log(`沖縄県施設検索API クローラー${DRY_RUN ? ' (--dry-run)' : ''}`);
-  console.log(`対象リソース: ${TARGET_RESOURCE_IDS.length}件\n`);
+  console.log(`施設検索API クローラー${DRY_RUN ? ' (--dry-run)' : ''}`);
+  console.log(`対象データセット: ${DATASETS.length}件\n`);
+
+  // クロール開始時刻を全出力で共有する（meta.updated と取得日を一致させる）。
+  const now = Date.now();
+  const updated = Math.floor(now / 1000);
+  const retrievedAt = new Date(now).toISOString().slice(0, 10); // YYYY-MM-DD
 
   const facilities = [];
+  const sources = []; // 出典（データソース）情報を蓄積し attribution.json に書き出す
 
-  for (const resourceId of TARGET_RESOURCE_IDS) {
-    console.log(`▼ リソース: ${resourceId}`);
+  for (const dataset of DATASETS) {
+    const resourceId = dataset.resourceId;
+    console.log(`▼ データセット: ${dataset.municipality || resourceId}`);
     const info = await fetchResourceInfo(resourceId);
+    const source = await resolveSource(dataset, info, retrievedAt);
+    sources.push(source);
+    console.log(
+      `  出典: ${source.municipality} / ${source.datasetName || '(名称不明)'}` +
+        ` / ${source.license || '(ライセンス不明)'}` +
+        ` / 自治体側更新日 ${source.sourceUpdatedAt || '不明'}`,
+    );
     const { cachePath, format } = await downloadResource(resourceId, info);
 
     let rawRecords;
@@ -501,7 +494,16 @@ async function main() {
   }
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
-  const updated = Math.floor(Date.now() / 1000);
+  // 各出力ファイルの meta に載せる出典・ライセンスの要約（後方互換の従来キー）。
+  const sourceSummary = sources
+    .map((s) => `${s.municipality}${s.datasetName ? s.datasetName : ''}`)
+    .join(', ');
+  const licenseSummary = [...new Set(sources.map((s) => s.license).filter(Boolean))].join(', ');
+  const fileMeta = () => buildFileMeta({ updated, source: sourceSummary, license: licenseSummary });
+
+  // 詳細な出典・ライセンス・免責を機械可読でまとめた api/attribution.json を書き出す。
+  // UI（フッター等）や利用側はこの 1 ファイルを読めば出典表記・免責を再現できる。
+  writeAttribution(buildAttribution({ updated, retrievedAt, sources }));
 
   // トップレベル index.json（都道府県名 → 市区町村名の配列）
   const topData = {};
@@ -509,7 +511,7 @@ async function main() {
     topData[pref] = [...byCity.keys()].sort();
   }
   writeJSON(path.join(OUT_DIR, 'index.json'), {
-    meta: { updated, source: META.source, license: META.license },
+    meta: fileMeta(),
     data: topData,
   });
 
@@ -523,7 +525,7 @@ async function main() {
       counts[city] = list.length;
     }
     writeJSON(path.join(prefDir, 'index.json'), {
-      meta: { updated },
+      meta: fileMeta(),
       data: counts,
     });
 
@@ -531,7 +533,7 @@ async function main() {
     for (const [city, list] of byCity) {
       cityCount++;
       writeJSON(path.join(prefDir, safeName(city), 'data.json'), {
-        meta: { updated },
+        meta: fileMeta(),
         data: list,
       });
     }
@@ -539,6 +541,9 @@ async function main() {
 
   // 施設名検索用のコンパクトな索引 api/search-index.json も生成する。
   generateSearchIndex();
+
+  // 利用規約・免責の NOTICE.md を config/notices.js から生成する。
+  generateNotice();
 
   // README の「収録データ」統計（件数・サイズ）も最新化する。
   generateReadmeStats();
