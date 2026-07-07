@@ -6,6 +6,7 @@
     "build:dry": "node scripts/crawl.js --dry-run",
     "build:search-index": "node scripts/gen-search-index.js",
     "build:readme-stats": "node scripts/gen-readme-stats.js",
+    "build:notice": "node scripts/gen-notice.js",
     "test": "node scripts/test.js && node scripts/gen-readme-stats.test.js"
   },
   "dependencies": {
