@@ -1,10 +1,9 @@
-# okinawa-facilities-api
+# Japan-facilities-api
 
-沖縄県のオープンデータ（食品営業許可・届出）をクロールし、
-[geolonia/japanese-addresses](https://github.com/geolonia/japanese-addresses) と同じ思想の
-**階層型静的JSON** として配信するシステムです。
+日本自治体が公開しているオープンデータ（食品営業許可・届出）をクロールし、APIとして配信するシステムです。
 
-- **ソース**: 沖縄県BODIK オープンデータ（CKAN: `https://data.bodik.jp`）
+## 
+- **ソース**: 沖縄県BODIK オープンデータ（CKAN: `https://data.bodik.jp`）、将来的に追加予定。
 - **運用**: GitHub Actions で毎週自動クロール → GitHub Pages で配信
 - **ライセンス**: 元データは CC BY 4.0
 
