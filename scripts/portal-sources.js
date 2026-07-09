@@ -79,4 +79,25 @@ export const PORTAL_SOURCES = [
   // ===== 九州 =====
   { key: 'kumamoto-city', acquire: { type: 'get', url: 'https://www.city.kumamoto.jp/dynamic/opendata/pub/Insyokutenneigyoukyoka.csv', format: 'csv', encoding: 'utf-8' }, source: '熊本市飲食店営業許可施設一覧', license: '公共データ利用規約', defaultPref: '熊本県', defaultCity: '熊本市' },
   { key: 'oita-city', acquire: { type: 'get', urls: ['https://www.city.oita.oita.jp/o095/kenko/hoken/documents/r080601allkyoka.csv', 'https://www.city.oita.oita.jp/o095/kenko/hoken/documents/r080601alltodoke.csv'], format: 'csv', encoding: 'auto' }, source: '大分市食品営業許可・届出施設一覧', license: 'CC BY 2.1 JP', defaultPref: '大分県', defaultCity: '大分市' },
+
+  // ===== 穴埋め（ZIP配布・保健所別・多摩島しょ 等の未対応分） =====
+  // 仙台市: ZIP内に区別シートのXLSX
+  { key: 'sendai', acquire: { type: 'get', url: 'https://www.city.sendai.jp/sekatsuese-shokuhin/kyokalist/documents/r7shokuhinichiran.zip', format: 'zip' }, allSheets: true, source: '仙台市営業許可施設一覧', license: '要確認', defaultPref: '宮城県', defaultCity: '仙台市' },
+  // 相模原市: ZIP内にCSV
+  { key: 'sagamihara', acquire: { type: 'get', url: 'https://opendata.city.sagamihara.kanagawa.jp/dataset/eigyo_kyoka/resource/1be0eb65-0348-4668-a440-0ce10cad1063/download/04.zip', format: 'zip', encoding: 'auto' }, source: '相模原市食品衛生関係施設一覧（営業許可）', license: 'CC BY 4.0', defaultPref: '神奈川県', defaultCity: '相模原市' },
+  // 甲府市: ZIP内にXLSX（※配布ファイル名が更新で変わる可能性あり）
+  { key: 'kofu', acquire: { type: 'get', url: 'https://www.city.kofu.yamanashi.jp/hokenjo/h31-shokuhin/documents/download_20260430143717.zip', format: 'zip' }, source: '甲府市食品営業許可施設一覧', license: '要確認', defaultPref: '山梨県', defaultCity: '甲府市' },
+  // 島根県（松江市を除く6保健所管内。松江市は別ソース matsue で対応）
+  { key: 'shimane-pref', acquire: { type: 'get', format: 'xlsx', urls: [
+    'https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_02unnnann.xlsx',
+    'https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_03izumo.xlsx',
+    'https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_04kenou.xlsx',
+    'https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_05hamada.xlsx',
+    'https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_06masuda.xlsx',
+    'https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_07oki.xlsx',
+  ] }, source: '島根県食品営業許可一覧（松江市を除く）', license: '要確認', defaultPref: '島根県' },
+  // 広島県（政令市・中核市を除く県所管域。改正食品衛生法R3.6以降分）
+  { key: 'hiroshima-pref', acquire: { type: 'get', url: 'https://www.pref.hiroshima.lg.jp/uploaded/attachment/664836.xlsx', format: 'xlsx' }, source: '広島県食品営業許可施設一覧', license: '広島県利用規約', defaultPref: '広島県' },
+  // 東京都保健医療局（多摩・島しょの都設置保健所所管分・許可）
+  { key: 'tokyo-hokeniryo', acquire: { type: 'get', url: 'https://www.hokeniryo.metro.tokyo.lg.jp/documents/d/hokeniryo/shokuhin-kyoka-4', format: 'csv', encoding: 'shift_jis' }, source: '東京都（保健医療局）食品関係営業許可台帳', license: 'CC BY 4.0', defaultPref: '東京都' },
 ];
