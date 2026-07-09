@@ -100,6 +100,12 @@ const COLUMN_MAP = {
   '許可満了日': 'valid_end',
   '許可終了日': 'valid_end',
 
+  // --- 厚労省 食品衛生申請等システム(i2fas) オープンデータ ---
+  '自治体コード': 'city_code',
+  '営業施設名称、屋号又は商号': 'facility_name',
+  '営業施設名称、屋号又は商号（フリガナ）': 'facility_name_kana',
+  '営業施設方書': 'address_extra',
+
   // --- 各自治体ポータル フォーマットのヘッダー揺れ ---
   '営業所名': 'facility_name', // 秋田市・柏市
   '営業所住所': 'address',
@@ -213,9 +219,47 @@ const PREFECTURE_BY_CODE = {
   '46': '鹿児島県', '47': '沖縄県',
 };
 
+const PREFECTURE_NAMES = Object.values(PREFECTURE_BY_CODE);
+
+// 住所文字列から都道府県・市区町村を切り出す。
+//   例: 「北海道足寄郡足寄町南三条…」→ ['北海道','足寄郡足寄町']
+//       「北海道札幌市中央区…」→ ['北海道','札幌市']（政令市は市に集約）
+//       「東京都千代田区…」→ ['東京都','千代田区']
+// ジオコーディング結果に頼れない/座標だけある一部データ（例: i2fas は市区町村名カラムが
+// 管轄自治体で施設の市区町村ではない）の grouping に使う。
+function splitPrefCity(addr) {
+  const a = String(addr || '').trim();
+  const pref = PREFECTURE_NAMES.find((p) => a.startsWith(p));
+  if (!pref) return [null, null];
+  const rest = a.slice(pref.length);
+  // 郡＋町村（「余市郡余市町」等、郡名に「市」を含むケースを先に処理）
+  let m = rest.match(/^(.+?郡.+?[町村])/);
+  if (m) return [pref, m[1]];
+  // 市（政令市の行政区「札幌市中央区」は市に集約）
+  m = rest.match(/^(.+?市)/);
+  if (m) return [pref, m[1]];
+  // 特別区・政令区
+  m = rest.match(/^(.+?区)/);
+  if (m) return [pref, m[1]];
+  // 郡なしの町村
+  m = rest.match(/^(.+?[町村])/);
+  if (m) return [pref, m[1]];
+  return [pref, null];
+}
+
 // レコードから都道府県名を解決する。
-// 優先: 都道府県名カラム → 市区町村コードの先頭2桁 → ソース既定値 → '不明'
+// locateByAddress ソースは施設住所から導出（管轄カラムを信用しない）。
+// 通常: 都道府県名カラム → 市区町村コードの先頭2桁 → ソース既定値 → '不明'
+// locateByAddress 用: 施設住所から [都道府県, 市区町村] を得る。
+// 住所が都道府県名で始まらない場合は、管轄の都道府県名（施設の都道府県と一致）を前置して再解析する。
+function locatedPrefCity(rec) {
+  let [p, c] = splitPrefCity(rec.address);
+  if (!p && rec.prefecture_name) [p, c] = splitPrefCity(`${rec.prefecture_name}${rec.address}`);
+  return [p, c];
+}
+
 function resolvePrefecture(rec, source) {
+  if (source.locateByAddress) return locatedPrefCity(rec)[0] || (rec.prefecture_name || '不明');
   const name = (rec.prefecture_name || '').trim();
   if (name) return name;
   const code = String(rec.city_code || '').trim();
@@ -226,8 +270,10 @@ function resolvePrefecture(rec, source) {
 }
 
 // レコードから市区町村名を解決する。
-// 優先: 市区町村名カラム → ソース既定値 → '不明'（後段のジオコーディングで補完を試みる）
+// locateByAddress ソースは施設住所から導出。
+// 通常: 市区町村名カラム → ソース既定値 → '不明'（後段のジオコーディングで補完を試みる）
 function resolveCity(rec, source) {
+  if (source.locateByAddress) return locatedPrefCity(rec)[1] || '不明';
   const name = (rec.city_name || '').trim();
   if (name) return name;
   if (source.defaultCity) return source.defaultCity;
@@ -311,6 +357,20 @@ const DEFAULT_HEADERS = {
 // 返り値: [{ cachePath, format }, ...]（複数ファイルはパース後に結合される）
 async function acquire(source) {
   const a = source.acquire;
+
+  // i2fasglob: scripts/fetch-i2fas.mjs が取得した .cache/i2fas/*.csv をまとめて読む
+  // （厚労省 食品衛生申請等システムのオープンデータ。取得はブラウザ自動化のため別スクリプト）。
+  if (a.type === 'i2fasglob') {
+    const dir = path.join(CACHE_DIR, 'i2fas');
+    if (!fs.existsSync(dir)) {
+      throw new Error(`.cache/i2fas がありません（先に node scripts/fetch-i2fas.mjs を実行）`);
+    }
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.csv')).sort();
+    if (files.length === 0) throw new Error('.cache/i2fas に CSV がありません');
+    console.log(`  i2fas キャッシュ ${files.length} ファイルを使用`);
+    return files.map((f) => ({ cachePath: path.join(dir, f), format: 'csv' }));
+  }
+
   const urls = a.urls || (a.url ? [a.url] : [null]); // ckan は url なしで resourceId 解決
   const results = [];
 
@@ -865,4 +925,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 // テスト用に純粋関数をエクスポートする。
-export { normalizeDate, sanitizeLatLng, resolvePrefecture, resolveCity, mapRecord, toFacility, parseCSVText };
+export { normalizeDate, sanitizeLatLng, resolvePrefecture, resolveCity, mapRecord, toFacility, parseCSVText, splitPrefCity };

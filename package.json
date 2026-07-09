@@ -6,6 +6,7 @@
     "build:dry": "node scripts/crawl.js --dry-run",
     "build:search-index": "node scripts/gen-search-index.js",
     "build:readme-stats": "node scripts/gen-readme-stats.js",
+    "fetch:i2fas": "node scripts/fetch-i2fas.mjs",
     "test": "node scripts/crawl.test.js && node scripts/test.js && node scripts/gen-readme-stats.test.js"
   },
   "dependencies": {
@@ -15,5 +16,8 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
   }
 }
