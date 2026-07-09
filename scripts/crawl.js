@@ -232,6 +232,10 @@ function splitPrefCity(addr) {
   const pref = PREFECTURE_NAMES.find((p) => a.startsWith(p));
   if (!pref) return [null, null];
   const rest = a.slice(pref.length);
+  // 市名自体が「市」で終わる市（二重の「市」）を先に確定させる（例: 四日市市・廿日市市・野々市市）
+  for (const d of ['四日市市', '廿日市市', '野々市市']) {
+    if (rest.startsWith(d)) return [pref, d];
+  }
   // 郡＋町村（「余市郡余市町」等、郡名に「市」を含むケースを先に処理）
   let m = rest.match(/^(.+?郡.+?[町村])/);
   if (m) return [pref, m[1]];

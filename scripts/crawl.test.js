@@ -131,6 +131,11 @@ test('splitPrefCity: 一般市・特別区', () => {
   assert.deepEqual(splitPrefCity('千葉県市川市八幡'), ['千葉県', '市川市']);
   assert.deepEqual(splitPrefCity('東京都千代田区丸の内'), ['東京都', '千代田区']);
 });
+test('splitPrefCity: 市名が「市」で終わる市（二重の市）', () => {
+  assert.deepEqual(splitPrefCity('三重県四日市市諏訪町'), ['三重県', '四日市市']);
+  assert.deepEqual(splitPrefCity('広島県廿日市市下平良'), ['広島県', '廿日市市']);
+  assert.deepEqual(splitPrefCity('石川県野々市市三納'), ['石川県', '野々市市']);
+});
 test('splitPrefCity: 都道府県で始まらなければ null', () => {
   assert.deepEqual(splitPrefCity('足寄町南三条'), [null, null]);
   assert.deepEqual(splitPrefCity(''), [null, null]);
