@@ -57,20 +57,20 @@ jobs:
       - name: Validate
         run: npm test
 
-      # 生成物 api/ は Git 管理外（.gitignore）。README の統計だけを main に反映する。
-      - name: Commit README stats
+      # 生成物 api/ と README 統計を main にコミットする。
+      - name: Commit data
         run: |
-          if git diff --quiet README.md; then
-            echo "README 変更なし"
+          if git diff --quiet api/ README.md; then
+            echo "変更なし"
           else
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add README.md
-            git commit -m "chore: update README data stats"
+            git add api/ README.md
+            git commit -m "chore: update facilities data"
             git push
           fi
 
-      # 生成した api/ を gh-pages へ配信する（main にはコミットしない）。
+      # 生成した api/ を gh-pages へも配信する。
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

@@ -13,17 +13,17 @@
 以下はクロール（`npm run build`）のたびに自動更新されます。ファイルサイズは目安です。
 
 <!-- STATS:START -->
-> **最終更新: 2026-07-07**
+> **最終更新: 2026-07-09**
 >
 > | 項目 | 値 |
 > |---|---|
-> | 施設レコード数 | 154,161 件 |
-> | ユニーク施設数（名前+座標） | 127,336 件 |
-> | 都道府県 | 5 |
-> | 市区町村 | 81 |
-> | `api/` 合計サイズ | 約 72.3 MB |
-> | `data.json` 合計 | 約 59.3 MB |
-> | `search-index.json` | 約 13.0 MB |
+> | 施設レコード数 | 7,092 件 |
+> | ユニーク施設数（名前+座標） | 0 件 |
+> | 都道府県 | 2 |
+> | 市区町村 | 2 |
+> | `api/` 合計サイズ | 約 2.4 MB |
+> | `data.json` 合計 | 約 2.4 MB |
+> | `search-index.json` | 99 B |
 <!-- STATS:END -->
 
 ## API 構造
@@ -224,6 +224,5 @@ export const SOURCES = [
 ## 自動更新
 
 `.github/workflows/crawl.yml` が毎週月曜 18:00 UTC（JST 火曜 AM 3:00）に実行され、
-`api/` を生成して `gh-pages` ブランチへ配信します。**生成物 `api/` は Git 管理せず**（`.gitignore`）、
-配信は gh-pages のみで行います（履歴肥大を避けるため）。README の「収録データ」統計だけを main に反映します。
-`workflow_dispatch` から手動実行も可能（`dry_run` オプション付き）。
+`api/` を生成して **main にコミット**し、あわせて `gh-pages` ブランチへ配信します。
+`workflow_dispatch` から手動実行も可能（`dry_run` / `fetch_i2fas` オプション付き）。
