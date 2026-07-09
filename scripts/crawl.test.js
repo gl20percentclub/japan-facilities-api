@@ -12,6 +12,7 @@ import {
   mapRecord,
   toFacility,
   parseCSVText,
+  splitPrefCity,
 } from './crawl.js';
 
 let passed = 0;
@@ -115,6 +116,24 @@ test('parseCSVText: 引用符内のカンマと改行', () => {
 test('parseCSVText: 空行を除去', () => {
   const rows = parseCSVText('a,b\n\n\nc,d\n');
   assert.deepEqual(rows, [['a', 'b'], ['c', 'd']]);
+});
+
+// --- splitPrefCity: 住所→[都道府県, 市区町村] ---
+test('splitPrefCity: 郡+町村（郡名に市を含む場合も）', () => {
+  assert.deepEqual(splitPrefCity('北海道足寄郡足寄町南三条1丁目'), ['北海道', '足寄郡足寄町']);
+  assert.deepEqual(splitPrefCity('北海道余市郡余市町大川町'), ['北海道', '余市郡余市町']);
+});
+test('splitPrefCity: 政令市の行政区は市に集約', () => {
+  assert.deepEqual(splitPrefCity('北海道札幌市中央区北1条'), ['北海道', '札幌市']);
+  assert.deepEqual(splitPrefCity('大阪府大阪市北区梅田'), ['大阪府', '大阪市']);
+});
+test('splitPrefCity: 一般市・特別区', () => {
+  assert.deepEqual(splitPrefCity('千葉県市川市八幡'), ['千葉県', '市川市']);
+  assert.deepEqual(splitPrefCity('東京都千代田区丸の内'), ['東京都', '千代田区']);
+});
+test('splitPrefCity: 都道府県で始まらなければ null', () => {
+  assert.deepEqual(splitPrefCity('足寄町南三条'), [null, null]);
+  assert.deepEqual(splitPrefCity(''), [null, null]);
 });
 
 console.log(`\n✅ crawl.js ユニットテスト: ${passed}件すべて合格`);
