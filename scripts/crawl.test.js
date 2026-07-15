@@ -15,6 +15,7 @@ import {
   splitPrefCity,
   findEmptySources,
   fetchWithRetry,
+  resolveLinkFromHtml,
 } from './crawl.js';
 
 let passed = 0;
@@ -220,6 +221,45 @@ testAsync('fetchWithRetry: リトライ上限を超えたら失敗', () =>
       assert.equal(calls(), 3); // 初回 + リトライ2回
     },
   ));
+
+// --- resolveLinkFromHtml: 掲載ページからリンクを解決 ---
+// 奈良県の掲載ページを模した HTML（全件1本＋差分複数）。
+const NARA_HTML = `
+<ul>
+  <li><a href="/documents/4585/20260527103326.xlsx">食品営業許可施設一覧【令和8年3月末時点の全許可施設一覧】（エクセル：1,105KB）</a></li>
+  <li><a href="/documents/4585/20260130165931_1.xlsx">食品営業許可施設一覧【令和7年4月～5月の新規許可施設】（エクセル：35KB）</a></li>
+  <li><a href="/documents/4585/keisair0802-0803.xlsx">食品営業許可施設一覧【令和8年2月～3月の新規許可施設一覧】（エクセル：42KB）</a></li>
+  <li><a href="/n086/other.html">関連ページ</a></li>
+</ul>`;
+
+test('resolveLinkFromHtml: 文言一致リンクを相対→絶対URLで解決', () => {
+  const hit = resolveLinkFromHtml(NARA_HTML, {
+    pattern: '全許可施設',
+    format: 'xlsx',
+    baseUrl: 'https://www.pref.nara.lg.jp/n086/52413.html',
+  });
+  assert.equal(hit.url, 'https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx');
+  assert.equal(hit.count, 1); // 差分（新規許可施設）とは区別され1件に絞れる
+  assert.match(hit.text, /全許可施設/);
+});
+test('resolveLinkFromHtml: format 拡張子で絞り込む', () => {
+  // pattern を緩めても .xlsx 以外（.html）は候補から除外される
+  const hit = resolveLinkFromHtml(NARA_HTML, { pattern: '関連', format: 'xlsx', baseUrl: 'https://x/' });
+  assert.equal(hit, null);
+});
+test('resolveLinkFromHtml: 複数一致は総数を返し先頭を採用', () => {
+  const hit = resolveLinkFromHtml(NARA_HTML, { pattern: '新規許可施設', format: 'xlsx', baseUrl: 'https://x/' });
+  assert.equal(hit.count, 2);
+  assert.equal(hit.url, 'https://x/documents/4585/20260130165931_1.xlsx');
+});
+test('resolveLinkFromHtml: 一致なしは null', () => {
+  assert.equal(resolveLinkFromHtml(NARA_HTML, { pattern: '存在しない', format: 'xlsx' }), null);
+});
+test('resolveLinkFromHtml: href の &amp; を復元', () => {
+  const html = '<a href="/dl?id=1&amp;t=x.csv">最新データ</a>';
+  const hit = resolveLinkFromHtml(html, { pattern: '最新', baseUrl: 'https://x/' });
+  assert.equal(hit.url, 'https://x/dl?id=1&t=x.csv');
+});
 
 const runAsync = async () => {
   for (const { name, fn } of asyncTests) {

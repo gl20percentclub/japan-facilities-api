@@ -9,6 +9,9 @@
 //               { type: 'ckan', ckanBase, resourceId }  CKAN resource_show でURL解決
 //               { type: 'get',  url, format?, encoding? } URLを直接GET
 //               { type: 'post', url, body, format?, encoding? } フォームPOSTで取得（京都市等）
+//               { type: 'resolve', pageUrl, linkPattern, format } 掲載ページを取得し、
+//                 リンク文言が linkPattern に一致する <a href> を実URLとして解決してGET。
+//                 ファイル名に日時が入る等で直リンクURLが更新のたびに変わる自治体（奈良県等）向け。
 //               format:   'csv' | 'xlsx' | 'xls'（省略時はURL拡張子/CKAN情報から推定）
 //               encoding: CSVの文字コード 'utf-8' | 'shift_jis' | 'auto'（既定auto）
 //   source      出典表示名（attribution）
@@ -77,15 +80,19 @@ export const SOURCES = [
   },
 
   // -------------------------------------------------------------------------
-  // 奈良県 食品営業許可施設一覧（令和8年3月末時点の全許可施設・奈良市を除く）
+  // 奈良県 食品営業許可施設一覧（全許可施設・奈良市を除く）
   // XLSX。都道府県・市区町村カラムなし → 市区町村はジオコーディングで補完。
+  // ファイル名に日時が入り更新のたびに直リンクURLが変わるため、掲載ページから
+  // 「全許可施設」を含むリンクを解決して最新の全件データを取得する（差分ファイルは
+  // 「新規許可施設」という別リンクなので linkPattern で確実に区別できる）。
   // https://www.pref.nara.lg.jp/n086/52413.html
   // -------------------------------------------------------------------------
   {
     key: 'nara-pref',
     acquire: {
-      type: 'get',
-      url: 'https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx',
+      type: 'resolve',
+      pageUrl: 'https://www.pref.nara.lg.jp/n086/52413.html',
+      linkPattern: '全許可施設',
       format: 'xlsx',
     },
     source: '奈良県食品営業許可施設一覧（奈良市を除く）',

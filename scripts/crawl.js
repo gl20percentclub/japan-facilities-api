@@ -390,6 +390,41 @@ async function fetchWithRetry(url, opts = {}, { retries = 3, baseDelayMs = 1000 
   throw lastErr;
 }
 
+// HTML から、リンク文言が pattern に一致する <a href> を1件解決する。
+//   pattern  リンクの表示テキストにマッチさせる正規表現文字列（省略時は文言で絞らない）
+//   format   拡張子でも絞り込む（'xlsx' 等。省略可）
+//   baseUrl  相対 href を絶対URL化する基準（掲載ページのURL）
+// 返り値: { url, text, count }（一致0件なら null。count は一致総数で、複数時は先頭を採用）
+function resolveLinkFromHtml(htmlText, { pattern, format, baseUrl } = {}) {
+  const textRe = pattern ? new RegExp(pattern, 'i') : null;
+  const extRe = format ? new RegExp(`\\.${format}(?:$|[?#])`, 'i') : null;
+  const anchorRe = /<a\b[^>]*\shref="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  const candidates = [];
+  let m;
+  while ((m = anchorRe.exec(htmlText))) {
+    const href = decodeHtmlEntities(m[1]);
+    const text = decodeHtmlEntities(m[2].replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim();
+    if (extRe && !extRe.test(href)) continue;
+    if (textRe && !textRe.test(text)) continue;
+    candidates.push({ href, text });
+  }
+  if (candidates.length === 0) return null;
+  const { href, text } = candidates[0];
+  const url = baseUrl ? new URL(href, baseUrl).toString() : href;
+  return { url, text, count: candidates.length };
+}
+
+// href/リンク文言中の基本的な HTML 実体参照を復元する（&amp; 等）。
+function decodeHtmlEntities(s) {
+  return String(s)
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
+
 // ZIP バイト列から対象の csv/xlsx/xls を取り出す。
 // entryPattern（正規表現文字列）に一致するエントリ、無ければ最初の csv/xlsx/xls。
 async function extractFromZip(zipBuf, entryPattern) {
@@ -444,6 +479,27 @@ async function acquire(source) {
       const info = await fetchCkanResourceInfo(a.ckanBase, a.resourceId);
       downloadUrl = info.url;
       if (!format) format = (info.format || '').toLowerCase();
+    }
+    // resolve: 掲載ページ(pageUrl)を取得し、リンク文言が linkPattern に一致する
+    // <a href> を実ダウンロードURLとして解決する。ファイル名に日時が入る等で
+    // 直リンクURLが更新のたびに変わる自治体（例: 奈良県）で最新版を追従するため。
+    if (a.type === 'resolve') {
+      console.log(`  リンク解決中: ${a.pageUrl}`);
+      const html = Buffer.from(
+        await fetchWithRetry(a.pageUrl, { headers: { ...DEFAULT_HEADERS } }),
+      ).toString('utf-8');
+      const hit = resolveLinkFromHtml(html, { pattern: a.linkPattern, format, baseUrl: a.pageUrl });
+      if (!hit) {
+        throw new Error(
+          `リンク解決に失敗: ${a.pageUrl} に「${a.linkPattern || '(指定なし)'}」に一致する` +
+            `${format ? ` .${format}` : ''} リンクが見つかりません`,
+        );
+      }
+      if (hit.count > 1) {
+        console.log(`  ⚠ ${hit.count}件一致。先頭を採用: 「${hit.text}」`);
+      }
+      console.log(`  リンク解決: 「${hit.text}」 -> ${hit.url}`);
+      downloadUrl = hit.url;
     }
     if (!format) {
       const m = String(downloadUrl).toLowerCase().match(/\.(csv|tsv|txt|xlsx|xls|zip)(?:$|\?)/);
@@ -1006,4 +1062,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 // テスト用に純粋関数をエクスポートする。
-export { normalizeDate, sanitizeLatLng, resolvePrefecture, resolveCity, mapRecord, toFacility, parseCSVText, splitPrefCity, findEmptySources, fetchWithRetry };
+export { normalizeDate, sanitizeLatLng, resolvePrefecture, resolveCity, mapRecord, toFacility, parseCSVText, splitPrefCity, findEmptySources, fetchWithRetry, resolveLinkFromHtml };
