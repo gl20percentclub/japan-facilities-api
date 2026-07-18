@@ -1,5 +1,10 @@
 # Japan-facilities-api
 
+[![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-facilities-address)](https://github.com/gl20percentclub/japan-facilities-address/graphs/contributors)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#-コントリビューション)
+[![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-facilities-address)](https://github.com/gl20percentclub/japan-facilities-address/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/gl20percentclub/japan-facilities-address)](https://github.com/gl20percentclub/japan-facilities-address/commits/main)
+
 日本の自治体が公開しているオープンデータ（食品営業許可・届出）をクロールし、APIとして配信するシステムです。
 
 - **ソース**: 各自治体のオープンデータ（BODIK 等の CKAN、自治体ポータルの直リンク CSV/XLSX、フォーム配布など）。対象は `scripts/sources.js` で定義。
@@ -216,6 +221,37 @@ export const SOURCES = [
   都道府県・市区町村で自動補完されます。
 - 一部データはヘッダの「緯度」「経度」が入れ替わっている（例: 大阪市）ため、日本域の範囲で
   自動的にサニティ補正します。
+
+## 🤝 コントリビューション
+
+**コントリビューションは大歓迎です！** バグ報告・機能提案・プルリクエスト、どんな形の貢献でも歓迎します。
+
+たとえば次のような貢献ができます。
+
+- 🗾 **新しい自治体データソースの追加** — [データソースの追加](#データソースの追加) の手順どおり `scripts/sources.js` に1エントリ追加するだけです。未収録の自治体は [`docs/COVERAGE.md`](docs/COVERAGE.md) で確認できます
+- 🐛 **バグ報告・データ品質の問題報告** — [Issues](https://github.com/gl20percentclub/japan-facilities-address/issues) からお気軽にどうぞ（座標のずれ、重複、文字化けなど）
+- 💡 **機能提案・改善アイデア** — Issue で議論を始めてください
+- 📖 **ドキュメントの改善** — 誤字修正や説明の追加も立派な貢献です
+
+### プルリクエストの流れ
+
+1. このリポジトリを Fork する
+2. ブランチを作成する（`git checkout -b feature/add-your-city`）
+3. 変更をコミットする
+4. `npm test` でバリデーションが通ることを確認する
+5. プルリクエストを作成する
+
+小さな変更でも遠慮なくどうぞ。不明点があれば Issue で気軽に質問してください。
+
+## ✨ コントリビューター
+
+このプロジェクトに貢献してくださった皆さんです。ありがとうございます！
+
+<a href="https://github.com/gl20percentclub/japan-facilities-address/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=gl20percentclub/japan-facilities-address" alt="Contributors" />
+</a>
+
+*Made with [contrib.rocks](https://contrib.rocks).*
 
 ## 出典・ライセンス・免責事項
 
