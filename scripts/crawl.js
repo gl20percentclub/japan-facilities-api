@@ -778,11 +778,21 @@ function writeJSON(filePath, obj) {
 //   結果は .cache/geocode-cache.json に永続化し、再実行・週次クロールを高速化する。
 // ---------------------------------------------------------------------------
 
-// 住所が都道府県名で始まっていなければ前置し、正規化の精度を上げる
+// 住所が都道府県名・市区町村名で始まっていなければ前置し、正規化の精度を上げる。
+// 神戸市・仙台市・富山県等は住所列が区/町名始まり（市名は別列）のため、市名を前置しないと
+// ジオコーダーが市名なしの区を解決できず県代表点(level 1)へ転落する。_city を前置して補正する。
 function geocodeQuery(facility) {
   const addr = facility.address || '';
   const pref = facility._pref && facility._pref !== '不明' ? facility._pref : '';
-  return pref && !addr.startsWith(pref) ? `${pref}${addr}` : addr;
+  const city = facility._city && facility._city !== '不明' ? facility._city : '';
+  if (!city) return pref && !addr.startsWith(pref) ? `${pref}${addr}` : addr;
+  // 住所が政令市の区名で始まり city 末尾と重複する場合は剥がす（例: city=神戸市東灘区, addr=東灘区…）
+  let a = addr;
+  const wm = city.match(/(.+?[市])(.+?[区])$/);
+  if (wm && a.startsWith(wm[2])) a = a.slice(wm[2].length);
+  else if (a.startsWith(city)) a = a.slice(city.length);
+  const head = city.startsWith(pref) ? city : `${pref}${city}`;
+  return a.startsWith(head) ? a : `${head}${a}`;
 }
 
 function loadGeocodeCache() {
