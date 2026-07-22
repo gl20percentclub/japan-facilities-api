@@ -1,7 +1,10 @@
 // data.bodik.jp から食品営業許可データセットを列挙し、自治体(org)ごとに
 // 「全件・許可」に最も近い CSV/XLSX リソースを1つ選び、sources 定義を生成する。
 //
-//   node scripts/gen-bodik-sources.mjs   → scripts/bodik-sources.js を再生成
+//   node scripts/gen-bodik-sources.mjs   → config/_bodik-generated.yaml を出力
+//   出力された sources エントリを config/sources.yaml の sources: にマージする。
+import * as yaml from 'js-yaml';
+import fs from 'node:fs';
 const BASE = 'https://data.bodik.jp';
 async function search(q){
   const url = `${BASE}/api/3/action/package_search?q=${encodeURIComponent(q)}&rows=1000`;
@@ -48,13 +51,17 @@ for (const p of pkgs.values()){
 }
 const list=[...byOrg.values()].sort((a,b)=>a.org.localeCompare(b.org,'ja'));
 console.log('orgs with a chosen resource:', list.length);
-const esc=s=>String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-let out=`// 自動生成: data.bodik.jp の食品営業許可データセット（自治体ごとに全件・許可の代表リソース1件）\n`;
-out+=`// 生成: node scripts/gen-bodik-sources.mjs（再生成で更新）。手修正時はこのヘッダを削除。\n\n`;
-out+=`export const BODIK_SOURCES = [\n`;
-for(const x of list){
-  out+=`  { key: 'bodik-${x.datasetId.slice(0,8)}', acquire: { type: 'ckan', ckanBase: 'https://data.bodik.jp', resourceId: '${x.resourceId}' }, source: '${esc(x.org)} ${esc(x.title)}', license: ${x.license?`'${esc(x.license)}'`:'null'} },\n`;
-}
-out+=`];\n`;
-import('node:fs').then(fs=>{fs.writeFileSync('scripts/bodik-sources.js',out);fs.writeFileSync('/tmp/bodik-list.json',JSON.stringify(list,null,1));});
-console.log('sample:', list.slice(0,12).map(x=>x.org+' / '+x.title+' ['+x.fmt+' sc'+x.sc+']'));
+// config/sources.yaml の sources: にそのままマージできる YAML エントリを出力する。
+// datasetId から掲載ページ(sourceUrl)も付与する。
+const entries = list.map((x) => ({
+  key: `bodik-${x.datasetId.slice(0, 8)}`,
+  acquire: { type: 'ckan', ckanBase: BASE, resourceId: x.resourceId },
+  source: `${x.org} ${x.title}`,
+  sourceUrl: `${BASE}/dataset/${x.datasetId}`,
+  ...(x.license ? { license: x.license } : {}),
+}));
+const header = `# 自動生成: data.bodik.jp の食品営業許可データセット（自治体ごとに全件・許可の代表リソース1件）\n` +
+  `# 生成: node scripts/gen-bodik-sources.mjs 。この内容を config/sources.yaml の sources: にマージする。\n\n`;
+fs.writeFileSync('config/_bodik-generated.yaml', header + yaml.dump(entries, { lineWidth: -1, noRefs: true, quotingType: '"' }));
+console.log(`\nconfig/_bodik-generated.yaml に ${entries.length} 件を出力。config/sources.yaml の sources: にマージしてください。`);
+console.log('sample:', list.slice(0, 12).map((x) => x.org + ' / ' + x.title + ' [' + x.fmt + ' sc' + x.sc + ']'));
