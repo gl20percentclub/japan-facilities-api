@@ -56,7 +56,7 @@ jobs:
         # Node のヒープ上限を引き上げる（GitHub Linux ランナーは 16GB RAM）。
         env:
           NODE_OPTIONS: --max-old-space-size=12288
-        run: node scripts/crawl.js ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}
+        run: node scripts/crawl.js --allow-empty-sources ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}
 
       # 全市区町村を結合した1本の配布用CSV（api/facilities-all.csv[.gz]）を生成する。
       # 市区町村名は normalize-japanese-addresses で名寄せ済み。gh-pages でそのまま配信される。
