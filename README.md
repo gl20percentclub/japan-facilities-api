@@ -197,14 +197,3 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 バグ報告、データソース追加、ドキュメント改善、機能提案を歓迎します。
 
 開発環境のセットアップやプルリクエストの手順は、[`CONTRIBUTING.md`](CONTRIBUTING.md) を参照してください。
-
-### コントリビューター
-
-<a href="https://github.com/gl20percentclub/japan-facilities-api/graphs/contributors">
-  <img
-    src="https://contrib.rocks/image?repo=gl20percentclub/japan-facilities-api"
-    alt="Contributors"
-  />
-</a>
-
-*Made with [contrib.rocks](https://contrib.rocks).*
