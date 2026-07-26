@@ -10,7 +10,7 @@
 [![Last Commit](https://img.shields.io/github/last-commit/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/commits/main)
 [![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#️-自動更新の仕組み)
 
-[クイックスタート](#-クイックスタート) · [API リファレンス](#-api-リファレンス) · [収録状況](docs/COVERAGE.md) · [バグ報告](https://github.com/gl20percentclub/japan-facilities-api/issues/new) · [機能要望](https://github.com/gl20percentclub/japan-facilities-api/issues/new)
+[クイックスタート](#-クイックスタート) · [API リファレンス](#-api-リファレンス) · [収録状況](docs/COVERAGE.md) · [出典・ライセンス](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) · [バグ報告](https://github.com/gl20percentclub/japan-facilities-api/issues/new) · [機能要望](https://github.com/gl20percentclub/japan-facilities-api/issues/new)
 
 </div>
 
@@ -304,6 +304,9 @@ sources:
   自動的にサニティ補正します。
 - 取得 → パース → 正規化 → 出力 の各処理は `scripts/lib/`（`config` / `acquire` / `parse` /
   `normalize` / `geocode`）に分割されています。
+- ソースを追加・変更したら `npm run build:attribution` で
+  [出典表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)（`attribution.html`）を
+  再生成してください（`npm test` が config との同期を検証します）。
 
 ## ⚙️ 自動更新の仕組み
 
@@ -349,7 +352,13 @@ sources:
 
 ### 出典・データソース
 
-全国の自治体が公開する食品営業許可オープンデータを収録しています。対象ソースの完全な一覧（自治体・取得URL・出典ページ・ライセンス）は、機械可読な形で以下に定義されています。
+全国の自治体が公開する食品営業許可オープンデータを収録しています。
+
+> 📢 **利用時の出典表示は [出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) を参照してください。**
+> 全ソースの出典 URL・ライセンスと、各データのライセンスが求める形式に沿った出典表示文（コピーしてそのまま使えます）を一覧化しています。
+> このページは `config/sources.yaml` から `npm run build:attribution`（[`scripts/gen-attribution.js`](scripts/gen-attribution.js)）で自動生成しており、`npm test` で内容の同期を検証しています。
+
+対象ソースの完全な一覧（自治体・取得URL・出典ページ・ライセンス）は、機械可読な形で以下に定義されています。
 
 - [`config/sources.yaml`](config/sources.yaml) — 全データソースの単一定義（個別自治体・BODIK 掲載分・各自治体ポータル掲載分を統合）。各エントリに取得URL（`acquire`）と出典の掲載ページ（`sourceUrl`）、ライセンスを持ちます
 - `scripts/gen-bodik-sources.mjs` — BODIK（`data.bodik.jp`）掲載自治体のエントリを再生成（`config/sources.yaml` へマージ）
