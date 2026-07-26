@@ -1,78 +1,38 @@
 <div align="center">
 
-# 🍽️ Japan Facilities API
+# 🍽️ Japan Facilities Data
 
-**日本全国の飲食施設オープンデータ（食品営業許可・届出）を、無料で使える静的 API として配信**
+**日本全国の飲食施設オープンデータ（食品営業許可・届出）を、無料で使える形に統合して配信**
 
 [![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/graphs/contributors)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#-コントリビューション)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#コントリビューション)
 [![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/issues)
-[![Last Commit](https://img.shields.io/github/last-commit/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/commits/main)
-[![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#️-自動更新の仕組み)
+[![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#更新頻度)
 
-[公式サイト](https://gl20percentclub.github.io/japan-facilities-api/) · [クイックスタート](#-クイックスタート) · [API リファレンス](#-api-リファレンス) · [プレビュー地図](https://gl20percentclub.github.io/japan-facilities-api/map.html) · [収録状況](docs/COVERAGE.md) · [出典・ライセンス](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) · [バグ報告](https://github.com/gl20percentclub/japan-facilities-api/issues/new) · [機能要望](https://github.com/gl20percentclub/japan-facilities-api/issues/new)
+[公式サイト](https://gl20percentclub.github.io/japan-facilities-api/) · [地図で見る](https://gl20percentclub.github.io/japan-facilities-api/map.html) · [全件CSVをダウンロード](https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz) · [収録状況](docs/COVERAGE.md) · [出典・ライセンス](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)
 
 </div>
 
 ---
 
-各自治体が公開しているオープンデータ（食品営業許可・届出）を毎週自動クロールし、正規化・ジオコーディングした上で GitHub Pages から静的 API として配信しています。**登録不要・API キー不要**でそのまま利用できます。
+## どんなデータか
 
-## ✨ 特徴
+全国の自治体が食品衛生法にもとづいて公開している**食品営業許可・届出の施設一覧**（飲食店・喫茶店・食品製造業など）を、毎週自動で収集し、全国共通フォーマットに正規化・ジオコーディングして配信しています。**登録不要・API キー不要・無料**です。
 
-- 🗾 **全国カバー** — 47都道府県・1,800以上の市区町村、70万件超の施設レコードを収録
-- 📍 **緯度経度つき** — 座標が無い元データも [normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses) でジオコーディングして補完
-- 🔄 **毎週自動更新** — GitHub Actions が毎週クロールして最新データを配信
-- 📦 **好きな形式で** — 市区町村別 JSON、検索用インデックス、全国結合 CSV、地図用ベクトルタイル
-- 🆓 **静的配信** — GitHub Pages でホスティング。登録・認証・レート制限の心配なし
+1レコード＝1つの営業許可で、次の項目を持ちます。
 
-<details>
-<summary><b>📖 目次</b></summary>
-
-- [クイックスタート](#-クイックスタート)
-- [収録データ](#-収録データ)
-- [全データ結合CSV（ダウンロード）](#-全データ結合csvダウンロード)
-- [API リファレンス](#-api-リファレンス)
-- [開発](#️-開発)
-  - [セットアップとビルド](#セットアップとビルド)
-  - [データソースの追加](#データソースの追加)
-- [自動更新の仕組み](#️-自動更新の仕組み)
-- [コントリビューション](#-コントリビューション)
-- [コントリビューター](#-コントリビューター)
-- [出典・ライセンス・免責事項](#-出典ライセンス免責事項)
-
-</details>
-
-## 🚀 クイックスタート
-
-ベース URL は `https://gl20percentclub.github.io/japan-facilities-api/api/` です。
-
-```bash
-# 都道府県一覧（都道府県名 → 市区町村名の配列）
-curl https://gl20percentclub.github.io/japan-facilities-api/api/facilities/index.json
-
-# 那覇市の全施設（パスは URL エンコードが必要な場合があります）
-curl "https://gl20percentclub.github.io/japan-facilities-api/api/facilities/%E6%B2%96%E7%B8%84%E7%9C%8C/%E9%82%A3%E8%A6%87%E5%B8%82/data.json"
-```
-
-JavaScript からはこう使えます。
-
-```js
-const BASE = 'https://gl20percentclub.github.io/japan-facilities-api/api';
-
-// 那覇市の全施設を取得（日本語パスは encodeURIComponent でエンコード）
-const res = await fetch(
-  `${BASE}/facilities/${encodeURIComponent('沖縄県')}/${encodeURIComponent('那覇市')}/data.json`
-);
-const { data } = await res.json();
-console.log(data[0].name, data[0].lat, data[0].lng);
-```
-
-## 📊 収録データ
-
-> 📋 **どの自治体のデータをカバーしているか**は [`docs/COVERAGE.md`](docs/COVERAGE.md) を参照（全市区町村 × 管轄保健所設置主体の一覧・収集状況・出典・ライセンス）。
-
-以下はクロール（`npm run build`）のたびに自動更新されます。ファイルサイズは目安です。
+| 列 | 内容 |
+|---|---|
+| `prefecture` / `city` | 都道府県・市区町村（[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses) で名寄せした公式表記） |
+| `city_raw` | 元データの市区町村表記（郡名の有無などの揺れをそのまま保持） |
+| `name` / `name_kana` | 施設名・カナ |
+| `business_type` | 業種（飲食店営業・喫茶店営業 など） |
+| `address` | 所在地 |
+| `lat` / `lng` | 緯度経度（WGS84）。無ければ空 |
+| `geocoding_level` | 座標の精度レベル（[精度について](#精度)） |
+| `phone` | 電話番号 |
+| `license_no` / `license_date` / `expire_date` | 許可番号・許可日・有効期限 |
+| `sources` / `licenses` | そのレコードの出典とライセンス |
 
 <!-- STATS:START -->
 > **最終更新: 2026-07-24**
@@ -80,57 +40,66 @@ console.log(data[0].name, data[0].lat, data[0].lng);
 > | 項目 | 値 |
 > |---|---|
 > | 施設レコード数 | 1,495,048 件 |
-> | ユニーク施設数（名前+座標） | 1,106,198 件 |
 > | 都道府県 | 52 |
 > | 市区町村 | 1,958 |
-> | `api/` 合計サイズ | 約 1184.9 MB |
-> | `data.json` 合計 | 約 598.1 MB |
-> | `search-index.json` | 約 3 KB |
 <!-- STATS:END -->
 
-## 📥 全データ結合CSV（ダウンロード）
+同じ施設が業種違いで複数レコードになることがあります（1施設が複数の許可を持つため）。これは元データの構造どおりで、意図的に残しています。
 
-都道府県別・市区町村別に分かれた JSON を、**全国 1 本にまとめた CSV** も配信しています。
-Excel / pandas / BI ツール等で扱いたい場合はこちらが便利です。
+## どれだけカバーしているか
 
-| ファイル | 配布URL |
+全国 1,741 市区町村のうち **1,727 市区町村（99%）** のデータを収録しています。
+
+食品営業許可を発行する権限は「保健所設置主体」（都道府県・政令市・中核市・特別区の計157主体）にあり、一般の市町村は許可を発行しません。そのため収集は次の優先順で行っています。
+
+1. 市区町村自身がオープンデータとして公開している
+2. 管轄の保健所設置主体（都道府県など）が公開している
+3. 厚生労働省「食品衛生申請等システム（i2fas）」のオープンデータに含まれる
+
+**どの自治体をどの経路でカバーしているかの全市区町村一覧**は [`docs/COVERAGE.md`](docs/COVERAGE.md) にあります。未収録の自治体もそこで確認できます。
+
+## 地図で見る
+
+まず中身を見たい場合は、プレビュー地図をどうぞ。座標を持つ全施設を点で表示しています。
+
+**👉 https://gl20percentclub.github.io/japan-facilities-api/map.html**
+
+配信サイトのページ構成は次のとおりです。いずれもリポジトリルートの静的 HTML で、ビルド不要です。
+
+| URL | ファイル | 内容 |
+|---|---|---|
+| [`/`](https://gl20percentclub.github.io/japan-facilities-api/) | `index.html` | ランディングページ（概要・配布形式） |
+| [`/map.html`](https://gl20percentclub.github.io/japan-facilities-api/map.html) | `map.html` | プレビュー地図（ベクトルタイルを MapLibre で表示） |
+| [`/attribution.html`](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) | `attribution.html` | 出典・ライセンス一覧（`config/sources.yaml` から自動生成） |
+
+## 配布形式
+
+配信しているのは **全件CSV** と **ベクトルタイル** の2つだけです。用途に応じて選んでください。
+
+### 1. 全件CSV — 分析・加工・DB取り込み向け
+
+| ファイル | URL |
 |---|---|
-| 結合CSV（gzip 圧縮・約60MB） | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz |
-| 結合CSV（非圧縮・約540MB） | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv |
+| gzip 圧縮版（推奨） | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz |
+| 非圧縮版 | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv |
 
 - **文字コード**: UTF-8（BOM 付き。Excel でそのまま開けます）
-- **列**: `prefecture, city, city_raw, name, name_kana, business_type, address, lat, lng, geocoding_level, phone, license_no, license_date, expire_date, sources, licenses`
-  - `city` は [normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses) で名寄せした公式市区町村名、`city_raw` は元データの生表記（郡名の有無などの揺れを含む）
-- **クレンジング**: 全列一致の重複を除去。一部ソースの列ズレ（都道府県が欠けた住所など）を補正。業種違いで別レコードになっている同一施設は、許可レコードとして残しています
-- 週次クロール（`npm run build`）のたびに再生成され、gh-pages で配信されます
+- **列**: [どんなデータか](#どんなデータか) の表のとおり
+- 全列一致の重複は除去済み
 
-> ⚠️ **市区町村が「不明」の行について**: 元データに市区町村欄が無く住所も粗い個票は、都道府県／市区町村を機械的に確定できず `prefecture=不明` または `city=不明` のまま収録しています（欠損させるより残す方針）。これらは元データ側の品質に起因するもので、結合CSVの生成ロジックの問題ではありません。
-
-## 🔍 API リファレンス
-
-**都道府県 > 市区町村 > `data.json`** の3階層構造です。
-
-```
-api/
-├── search-index.json           # 施設名検索用のコンパクトな索引（全市区町村横断）
-├── facilities-all.csv[.gz]     # 全国結合CSV（ダウンロード用）
-├── tiles/                      # 地図用ベクトルタイル（z/x/y .pbf）
-│   ├── metadata.json           # TileJSON（レイヤ・ズーム範囲・bounds）
-│   └── {z}/{x}/{y}.pbf         # MVT（レイヤ facilities: 座標を持つ施設の点）
-└── facilities/
-    ├── index.json              # 都道府県一覧（都道府県名 → 市区町村名の配列）
-    └── 沖縄県/
-        ├── index.json          # 市区町村名 → 施設数 のマップ
-        ├── 那覇市/
-        │   └── data.json       # その市区町村の全施設オブジェクトの配列
-        └── 宜野湾市/
-            └── data.json
+```bash
+curl -O https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz
+gunzip facilities-all.csv.gz
 ```
 
-### `tiles/`（地図用ベクトルタイル）
+```python
+import pandas as pd
+df = pd.read_csv('https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz')
+```
 
-座標を持つ施設を点として焼いた Mapbox Vector Tile（MVT）を、`{z}/{x}/{y}.pbf` の
-静的ディレクトリ形式で配信します。MapLibre GL JS からそのまま読めます（タイルサーバー不要）。
+### 2. ベクトルタイル — 地図表示向け
+
+座標を持つ施設を点として焼いた Mapbox Vector Tile（MVT）を `{z}/{x}/{y}.pbf` の静的ディレクトリ形式で配信しています。タイルサーバー不要で MapLibre GL JS からそのまま読めます。
 
 ```js
 map.addSource('facilities', {
@@ -141,128 +110,116 @@ map.addSource('facilities', {
 // レイヤ名は "facilities"、各点の属性は name / business_type / pref / city
 ```
 
-- タイルは非圧縮 pbf で配信するため、追加のヘッダ設定は不要です。
-- メタデータ（レイヤ定義・ズーム範囲・bounds）は [`tiles/metadata.json`](https://gl20percentclub.github.io/japan-facilities-api/api/tiles/metadata.json) を参照。
-- 生成は `npm run build:tiles`（クロール時 `npm run build` にも自動生成、pure JS の geojson-vt + vt-pbf）。
+- 非圧縮 pbf で配信するため、追加のヘッダ設定は不要です
+- レイヤ定義・ズーム範囲・bounds・件数は [`api/tiles/metadata.json`](https://gl20percentclub.github.io/japan-facilities-api/api/tiles/metadata.json)（TileJSON）を参照
 
-### `search-index.json`（施設名検索用・都道府県別分割）
+> **市区町村別の JSON や検索インデックスは配信していません。** 実際のユースケースがほぼ無く、生成物が肥大するだけだったため廃止しました。部分的なデータが欲しい場合は CSV をフィルタしてください。
 
-施設名で横断検索したい利用側（地図アプリ等）向けの軽量な索引。検索に必要な項目だけを
-配列形式で持ちます。データ量増加で単一ファイルが GitHub の 100MB/ファイル上限に近づくため、
-**都道府県ごとに分割**し、トップにマニフェストを置きます。
+### 更新頻度
 
-```
-api/
-├── search-index.json          # マニフェスト（都道府県一覧・件数・schema・各shardのパス）
-└── search-index/
-    ├── 東京都.json             # { meta, data:[[name, address, lat, lng, level], ...] }
-    ├── 大阪府.json
-    └── …
-```
+GitHub Actions が毎週月曜 18:00 UTC（JST 火曜 AM 3:00）にクロールし、`gh-pages` ブランチへ配信します。URL は変わりません。
 
-**マニフェスト `search-index.json`**:
-```json
-{
-  "meta": { "updated": 1700000000, "count": 576220, "schema": ["name", "address", "lat", "lng", "level"] },
-  "prefectures": [
-    { "name": "東京都", "count": 41234, "file": "search-index/東京都.json" }
-  ]
-}
-```
+## 精度
 
-**各 shard `search-index/{都道府県}.json`**:
-```json
-{
-  "meta": { "updated": 1700000000, "count": 41234, "schema": ["name", "address", "lat", "lng", "level"] },
-  "data": [ ["ステーキハウス○○", "港区松山1-9-9", 35.665, 139.75, 8] ]
-}
-```
+### 緯度経度
 
-- 各行は `meta.schema` の順（`name, address, lat, lng, level`）。
-- 同一施設（業種違いで複数行）は `名前+座標` で重複排除済み。座標を持つ施設のみ収録。
-- 利用側はマニフェストを読み、必要な都道府県 shard を取得。全国横断検索は全 shard を連結。
-- `npm run build:search-index` で再生成、クロール時（`npm run build`）にも自動生成されます。
+**緯度経度は当サービスが独自に付与した参考情報**であり、自治体が提供しているものではありません。元データに座標が無い施設は、住所をもとに [normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses) でジオコーディングしています。
 
-### `index.json`
+`geocoding_level` はその精度レベルです（元データに座標があった場合・補完できなかった場合は空）。
 
-`meta.sources` は、そのファイルに含まれる施設の出典・ライセンスの一覧（複数ソースを統合した場合は複数要素）。
+| level | 意味 |
+|---|---|
+| `1` | 都道府県の代表点 |
+| `2` | 市区町村の代表点 |
+| `3` | 町丁目の代表点（重心） |
+| `8` | 街区・地番レベル |
 
-```json
-{
-  "meta": {
-    "updated": 1749600000,
-    "sources": [
-      { "source": "沖縄県食品営業許可・届出", "license": "CC BY 4.0" },
-      { "source": "大阪市食品営業許可施設一覧", "license": "CC BY 4.0" }
-    ]
-  },
-  "data": { "沖縄県": ["那覇市", "宜野湾市"], "大阪府": ["大阪市"] }
-}
-```
+値が小さいほど大まかな位置です。`3` は丁目の中心であって建物の位置ではありません。**建物単位の正確さが要る用途では level を必ず確認してください。**
 
-### `{都道府県}/index.json`
+「市内一円」のような住所は、正規化しても都道府県の代表点にしか落ちず誤解を招くため、あえて座標を付けていません。
 
-```json
-{
-  "meta": { "updated": 1749600000 },
-  "data": { "那覇市": 342, "宜野湾市": 128 }
-}
+### データの鮮度・網羅性
+
+- 一部データは改正食品衛生法（令和3年6月）以前のスナップショットで、他ソースより古い場合があります（例: 京都市は令和3年3月末時点）
+- i2fas のデータは掲載に賛同した施設のみのため、全件ではありません
+- 元データに市区町村欄が無く住所も粗い個票は、`prefecture=不明` / `city=不明` のまま収録しています（欠損させるより残す方針）
+- 廃業した施設が元データに残っている場合があります
+
+最新かつ正式な情報は、各自治体が公開する情報をご確認ください。
+
+## 利用ガイドライン
+
+### ライセンス
+
+| 対象 | ライセンス |
+|---|---|
+| 生成データ（CSV・ベクトルタイル） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ja) |
+| このリポジトリのコード | MIT |
+
+各自治体の元データは CC BY 4.0 / CC BY 2.1 JP / 公共データ利用規約（PDL1.0）/ 自治体独自の利用規約などライセンスが異なりますが、いずれも**出典を明示すれば商用を含めて自由に利用・改変・再配布できる**条件です。それらを統合した本データセットは、原典の条件を満たす形で **CC BY 4.0** として配布します。レコード単位の出典・ライセンスは CSV の `sources` / `licenses` 列で確認できます。
+
+- 商用利用禁止（NC）・改変禁止（ND）など CC BY 4.0 と両立しない条件のソースは収録しません
+- ライセンス表記を確認中のソース（`config/sources.yaml` の `license: 要確認`）は、出典明示のうえで暫定的に収録しています。問題があれば [Issue](https://github.com/gl20percentclub/japan-facilities-api/issues) でご指摘ください
+
+### 出典表示の方法
+
+利用時は次のようにクレジットを表示してください。
+
+**Web ページ・アプリの場合**
+
+```html
+出典: <a href="https://github.com/gl20percentclub/japan-facilities-api">Japan Facilities Data</a>
+（各自治体の食品営業許可オープンデータを加工して作成）
 ```
 
-### `{都道府県}/{市区町村}/data.json`
+**地図上のアトリビューションの場合**
 
-業種ごとには分割せず、その市区町村の全施設を1ファイルにまとめます。
-業種は各施設の `business_type` で判別できます。
-
-```json
-{
-  "meta": { "updated": 1749600000 },
-  "data": [
-    {
-      "name": "ステーキハウス○○",
-      "name_kana": "ステーキハウスマルマル",
-      "business_type": "飲食店営業",
-      "address": "那覇市松山1-9-9",
-      "lat": 26.216965935,
-      "lng": 127.678060421,
-      "geocoding_level": 8,
-      "phone": "098-XXX-XXXX",
-      "license_no": "第01202300556号",
-      "license_date": "2023-12-07",
-      "expire_date": "2030-01-31"
-    }
-  ]
-}
+```
+© Japan Facilities Data（各自治体オープンデータ）
 ```
 
-### 緯度経度（ジオコーディング）
+**論文・レポートの場合**
 
-元データに緯度経度が無い施設は、住所をもとに
-[@geolonia/normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses)
-で座標を補完します。
+```
+Japan Facilities Data（https://github.com/gl20percentclub/japan-facilities-api）,
+各自治体の食品営業許可オープンデータを加工して作成, 取得日: YYYY-MM-DD
+```
 
-- `lat` / `lng`: WGS84（EPSG:4326）。補完できなかった場合は `null`。
-- `geocoding_level`: 補完した座標の**精度レベル**。元データに座標があった場合や補完できなかった場合は `null`。
-  - `1` = 都道府県の代表点 / `2` = 市区町村の代表点 / `3` = 町丁目の代表点（重心） / `8` = 街区・地番レベル
-  - 値が小さいほど大まかな位置（例: `3` は丁目の中心であり、建物の正確な位置ではない）。
+特定の自治体のデータだけを使う場合は、CSV の `sources` 列にある**元の自治体名を併記**してください（例: 「出典: 大阪市食品営業許可施設一覧 を加工して作成」）。
 
-補完結果は `.cache/geocode-cache.json` にキャッシュされ、再クロール時に再利用されます。
+> 📢 **全ソース分の出典表示文は [出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) にあります。** 各データのライセンスが求める形式に沿った文をコピーしてそのまま使えます。
 
-## 🛠️ 開発
+### 免責事項
+
+- 本サービスは各自治体のオープンデータを独自に集約・加工したものであり、**各自治体の公式サービスではありません**
+- 緯度経度は当サービスが付与した参考情報で、実際の所在地と異なる場合があります
+- 内容の正確性・完全性・最新性を保証するものではありません
+- 本データの利用によって生じたいかなる損害についても責任を負いません
+
+## 出典
+
+全ソースの出典 URL・ライセンス・出典表示文は [出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) で一覧できます。このページは [`config/sources.yaml`](config/sources.yaml) から [`scripts/gen-attribution.js`](scripts/gen-attribution.js) が自動生成し、`npm test` で config との同期を検証しています。
+
+機械可読な定義そのものは [`config/sources.yaml`](config/sources.yaml) にあり、各エントリが取得URL（`acquire`）・出典の掲載ページ（`sourceUrl`）・ライセンス（`license`）を持ちます。
+
+主な出典は次の3系統です。
+
+- **各自治体が公開する食品営業許可オープンデータ** — 都道府県・政令市・中核市・特別区などの公開データ
+- **BODIK オープンデータカタログ**（`data.bodik.jp`）— 主に九州・中国地方の自治体が利用する共同カタログ
+- **厚生労働省「食品衛生申請等システム（i2fas）」** — 全国・保健所設置主体別のオープンデータ。ライセンスは公共データ利用規約（第1.0版, PDL1.0）＝CC BY 4.0 互換。掲載に賛同した施設のみ
+
+## 開発
 
 ### セットアップとビルド
 
 ```bash
 npm ci
 
-# クロール → api/ を生成
+# クロール → api/ を生成（結合CSV + ベクトルタイル）
 npm run build
 
 # ダウンロードをスキップしキャッシュ（.cache/）を使う
 npm run build:dry
-
-# ジオコーディングをスキップして高速に生成（座標は補完されない）
-node scripts/crawl.js --no-geocode
 
 # 特定ソースだけ処理（動作確認・部分再生成）
 node scripts/crawl.js --only=osaka-city,tokyo-minato
@@ -271,12 +228,21 @@ node scripts/crawl.js --only=osaka-city,tokyo-minato
 npm test
 ```
 
+`node scripts/crawl.js` は次のオプションを取ります。
+
+| オプション | 効果 |
+|---|---|
+| `--dry-run` | ダウンロードをスキップしキャッシュを使う |
+| `--no-geocode` | ジオコーディングをスキップ（座標は補完されない） |
+| `--no-normmap` | 市区町村名の名寄せをスキップ（生表記のまま・高速） |
+| `--only=key1,key2` | 指定キーのソースだけ処理 |
+| `--allow-empty-sources` | 0件のソースがあっても中断しない |
+
+生成物 `api/` は Git 管理せず（`.gitignore`）、配信は `gh-pages` のみです（履歴肥大を避けるため）。README の統計だけを `main` に反映します。
+
 ### データソースの追加
 
-データソースの定義は **単一の設定ファイル [`config/sources.yaml`](config/sources.yaml)** に集約されています。
-`sources:` に1エントリ追加するだけで、新しい自治体のオープンデータを取り込めます。
-取得方法（CKAN / 直リンクGET / フォームPOST / 掲載ページ解決）、形式（CSV / TSV / XLSX / XLS）、
-文字コード、都道府県・市区町村の既定値などをエントリで指定します。
+データソースの定義は **単一の設定ファイル [`config/sources.yaml`](config/sources.yaml)** に集約されています。`sources:` に1エントリ追加するだけで、新しい自治体のオープンデータを取り込めます。
 
 ```yaml
 sources:
@@ -296,106 +262,54 @@ sources:
     defaultCity: 大阪市
 ```
 
-- 列名（ヘッダー）の揺れは、同ファイル冒頭の `columns:`（内部キー → 元ヘッダー表記[] の別名辞書）に
-  集約しています。新しい表記が出てきたら該当の内部キーに1行足すだけで全ソースに効きます。
-- 都道府県・市区町村カラムが無く `defaultCity` も指定しないデータは、ジオコーディング結果の
-  都道府県・市区町村で自動補完されます。
-- 一部データはヘッダの「緯度」「経度」が入れ替わっている（例: 大阪市）ため、日本域の範囲で
-  自動的にサニティ補正します。
-- 取得 → パース → 正規化 → 出力 の各処理は `scripts/lib/`（`config` / `acquire` / `parse` /
-  `normalize` / `geocode`）に分割されています。
-- ソースを追加・変更したら `npm run build:attribution` で
-  [出典表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)（`attribution.html`）を
-  再生成してください（`npm test` が config との同期を検証します）。
+- 取得方法（CKAN / 直リンクGET / フォームPOST / 掲載ページ解決）、形式（CSV / TSV / XLSX / XLS）、文字コード、既定の都道府県・市区町村をエントリで指定します
+- 列名（ヘッダー）の揺れは、同ファイル冒頭の `columns:`（内部キー → 元ヘッダー表記[] の別名辞書）に集約しています。新しい表記が出てきたら1行足すだけで全ソースに効きます
+- ソースを追加・変更したら `npm run build:attribution` で[出典表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)（`attribution.html`）を再生成してください（`npm test` が config との同期を検証します）
 
-## ⚙️ 自動更新の仕組み
+### コードの構成
 
-`.github/workflows/crawl.yml` が毎週月曜 18:00 UTC（JST 火曜 AM 3:00）に実行され、
-`api/` を生成して `gh-pages` ブランチへ配信します。**生成物 `api/` は Git 管理せず**（`.gitignore`）、
-配信は gh-pages のみ（履歴肥大を避けるため）。README の「収録データ」統計だけを main に反映します。
-`workflow_dispatch` から手動実行も可能（`dry_run` / `fetch_i2fas` オプション付き）。
+```
+scripts/
+├── crawl.js               オーケストレーター（取得→パース→正規化→ジオコーディング→出力）
+├── build-merged-csv.js    全件CSV の書き出し（+ gzip）
+├── gen-tiles.js           ベクトルタイル生成（geojson-vt + vt-pbf、pure JS）
+├── gen-readme-stats.js    README の統計ブロック更新
+├── gen-attribution.js     出典表示ページ attribution.html の生成
+├── fetch-i2fas.mjs        厚労省 i2fas オープンデータの取得（ブラウザ自動化）
+├── gen-bodik-sources.mjs  BODIK 掲載自治体のソース定義を再生成
+└── lib/
+    ├── config.js          設定ファイル(YAML)の読み込み
+    ├── acquire.js         取得（ckan / get / post / resolve / i2fasglob）
+    ├── parse.js           パース（CSV/TSV/XLSX、文字コード、ヘッダー行判定）
+    ├── normalize.js       正規化（別名→内部キー、住所結合、日付、座標補正）
+    ├── geocode.js         ジオコーディング（住所→座標の補完）
+    ├── city-normmap.js    市区町村名の名寄せ（表記ゆれ→公式名）
+    └── csv-read.js        CSV のストリーミング読み込み（バリデーション用）
+```
 
-配信サイト（gh-pages）のページ構成は次のとおりです。いずれもリポジトリルートの静的 HTML で、ビルド不要です。
-
-| URL | ファイル | 内容 |
-|---|---|---|
-| [`/`](https://gl20percentclub.github.io/japan-facilities-api/) | `index.html` | ランディングページ（概要・特徴・クイックスタート・配信形式） |
-| [`/map.html`](https://gl20percentclub.github.io/japan-facilities-api/map.html) | `map.html` | プレビュー地図（ベクトルタイルを MapLibre で表示） |
-| [`/attribution.html`](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) | `attribution.html` | 出典・ライセンス表示（`config/sources.yaml` から自動生成） |
-
-## 🤝 コントリビューション
+## コントリビューション
 
 **コントリビューションは大歓迎です！** バグ報告・機能提案・プルリクエスト、どんな形の貢献でも歓迎します。
 
-たとえば次のような貢献ができます。
-
-- 🗾 **新しい自治体データソースの追加** — [データソースの追加](#データソースの追加) の手順どおり [`config/sources.yaml`](config/sources.yaml) に1エントリ追加するだけです。未収録の自治体は [`docs/COVERAGE.md`](docs/COVERAGE.md) で確認できます
+- 🗾 **新しい自治体データソースの追加** — [`config/sources.yaml`](config/sources.yaml) に1エントリ追加するだけです。未収録の自治体は [`docs/COVERAGE.md`](docs/COVERAGE.md) で確認できます
 - 🐛 **バグ報告・データ品質の問題報告** — [Issues](https://github.com/gl20percentclub/japan-facilities-api/issues) からお気軽にどうぞ（座標のずれ、重複、文字化けなど）
 - 💡 **機能提案・改善アイデア** — Issue で議論を始めてください
 - 📖 **ドキュメントの改善** — 誤字修正や説明の追加も立派な貢献です
 
 ### プルリクエストの流れ
 
-1. このリポジトリを Fork する
+1. Fork する
 2. ブランチを作成する（`git checkout -b feature/add-your-city`）
 3. 変更をコミットする
-4. `npm test` でバリデーションが通ることを確認する
+4. `npm run test:unit` が通ることを確認する
 5. プルリクエストを作成する
 
 小さな変更でも遠慮なくどうぞ。不明点があれば Issue で気軽に質問してください。
 
-## ✨ コントリビューター
-
-このプロジェクトに貢献してくださった皆さんです。ありがとうございます！
+### コントリビューター
 
 <a href="https://github.com/gl20percentclub/japan-facilities-api/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=gl20percentclub/japan-facilities-api" alt="Contributors" />
 </a>
 
 *Made with [contrib.rocks](https://contrib.rocks).*
-
-## 📄 出典・ライセンス・免責事項
-
-本サービスは各自治体が公開するオープンデータを取得・加工・統合して提供しています。
-
-### 出典・データソース
-
-全国の自治体が公開する食品営業許可オープンデータを収録しています。
-
-> 📢 **利用時の出典表示は [出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) を参照してください。**
-> 全ソースの出典 URL・ライセンスと、各データのライセンスが求める形式に沿った出典表示文（コピーしてそのまま使えます）を一覧化しています。
-> このページは `config/sources.yaml` から `npm run build:attribution`（[`scripts/gen-attribution.js`](scripts/gen-attribution.js)）で自動生成しており、`npm test` で内容の同期を検証しています。
-
-対象ソースの完全な一覧（自治体・取得URL・出典ページ・ライセンス）は、機械可読な形で以下に定義されています。
-
-- [`config/sources.yaml`](config/sources.yaml) — 全データソースの単一定義（個別自治体・BODIK 掲載分・各自治体ポータル掲載分を統合）。各エントリに取得URL（`acquire`）と出典の掲載ページ（`sourceUrl`）、ライセンスを持ちます
-- `scripts/gen-bodik-sources.mjs` — BODIK（`data.bodik.jp`）掲載自治体のエントリを再生成（`config/sources.yaml` へマージ）
-- `scripts/fetch-i2fas.mjs` — 厚生労働省 食品衛生申請等システム（i2fas）オープンデータ（全国・保健所設置主体別）を取得
-
-各データの出典・ライセンスは、生成物 `api/**/index.json` ・ `data.json` の `meta.sources` にも埋め込まれています。
-
-- 自治体ごとにライセンスは異なります（例: CC BY 4.0 / CC BY 2.1 JP / Public Data License (PDL1.0) / 自治体独自ライセンス）。ライセンス表記が確認できないソースは出典明示で運用しています。
-- 一部データは改正食品衛生法（令和3年6月）以前のスナップショットで、他ソースより古い場合があります（例: 京都市は令和3年3月末時点）。
-- 厚生労働省「食品衛生申請等システム（i2fas）」のオープンデータも収録対象です。ライセンスは「公共データ利用規約（第1.0版, PDL1.0）」＝CC BY 4.0 互換（出典明示で商用含む再利用可）。掲載賛同施設のみの公開のため全件ではありません。取得はブラウザ自動化（`node scripts/fetch-i2fas.mjs`）で行い、`.cache/i2fas` に保存後クロールで統合します。robots.txt が `/faspub/` をクロール禁止としているため、逐次・低レートで取得します。
-
-### 加工データであることについて
-
-本データは各自治体が公開するオープンデータを加工・統合したものです。
-当サービスでは、全国共通フォーマットへの正規化、項目名の統一、緯度経度の付与などの加工を行っています。
-
-### 緯度経度について
-
-緯度経度は当サービスが独自に付与した参考情報です。
-緯度経度は自治体が提供しているものではなく、住所等をもとにジオコーディングして付与しています。
-一部施設について位置情報が実際の所在地と異なる場合があります。
-地図表示や位置情報について正確性を保証するものではありません。
-
-### 正確性・最新性について
-
-本サービスは、内容の正確性、完全性、最新性について保証するものではありません。
-最新かつ正式な情報は、各自治体が公開する情報をご確認ください。
-
-### 公式サービスではないことについて
-
-本サービスは各自治体が公開するオープンデータを独自に集約・加工したサービスです。
-**各自治体の公式サービスではありません。**
