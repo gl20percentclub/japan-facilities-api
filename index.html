@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Japan Facilities API — 日本全国の飲食施設オープンデータを無料の静的 API で</title>
-  <meta name="description" content="全国の自治体が公開する食品営業許可・届出のオープンデータを、正規化・ジオコーディングして無料の静的 API として配信。登録不要・API キー不要で、JSON / CSV / ベクトルタイルをそのまま利用できます。">
+  <meta name="description" content="全国の自治体が公開する食品営業許可・届出のオープンデータを、正規化・ジオコーディングして無料で配信。登録不要・API キー不要で、全件 CSV とベクトルタイルをそのまま利用できます。">
 
   <!-- SNS シェア時のカード表示（画像は用意していないためテキストのみ） -->
   <meta property="og:type" content="website">
@@ -168,7 +168,7 @@
       <h1>日本全国の飲食施設オープンデータを<br><span class="accent">そのまま使える API</span> に</h1>
       <p>
         全国の自治体が公開する食品営業許可・届出のオープンデータを毎週自動でクロールし、
-        全国共通フォーマットへの正規化と緯度経度の付与を行って、静的 API として配信しています。
+        全国共通フォーマットへの正規化と緯度経度の付与を行い、全件 CSV とベクトルタイルで配信しています。
       </p>
       <div class="cta">
         <a class="btn primary" href="#quickstart">クイックスタート</a>
@@ -178,13 +178,13 @@
 
       <!-- 統計は配信中の api/ から読み込んで更新する（取得できなければ下の既定値のまま） -->
       <div class="stats">
-        <div class="stat"><span class="num" id="stat-facility">110万</span><span class="lbl">ユニーク施設</span></div>
+        <div class="stat"><span class="num" id="stat-facility">149万</span><span class="lbl">施設レコード</span></div>
         <div class="stat"><span class="num" id="stat-pref">52</span><span class="lbl">都道府県</span></div>
         <div class="stat"><span class="num" id="stat-city">1,958</span><span class="lbl">市区町村</span></div>
         <div class="stat"><span class="num" data-source-count>98</span><span class="lbl">データソース</span></div>
       </div>
       <p class="stats-note" id="stats-note">毎週月曜に自動更新</p>
-      <p class="stats-note">ユニーク施設数は「名前＋座標」で重複除外した件数です（業種違いを含む全レコードは約 149 万件）。</p>
+      <p class="stats-note">1レコード＝1つの営業許可です。同じ施設が業種違いで複数レコードになる場合があります。</p>
     </div>
   </header>
 
@@ -197,7 +197,7 @@
         <div class="card">
           <span class="ico">🗾</span>
           <h3>全国をカバー</h3>
-          <p>47 都道府県・1,900 以上の市区町村。都道府県 > 市区町村 の階層で、必要な地域だけを取得できます。</p>
+          <p>47 都道府県・1,900 以上の市区町村。全国分を1本の CSV にまとめて配信しています。</p>
         </div>
         <div class="card">
           <span class="ico">📍</span>
@@ -207,7 +207,7 @@
         <div class="card">
           <span class="ico">🧹</span>
           <h3>形式を正規化</h3>
-          <p>自治体ごとに違う列名・文字コード・市区町村表記を統一し、同じスキーマの JSON にそろえています。</p>
+          <p>自治体ごとに違う列名・文字コード・市区町村表記を統一し、全国共通のスキーマにそろえています。</p>
         </div>
         <div class="card">
           <span class="ico">🔄</span>
@@ -216,8 +216,8 @@
         </div>
         <div class="card">
           <span class="ico">📦</span>
-          <h3>好きな形式で</h3>
-          <p>市区町村別 JSON、施設名検索用インデックス、全国結合 CSV、地図用ベクトルタイルを用意。</p>
+          <h3>2つの形式で</h3>
+          <p>分析用の全件 CSV と、地図用のベクトルタイル。用途に合わせて選べます。</p>
         </div>
         <div class="card">
           <span class="ico">🆓</span>
@@ -233,27 +233,23 @@
     <div class="wrap">
       <h2>クイックスタート</h2>
       <p class="lead">
+        配信しているのは <strong>全件CSV</strong> と <strong>ベクトルタイル</strong> の2つだけです。
         ベース URL は <code>https://gl20percentclub.github.io/japan-facilities-api/api/</code>。
-        取得したい市区町村の <code>data.json</code> を叩くだけです。
       </p>
 
-      <p class="step">1. 収録されている都道府県・市区町村の一覧を取る</p>
-<pre><code>curl https://gl20percentclub.github.io/japan-facilities-api/api/facilities/index.json</code></pre>
+      <p class="step">1. 全件CSV をダウンロードする（gzip 約 60MB）</p>
+<pre><code>curl -O https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz
+gunzip facilities-all.csv.gz</code></pre>
 
-      <p class="step">2. 市区町村の全施設を取る（日本語パスは URL エンコードする）</p>
-<pre><code>curl "https://gl20percentclub.github.io/japan-facilities-api/api/facilities/%E6%B2%96%E7%B8%84%E7%9C%8C/%E9%82%A3%E8%A6%87%E5%B8%82/data.json"</code></pre>
+      <p class="step">2. pandas で読み込む（URL 直指定でもいけます）</p>
+<pre><code>import pandas as pd
 
-      <p class="step">3. JavaScript から使う</p>
-<pre><code>const BASE = 'https://gl20percentclub.github.io/japan-facilities-api/api';
+df = pd.read_csv('https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz')
+<span class="c"># 那覇市の飲食店営業だけ抜き出す</span>
+naha = df[(df.city == '那覇市') &amp; (df.business_type == '飲食店営業')]
+print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
 
-<span class="c">// 那覇市の全施設を取得</span>
-const res = await fetch(
-  `${BASE}/facilities/${encodeURIComponent('沖縄県')}/${encodeURIComponent('那覇市')}/data.json`
-);
-const { data } = await res.json();
-console.log(data[0].name, data[0].lat, data[0].lng);</code></pre>
-
-      <p class="step">4. 地図に出す（MapLibre GL JS・タイルサーバー不要）</p>
+      <p class="step">3. 地図に出す（MapLibre GL JS・タイルサーバー不要）</p>
 <pre><code>map.addSource('facilities', {
   type: 'vector',
   tiles: ['https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf'],
@@ -261,20 +257,13 @@ console.log(data[0].name, data[0].lat, data[0].lng);</code></pre>
 });
 <span class="c">// レイヤ名は "facilities"、属性は name / business_type / pref / city</span></code></pre>
 
-      <p class="step">返ってくる施設データ</p>
-<pre><code>{
-  "name": "ステーキハウス○○",
-  "name_kana": "ステーキハウスマルマル",
-  "business_type": "飲食店営業",
-  "address": "那覇市松山1-9-9",
-  "lat": 26.216965935,
-  "lng": 127.678060421,
-  "geocoding_level": 8,        <span class="c">// 8=街区・地番 / 3=町丁目 / 2=市区町村 / 1=都道府県</span>
-  "phone": "098-XXX-XXXX",
-  "license_no": "第01202300556号",
-  "license_date": "2023-12-07",
-  "expire_date": "2030-01-31"
-}</code></pre>
+      <p class="step">CSV の中身</p>
+<pre><code>prefecture,city,city_raw,name,name_kana,business_type,address,lat,lng,geocoding_level,phone,license_no,license_date,expire_date,sources,licenses
+沖縄県,那覇市,那覇市,ステーキハウス○○,ステーキハウスマルマル,飲食店営業,那覇市松山1-9-9,26.216965935,127.678060421,8,098-XXX-XXXX,第01202300556号,2023-12-07,2030-01-31,沖縄県食品営業許可・届出,CC BY 4.0</code></pre>
+      <p class="lead" style="margin:12px 0 0">
+        <code>geocoding_level</code> は付与した座標の精度（8=街区・地番 / 3=町丁目 / 2=市区町村 / 1=都道府県）。
+        元データに座標があった場合と補完できなかった場合は空です。
+      </p>
     </div>
   </section>
 
@@ -282,7 +271,7 @@ console.log(data[0].name, data[0].lat, data[0].lng);</code></pre>
   <section id="formats">
     <div class="wrap">
       <h2>配信している形式</h2>
-      <p class="lead">用途に合わせて選べます。すべて同じベース URL 配下の静的ファイルです。</p>
+      <p class="lead">用途に合わせて2つから選べます。どちらも同じベース URL 配下の静的ファイルです。</p>
       <div class="table-scroll">
         <table class="formats">
           <thead>
@@ -290,19 +279,9 @@ console.log(data[0].name, data[0].lat, data[0].lng);</code></pre>
           </thead>
           <tbody>
             <tr>
-              <td>市区町村別 JSON</td>
-              <td><code>api/facilities/{都道府県}/{市区町村}/data.json</code></td>
-              <td>ある地域の全施設を、全項目つきで取得する。もっとも基本的な形式です。</td>
-            </tr>
-            <tr>
-              <td>検索インデックス</td>
-              <td><code>api/search-index.json</code>（都道府県別に分割）</td>
-              <td>施設名の横断検索向けの軽量な索引。名前・住所・座標だけを配列で持ちます。</td>
-            </tr>
-            <tr>
-              <td>全国結合 CSV</td>
+              <td>全件 CSV</td>
               <td><code>api/facilities-all.csv.gz</code>（約 60MB / 非圧縮 約 540MB）</td>
-              <td>Excel・pandas・BI ツールでまとめて分析する。UTF-8 BOM 付きです。</td>
+              <td>Excel・pandas・BI ツール・DB 取り込みで分析する。全項目入り・UTF-8 BOM 付きです。</td>
             </tr>
             <tr>
               <td>ベクトルタイル</td>
@@ -313,7 +292,8 @@ console.log(data[0].name, data[0].lat, data[0].lng);</code></pre>
         </table>
       </div>
       <p class="lead" style="margin:20px 0 0">
-        各項目の詳細は <a href="https://github.com/gl20percentclub/japan-facilities-api#-api-リファレンス">API リファレンス</a>、
+        地域や業種を絞りたい場合は、CSV をダウンロードしてフィルタしてください。
+        各列の詳細は <a href="https://github.com/gl20percentclub/japan-facilities-api#どんなデータか">README</a>、
         自治体ごとの収録状況は <a href="https://github.com/gl20percentclub/japan-facilities-api/blob/main/docs/COVERAGE.md">収録状況一覧</a> を参照してください。
       </p>
     </div>
@@ -380,32 +360,29 @@ console.log(data[0].name, data[0].lat, data[0].lng);</code></pre>
       return n.toLocaleString('ja-JP');
     }
 
-    // 都道府県・市区町村の数は facilities/index.json（都道府県 → 市区町村配列）から数える。
-    fetch(`${API_BASE}/facilities/index.json`)
+    // 配信は CSV とベクトルタイルの2形式のみで、統計用の JSON は別途置かない。
+    // 件数・最終更新はタイルの TileJSON（metadata.json）に埋め込んである。
+    fetch(`${API_BASE}/tiles/metadata.json`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((json) => {
-        const prefs = Object.keys(json.data || {});
-        const cities = prefs.reduce((n, p) => n + (json.data[p]?.length || 0), 0);
-        document.getElementById('stat-pref').textContent = prefs.length.toLocaleString('ja-JP');
-        document.getElementById('stat-city').textContent = cities.toLocaleString('ja-JP');
+      .then((meta) => {
+        const stats = meta.stats || {};
+        if (typeof stats.prefectures === 'number') {
+          document.getElementById('stat-pref').textContent = stats.prefectures.toLocaleString('ja-JP');
+        }
+        if (typeof stats.cities === 'number') {
+          document.getElementById('stat-city').textContent = stats.cities.toLocaleString('ja-JP');
+        }
+        if (typeof stats.records === 'number') {
+          document.getElementById('stat-facility').textContent = formatCount(stats.records);
+        }
         // 最終更新日（UNIX 秒）が取れたら更新頻度の注記に添える。
-        if (json.meta?.updated) {
-          const d = new Date(json.meta.updated * 1000);
+        if (meta.updated) {
+          const d = new Date(meta.updated * 1000);
           const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           document.getElementById('stats-note').textContent = `毎週月曜に自動更新 — 最終更新 ${ymd}`;
         }
       })
       .catch(() => { /* 統計が取れなくてもページは成立する */ });
-
-    // 施設数は検索インデックスのマニフェスト（meta.count）から取る。
-    fetch(`${API_BASE}/search-index.json`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((json) => {
-        if (json.meta?.count) {
-          document.getElementById('stat-facility').textContent = formatCount(json.meta.count);
-        }
-      })
-      .catch(() => { /* 同上 */ });
   </script>
 </body>
 </html>

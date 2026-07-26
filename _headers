@@ -2,7 +2,17 @@
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
-/api/*
+/api/facilities-all.csv
+  Content-Type: text/csv; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/api/tiles/*
+  Content-Type: application/x-protobuf
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/api/tiles/metadata.json
   Content-Type: application/json; charset=utf-8
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
