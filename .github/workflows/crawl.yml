@@ -68,21 +68,26 @@ jobs:
           node scripts/build-merged-csv.js
           gzip -kf api/facilities-all.csv
 
+      # 出典表示ページ（attribution.html）を config/sources.yaml から再生成する。
+      # npm test で config との同期を検証するため、Validate より前に実行する。
+      - name: Build attribution page
+        run: npm run build:attribution
+
       - name: Validate
         run: npm test
 
-      # README の統計（件数・サイズ）だけを main に反映する。
+      # README の統計（件数・サイズ）と出典表示ページだけを main に反映する。
       # 生成物 api/ は Git 管理せず（.gitignore）、配信は gh-pages のみで行う（履歴肥大を避けるため）。
       # クロール中に他の push で main が進むことがあるため、rebase してリトライする。
       - name: Commit README stats
         run: |
-          if git diff --quiet README.md; then
-            echo "README 変更なし"; exit 0
+          if git diff --quiet README.md attribution.html; then
+            echo "README / attribution.html 変更なし"; exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git commit -m "chore: update README data stats"
+          git add README.md attribution.html
+          git commit -m "chore: update README data stats and attribution page"
           for i in 1 2 3; do
             if git pull --rebase --autostash origin main && git push; then
               echo "pushed"; exit 0
