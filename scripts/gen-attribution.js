@@ -351,6 +351,18 @@ export function renderHtml(entries) {
       --muted: #9aa5b1;
       --border: rgba(31, 41, 51, 0.12);
       --panel: #f7f8fa;
+      --bg: #ffffff;
+    }
+    /* 端末のダークモード設定に追随する（LP・地図と配色をそろえる） */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #e4e7eb;
+        --sub: #b0b8c0;
+        --muted: #7b8794;
+        --border: rgba(228, 231, 235, 0.16);
+        --panel: #1c2229;
+        --bg: #14181d;
+      }
     }
     * { box-sizing: border-box; }
     body {
@@ -358,7 +370,7 @@ export function renderHtml(entries) {
       font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
       color: var(--ink);
       line-height: 1.7;
-      background: #fff;
+      background: var(--bg);
     }
     .wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 80px; }
     a { color: var(--accent); }
@@ -493,7 +505,10 @@ ${sections.map(renderSection).join('\n')}
         <a href="${REPO_URL}/blob/main/scripts/gen-attribution.js">scripts/gen-attribution.js</a> が自動生成しています。
         誤りを見つけた場合は <a href="${REPO_URL}/issues">Issue</a> でお知らせください。
       </p>
-      <p><a href="${SITE_URL}">← プレビュー地図に戻る</a> · <a href="${REPO_URL}">GitHub リポジトリ</a></p>
+      <p>
+        <a href="./">← トップへ戻る</a> · <a href="./map.html">プレビュー地図</a> ·
+        <a href="${REPO_URL}">GitHub リポジトリ</a>
+      </p>
     </footer>
   </div>
 
