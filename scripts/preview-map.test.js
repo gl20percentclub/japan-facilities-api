@@ -95,8 +95,9 @@ test('ヘッダーの統計が参照する metadata.stats のキーがすべて�
 });
 
 // 廃止した配信形式（階層JSON・検索インデックス）を参照していないこと。
+// 「data.json」は metadata.json に部分一致するため、パス区切り込みで判定する。
 test('廃止した配信形式を参照していない', () => {
-  for (const gone of ['facilities/index.json', 'search-index', 'data.json']) {
+  for (const gone of ['facilities/index.json', 'search-index', '/data.json']) {
     assert.ok(!HTML.includes(gone), `map.html が ${gone} を参照していない`);
   }
 });
