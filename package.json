@@ -1,5 +1,5 @@
 {
-  "name": "okinawa-facilities-api",
+  "name": "japan-food-facilities-api",
   "type": "module",
   "scripts": {
     "build": "node scripts/crawl.js",

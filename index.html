@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>🍽️ Japan Facilities API — データプレビュー地図</title>
-  <meta name="description" content="日本全国の飲食施設オープンデータ（食品営業許可・届出）を地図上でプレビューできます。">
+  <title>🍽️ Japan Food Facilities API — データプレビュー地図</title>
+  <meta name="description" content="日本全国の食品営業施設オープンデータ（食品営業許可・届出）を地図上でプレビューできます。">
 
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
   <style>
@@ -118,8 +118,8 @@
   <div id="map"></div>
 
   <div class="panel">
-    <h1>🍽️ Japan Facilities API</h1>
-    <p class="sub">日本全国の飲食施設オープンデータ（食品営業許可・届出）のプレビュー地図です。</p>
+    <h1>🍽️ Japan Food Facilities API</h1>
+    <p class="sub">日本全国の食品営業施設オープンデータ（食品営業許可・届出）のプレビュー地図です。</p>
     <div class="stats">
       <div class="stat"><span class="num" id="stat-pref">–</span><span class="lbl">都道府県</span></div>
       <div class="stat"><span class="num" id="stat-city">–</span><span class="lbl">市区町村</span></div>
@@ -128,8 +128,8 @@
     <p class="meta-line">
       <span class="legend-dot"></span>各点＝1施設
       <span id="updated"></span><br>
-      <a href="https://github.com/gl20percentclub/japan-facilities-api">GitHub リポジトリ</a> ·
-      <a href="https://github.com/gl20percentclub/japan-facilities-api#-api-リファレンス">API リファレンス</a>
+      <a href="https://github.com/gl20percentclub/japan-food-facilities-api">GitHub リポジトリ</a> ·
+      <a href="https://github.com/gl20percentclub/japan-food-facilities-api#-api-リファレンス">API リファレンス</a>
     </p>
   </div>
 
@@ -168,7 +168,7 @@
             maxzoom: TILE_MAX_ZOOM,
             bounds: JAPAN_BOUNDS,
             attribution:
-              '施設データ: <a href="https://github.com/gl20percentclub/japan-facilities-api" target="_blank" rel="noopener">Japan Facilities API</a>（各自治体オープンデータ）',
+              '施設データ: <a href="https://github.com/gl20percentclub/japan-food-facilities-api" target="_blank" rel="noopener">Japan Food Facilities API</a>（各自治体オープンデータ）',
           },
         },
         layers: [

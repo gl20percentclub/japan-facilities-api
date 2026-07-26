@@ -1,16 +1,16 @@
 <div align="center">
 
-# 🍽️ Japan Facilities API
+# 🍽️ Japan Food Facilities API
 
-**日本全国の飲食施設オープンデータ（食品営業許可・届出）を、無料で使える静的 API として配信**
+**日本全国の食品営業施設オープンデータ（食品営業許可・届出）を、無料で使える静的 API として配信**
 
-[![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/graphs/contributors)
+[![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/graphs/contributors)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#-コントリビューション)
-[![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/issues)
-[![Last Commit](https://img.shields.io/github/last-commit/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/commits/main)
+[![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/commits/main)
 [![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#️-自動更新の仕組み)
 
-[クイックスタート](#-クイックスタート) · [API リファレンス](#-api-リファレンス) · [収録状況](docs/COVERAGE.md) · [バグ報告](https://github.com/gl20percentclub/japan-facilities-api/issues/new) · [機能要望](https://github.com/gl20percentclub/japan-facilities-api/issues/new)
+[クイックスタート](#-クイックスタート) · [API リファレンス](#-api-リファレンス) · [収録状況](docs/COVERAGE.md) · [バグ報告](https://github.com/gl20percentclub/japan-food-facilities-api/issues/new) · [機能要望](https://github.com/gl20percentclub/japan-food-facilities-api/issues/new)
 
 </div>
 
@@ -21,6 +21,7 @@
 ## ✨ 特徴
 
 - 🗾 **全国カバー** — 47都道府県・1,800以上の市区町村、70万件超の施設レコードを収録
+- 🍱 **飲食店だけじゃない** — レコードの8割強は飲食店営業ですが、菓子製造業・そうざい製造業・食肉/魚介類販売業・食肉処理業・食品の冷凍又は冷蔵業など、食品衛生法上の許可・届出業種を幅広く収録（業種は `business_type` で判別）
 - 📍 **緯度経度つき** — 座標が無い元データも [normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses) でジオコーディングして補完
 - 🔄 **毎週自動更新** — GitHub Actions が毎週クロールして最新データを配信
 - 📦 **好きな形式で** — 市区町村別 JSON、検索用インデックス、全国結合 CSV、地図用ベクトルタイル
@@ -45,20 +46,20 @@
 
 ## 🚀 クイックスタート
 
-ベース URL は `https://gl20percentclub.github.io/japan-facilities-api/api/` です。
+ベース URL は `https://gl20percentclub.github.io/japan-food-facilities-api/api/` です。
 
 ```bash
 # 都道府県一覧（都道府県名 → 市区町村名の配列）
-curl https://gl20percentclub.github.io/japan-facilities-api/api/facilities/index.json
+curl https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities/index.json
 
 # 那覇市の全施設（パスは URL エンコードが必要な場合があります）
-curl "https://gl20percentclub.github.io/japan-facilities-api/api/facilities/%E6%B2%96%E7%B8%84%E7%9C%8C/%E9%82%A3%E8%A6%87%E5%B8%82/data.json"
+curl "https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities/%E6%B2%96%E7%B8%84%E7%9C%8C/%E9%82%A3%E8%A6%87%E5%B8%82/data.json"
 ```
 
 JavaScript からはこう使えます。
 
 ```js
-const BASE = 'https://gl20percentclub.github.io/japan-facilities-api/api';
+const BASE = 'https://gl20percentclub.github.io/japan-food-facilities-api/api';
 
 // 那覇市の全施設を取得（日本語パスは encodeURIComponent でエンコード）
 const res = await fetch(
@@ -95,8 +96,8 @@ Excel / pandas / BI ツール等で扱いたい場合はこちらが便利です
 
 | ファイル | 配布URL |
 |---|---|
-| 結合CSV（gzip 圧縮・約60MB） | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz |
-| 結合CSV（非圧縮・約540MB） | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv |
+| 結合CSV（gzip 圧縮・約60MB） | https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv.gz |
+| 結合CSV（非圧縮・約540MB） | https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv |
 
 - **文字コード**: UTF-8（BOM 付き。Excel でそのまま開けます）
 - **列**: `prefecture, city, city_raw, name, name_kana, business_type, address, lat, lng, geocoding_level, phone, license_no, license_date, expire_date, sources, licenses`
@@ -135,14 +136,14 @@ api/
 ```js
 map.addSource('facilities', {
   type: 'vector',
-  tiles: ['https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf'],
+  tiles: ['https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf'],
   minzoom: 6, maxzoom: 12,
 });
 // レイヤ名は "facilities"、各点の属性は name / business_type / pref / city
 ```
 
 - タイルは非圧縮 pbf で配信するため、追加のヘッダ設定は不要です。
-- メタデータ（レイヤ定義・ズーム範囲・bounds）は [`tiles/metadata.json`](https://gl20percentclub.github.io/japan-facilities-api/api/tiles/metadata.json) を参照。
+- メタデータ（レイヤ定義・ズーム範囲・bounds）は [`tiles/metadata.json`](https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/metadata.json) を参照。
 - 生成は `npm run build:tiles`（クロール時 `npm run build` にも自動生成、pure JS の geojson-vt + vt-pbf）。
 
 ### `search-index.json`（施設名検索用・都道府県別分割）
@@ -319,7 +320,7 @@ sources:
 たとえば次のような貢献ができます。
 
 - 🗾 **新しい自治体データソースの追加** — [データソースの追加](#データソースの追加) の手順どおり [`config/sources.yaml`](config/sources.yaml) に1エントリ追加するだけです。未収録の自治体は [`docs/COVERAGE.md`](docs/COVERAGE.md) で確認できます
-- 🐛 **バグ報告・データ品質の問題報告** — [Issues](https://github.com/gl20percentclub/japan-facilities-api/issues) からお気軽にどうぞ（座標のずれ、重複、文字化けなど）
+- 🐛 **バグ報告・データ品質の問題報告** — [Issues](https://github.com/gl20percentclub/japan-food-facilities-api/issues) からお気軽にどうぞ（座標のずれ、重複、文字化けなど）
 - 💡 **機能提案・改善アイデア** — Issue で議論を始めてください
 - 📖 **ドキュメントの改善** — 誤字修正や説明の追加も立派な貢献です
 
@@ -337,8 +338,8 @@ sources:
 
 このプロジェクトに貢献してくださった皆さんです。ありがとうございます！
 
-<a href="https://github.com/gl20percentclub/japan-facilities-api/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=gl20percentclub/japan-facilities-api" alt="Contributors" />
+<a href="https://github.com/gl20percentclub/japan-food-facilities-api/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=gl20percentclub/japan-food-facilities-api" alt="Contributors" />
 </a>
 
 *Made with [contrib.rocks](https://contrib.rocks).*
