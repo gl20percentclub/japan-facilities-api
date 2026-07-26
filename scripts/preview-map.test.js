@@ -1,9 +1,9 @@
-// プレビュー地図(index.html)と gen-tiles.js の生成物との整合性テスト。
+// プレビュー地図(map.html)と gen-tiles.js の生成物との整合性テスト。
 //   node scripts/preview-map.test.js
 //
-// index.html はベクトルタイル(api/tiles)を直接読むため、レイヤ名・ズーム範囲・
+// map.html はベクトルタイル(api/tiles)を直接読むため、レイヤ名・ズーム範囲・
 // タイルパス・利用する属性が gen-tiles.js の出力とズレると地図が黙って壊れる。
-// ここでは実際に generateTiles を走らせた生成物と index.html の記述を突き合わせ、
+// ここでは実際に generateTiles を走らせた生成物と map.html の記述を突き合わせ、
 // 両者が食い違ったら失敗させることで、その回帰を防ぐ。
 
 import assert from 'node:assert/strict';
@@ -15,7 +15,7 @@ import { buildFeatureCollection, generateTiles } from './gen-tiles.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const HTML = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf-8');
+const HTML = fs.readFileSync(path.join(ROOT, 'map.html'), 'utf-8');
 
 let passed = 0;
 function test(name, fn) {
@@ -24,10 +24,10 @@ function test(name, fn) {
   console.log(`  ✓ ${name}`);
 }
 
-// index.html から地図設定に使っている値を素朴に抽出する（フルパーサは不要）。
+// map.html から地図設定に使っている値を素朴に抽出する（フルパーサは不要）。
 function htmlValue(re, label) {
   const m = HTML.match(re);
-  assert.ok(m, `index.html から ${label} を抽出できる`);
+  assert.ok(m, `map.html から ${label} を抽出できる`);
   return m[1];
 }
 
@@ -83,7 +83,7 @@ test('タイルURLテンプレートが「api/tiles/ + metadata.tiles[0]」の�
     generateTiles({ minZoom: 6, maxZoom: 12, facilitiesDir: path.join(dir, 'facilities'), outDir });
     const meta = JSON.parse(fs.readFileSync(path.join(outDir, 'metadata.json'), 'utf-8'));
     const expectedPath = `api/tiles/${meta.tiles[0]}`; // = api/tiles/{z}/{x}/{y}.pbf
-    assert.ok(HTML.includes(expectedPath), `index.html がタイルパス ${expectedPath} を参照する`);
+    assert.ok(HTML.includes(expectedPath), `map.html がタイルパス ${expectedPath} を参照する`);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -94,11 +94,11 @@ test('ポップアップで参照する施設属性がすべて生成featureに�
   try {
     const fc = buildFeatureCollection(path.join(dir, 'facilities'));
     const props = fc.features[0].properties;
-    // index.html が p.<prop> として参照している属性を抽出する。
+    // map.html が p.<prop> として参照している属性を抽出する。
     const referenced = new Set(
       [...HTML.matchAll(/\bp\.([a-z_]+)\b/g)].map((m) => m[1]),
     );
-    assert.ok(referenced.size >= 3, `index.html が施設属性を参照している (${[...referenced].join(',')})`);
+    assert.ok(referenced.size >= 3, `map.html が施設属性を参照している (${[...referenced].join(',')})`);
     for (const key of referenced) {
       assert.ok(key in props, `属性 ${key} が生成feature.properties に存在する`);
     }

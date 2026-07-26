@@ -10,7 +10,7 @@
 [![Last Commit](https://img.shields.io/github/last-commit/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/commits/main)
 [![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#️-自動更新の仕組み)
 
-[クイックスタート](#-クイックスタート) · [API リファレンス](#-api-リファレンス) · [収録状況](docs/COVERAGE.md) · [出典・ライセンス](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) · [バグ報告](https://github.com/gl20percentclub/japan-facilities-api/issues/new) · [機能要望](https://github.com/gl20percentclub/japan-facilities-api/issues/new)
+[公式サイト](https://gl20percentclub.github.io/japan-facilities-api/) · [クイックスタート](#-クイックスタート) · [API リファレンス](#-api-リファレンス) · [プレビュー地図](https://gl20percentclub.github.io/japan-facilities-api/map.html) · [収録状況](docs/COVERAGE.md) · [出典・ライセンス](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) · [バグ報告](https://github.com/gl20percentclub/japan-facilities-api/issues/new) · [機能要望](https://github.com/gl20percentclub/japan-facilities-api/issues/new)
 
 </div>
 
@@ -314,6 +314,14 @@ sources:
 `api/` を生成して `gh-pages` ブランチへ配信します。**生成物 `api/` は Git 管理せず**（`.gitignore`）、
 配信は gh-pages のみ（履歴肥大を避けるため）。README の「収録データ」統計だけを main に反映します。
 `workflow_dispatch` から手動実行も可能（`dry_run` / `fetch_i2fas` オプション付き）。
+
+配信サイト（gh-pages）のページ構成は次のとおりです。いずれもリポジトリルートの静的 HTML で、ビルド不要です。
+
+| URL | ファイル | 内容 |
+|---|---|---|
+| [`/`](https://gl20percentclub.github.io/japan-facilities-api/) | `index.html` | ランディングページ（概要・特徴・クイックスタート・配信形式） |
+| [`/map.html`](https://gl20percentclub.github.io/japan-facilities-api/map.html) | `map.html` | プレビュー地図（ベクトルタイルを MapLibre で表示） |
+| [`/attribution.html`](https://gl20percentclub.github.io/japan-facilities-api/attribution.html) | `attribution.html` | 出典・ライセンス表示（`config/sources.yaml` から自動生成） |
 
 ## 🤝 コントリビューション
 
