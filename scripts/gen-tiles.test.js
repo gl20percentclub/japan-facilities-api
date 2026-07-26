@@ -46,53 +46,45 @@ test('lonLatToTile: 返したタイルの境界内に元の点が含まれる', 
   }
 });
 
-// --- buildFeatureCollection / generateTiles: 一時フィクスチャで検証 ---
-function makeFixture() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tiles-test-'));
-  const cityDir = path.join(dir, 'facilities', '東京都', '港区');
-  fs.mkdirSync(cityDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(cityDir, 'data.json'),
-    JSON.stringify({
-      meta: { updated: 1749600000 },
-      data: [
-        { name: '店A', business_type: '飲食店営業', address: '港区赤坂1-1', lat: 35.673, lng: 139.737, geocoding_level: 8 },
-        { name: '店B', business_type: '喫茶店営業', address: '港区六本木6-1', lat: 35.662, lng: 139.731, geocoding_level: 8 },
-        { name: '座標なし', business_type: '飲食店営業', address: '港区不明', lat: null, lng: null, geocoding_level: null },
-      ],
-    }),
-  );
-  return dir;
+// --- buildFeatureCollection / generateTiles: インメモリの施設配列で検証 ---
+function makeFacilities() {
+  return [
+    { name: '店A', business_type: '飲食店営業', address: '港区赤坂1-1', lat: 35.673, lng: 139.737, geocoding_level: 8, pref: '東京都', city: '港区' },
+    { name: '店B', business_type: '喫茶店営業', address: '港区六本木6-1', lat: 35.662, lng: 139.731, geocoding_level: 8, pref: '東京都', city: '港区' },
+    { name: '座標なし', business_type: '飲食店営業', address: '港区不明', lat: null, lng: null, geocoding_level: null, pref: '東京都', city: '港区' },
+  ];
+}
+
+function tmpDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'tiles-test-'));
 }
 
 test('buildFeatureCollection: 座標を持つ施設だけを点に変換する', () => {
-  const dir = makeFixture();
-  try {
-    const fc = buildFeatureCollection(path.join(dir, 'facilities'));
-    assert.equal(fc.type, 'FeatureCollection');
-    assert.equal(fc.features.length, 2); // 座標なしは除外
-    const f = fc.features[0];
-    assert.equal(f.geometry.type, 'Point');
-    assert.deepEqual(f.geometry.coordinates, [139.737, 35.673]); // [lng, lat]
-    assert.equal(f.properties.pref, '東京都');
-    assert.equal(f.properties.city, '港区');
-    assert.ok('name' in f.properties && 'business_type' in f.properties);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  const fc = buildFeatureCollection(makeFacilities());
+  assert.equal(fc.type, 'FeatureCollection');
+  assert.equal(fc.features.length, 2); // 座標なしは除外
+  const f = fc.features[0];
+  assert.equal(f.geometry.type, 'Point');
+  assert.deepEqual(f.geometry.coordinates, [139.737, 35.673]); // [lng, lat]
+  assert.equal(f.properties.pref, '東京都');
+  assert.equal(f.properties.city, '港区');
+  assert.ok('name' in f.properties && 'business_type' in f.properties);
 });
 
 test('generateTiles: metadata.json と、各点に対応する非空 pbf タイルを生成する', () => {
-  const dir = makeFixture();
+  const dir = tmpDir();
   const outDir = path.join(dir, 'tiles');
   try {
-    const written = generateTiles({
+    const { tiles: written, points } = generateTiles(makeFacilities(), {
       minZoom: 12,
       maxZoom: 12,
-      facilitiesDir: path.join(dir, 'facilities'),
       outDir,
+      updated: 1749600000,
+      stats: { rowsOut: 3, prefectures: 1, cities: 1 },
+      log: () => {},
     });
     assert.ok(written >= 1, `タイルが1枚以上生成される (${written})`);
+    assert.equal(points, 2, '座標を持つ点だけが焼かれる');
 
     // metadata.json（TileJSON）の要点
     const meta = JSON.parse(fs.readFileSync(path.join(outDir, 'metadata.json'), 'utf-8'));
@@ -101,6 +93,10 @@ test('generateTiles: metadata.json と、各点に対応する非空 pbf タイ�
     assert.equal(meta.maxzoom, 12);
     assert.deepEqual(meta.tiles, ['{z}/{x}/{y}.pbf']);
     assert.equal(meta.vector_layers[0].id, 'facilities');
+
+    // プレビュー地図が読む統計が埋め込まれている
+    assert.equal(meta.updated, 1749600000);
+    assert.deepEqual(meta.stats, { points: 2, records: 3, prefectures: 1, cities: 1 });
 
     // フィクスチャの点が属する z12 タイルに、非空の .pbf が実在する
     // （書き出しパスが lonLatToTile と整合していることの検証）

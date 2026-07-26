@@ -27,7 +27,7 @@ export const PREFECTURE_BY_CODE = {
   '46': '鹿児島県', '47': '沖縄県',
 };
 
-const PREFECTURE_NAMES = Object.values(PREFECTURE_BY_CODE);
+export const PREFECTURE_NAMES = Object.values(PREFECTURE_BY_CODE);
 
 // 住所文字列から都道府県・市区町村を切り出す。
 //   例: 「北海道足寄郡足寄町南三条…」→ ['北海道','足寄郡足寄町']

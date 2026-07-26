@@ -123,14 +123,14 @@
     <div class="stats">
       <div class="stat"><span class="num" id="stat-pref">–</span><span class="lbl">都道府県</span></div>
       <div class="stat"><span class="num" id="stat-city">–</span><span class="lbl">市区町村</span></div>
-      <div class="stat"><span class="num" id="stat-fac">70万+</span><span class="lbl">施設</span></div>
+      <div class="stat"><span class="num" id="stat-fac">–</span><span class="lbl">施設</span></div>
     </div>
     <p class="meta-line">
       <span class="legend-dot"></span>各点＝1施設
       <span id="updated"></span><br>
       <a href="./">トップ</a> ·
       <a href="https://github.com/gl20percentclub/japan-facilities-api">GitHub リポジトリ</a> ·
-      <a href="https://github.com/gl20percentclub/japan-facilities-api#-api-リファレンス">API リファレンス</a> ·
+      <a href="https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz">全件CSV</a> ·
       <a href="./attribution.html">出典・ライセンス</a>
     </p>
   </div>
@@ -240,16 +240,21 @@
     map.on('mouseenter', 'facilities-circle', () => { map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', 'facilities-circle', () => { map.getCanvas().style.cursor = ''; });
 
-    // --- 統計（index.json）を取得してヘッダーに反映 ---
-    fetch(`${API_BASE}/facilities/index.json`)
+    // --- 統計をヘッダーに反映 ---
+    // データ配信は CSV とベクトルタイルの2形式のみで、統計用の JSON は別途置かない。
+    // 件数・最終更新はタイルの TileJSON（metadata.json）に埋め込んである。
+    fetch(`${API_BASE}/tiles/metadata.json`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((json) => {
-        const prefs = Object.keys(json.data || {});
-        const cities = prefs.reduce((n, p) => n + (json.data[p]?.length || 0), 0);
-        document.getElementById('stat-pref').textContent = prefs.length.toLocaleString('ja-JP');
-        document.getElementById('stat-city').textContent = cities.toLocaleString('ja-JP');
-        if (json.meta?.updated) {
-          const d = new Date(json.meta.updated * 1000);
+      .then((meta) => {
+        const stats = meta.stats || {};
+        const put = (id, v) => {
+          if (typeof v === 'number') document.getElementById(id).textContent = v.toLocaleString('ja-JP');
+        };
+        put('stat-pref', stats.prefectures);
+        put('stat-city', stats.cities);
+        put('stat-fac', stats.records);
+        if (meta.updated) {
+          const d = new Date(meta.updated * 1000);
           const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           document.getElementById('updated').textContent = `最終更新 ${ymd}`;
         }

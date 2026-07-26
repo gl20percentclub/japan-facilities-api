@@ -2,9 +2,9 @@
 //   node scripts/preview-map.test.js
 //
 // map.html はベクトルタイル(api/tiles)を直接読むため、レイヤ名・ズーム範囲・
-// タイルパス・利用する属性が gen-tiles.js の出力とズレると地図が黙って壊れる。
-// ここでは実際に generateTiles を走らせた生成物と map.html の記述を突き合わせ、
-// 両者が食い違ったら失敗させることで、その回帰を防ぐ。
+// タイルパス・利用する属性・metadata.json の統計フィールドが gen-tiles.js の出力と
+// ズレると地図が黙って壊れる。ここでは実際に generateTiles を走らせた生成物と
+// map.html の記述を突き合わせ、両者が食い違ったら失敗させる。
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -31,79 +31,73 @@ function htmlValue(re, label) {
   return m[1];
 }
 
-function makeFixture() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'preview-test-'));
-  const cityDir = path.join(dir, 'facilities', '東京都', '千代田区');
-  fs.mkdirSync(cityDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(cityDir, 'data.json'),
-    JSON.stringify({
-      meta: { updated: 1749600000 },
-      data: [
-        { name: '店A', business_type: '飲食店営業', address: '千代田区丸の内1-1', lat: 35.681, lng: 139.767, geocoding_level: 8 },
-      ],
-    }),
-  );
-  return dir;
-}
+const FACILITIES = [
+  { name: '店A', business_type: '飲食店営業', address: '千代田区丸の内1-1', lat: 35.681, lng: 139.767, geocoding_level: 8, pref: '東京都', city: '千代田区' },
+];
+const STATS = { rowsOut: 1, prefectures: 1, cities: 1 };
 
-test('source-layer が gen-tiles の出力レイヤ名(metadata.vector_layers[0].id)と一致する', () => {
-  const sourceLayer = htmlValue(/'source-layer':\s*'([^']+)'/, "source-layer");
-  const dir = makeFixture();
+/** 一時ディレクトリにタイルを焼き、metadata.json を返す。 */
+function withTiles(opts, fn) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'preview-test-'));
   try {
     const outDir = path.join(dir, 'tiles');
-    generateTiles({ minZoom: 6, maxZoom: 12, facilitiesDir: path.join(dir, 'facilities'), outDir });
-    const meta = JSON.parse(fs.readFileSync(path.join(outDir, 'metadata.json'), 'utf-8'));
-    assert.equal(sourceLayer, meta.vector_layers[0].id, `source-layer(${sourceLayer}) == 生成レイヤ(${meta.vector_layers[0].id})`);
+    generateTiles(FACILITIES, { outDir, stats: STATS, log: () => {}, ...opts });
+    fn(JSON.parse(fs.readFileSync(path.join(outDir, 'metadata.json'), 'utf-8')));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+}
+
+test('source-layer が gen-tiles の出力レイヤ名(metadata.vector_layers[0].id)と一致する', () => {
+  const sourceLayer = htmlValue(/'source-layer':\s*'([^']+)'/, 'source-layer');
+  withTiles({ minZoom: 6, maxZoom: 12 }, (meta) => {
+    assert.equal(sourceLayer, meta.vector_layers[0].id, `source-layer(${sourceLayer}) == 生成レイヤ(${meta.vector_layers[0].id})`);
+  });
 });
 
 test('TILE_MIN_ZOOM / TILE_MAX_ZOOM が gen-tiles の既定ズーム範囲と一致する', () => {
   const minZoom = Number(htmlValue(/TILE_MIN_ZOOM\s*=\s*(\d+)/, 'TILE_MIN_ZOOM'));
   const maxZoom = Number(htmlValue(/TILE_MAX_ZOOM\s*=\s*(\d+)/, 'TILE_MAX_ZOOM'));
-  const dir = makeFixture();
-  try {
-    const outDir = path.join(dir, 'tiles');
-    // 既定のズーム範囲(scripts/gen-tiles.js の MIN_ZOOM/MAX_ZOOM)で生成する。
-    generateTiles({ facilitiesDir: path.join(dir, 'facilities'), outDir });
-    const meta = JSON.parse(fs.readFileSync(path.join(outDir, 'metadata.json'), 'utf-8'));
+  // 既定のズーム範囲(scripts/gen-tiles.js の MIN_ZOOM/MAX_ZOOM)で生成する。
+  withTiles({}, (meta) => {
     assert.equal(minZoom, meta.minzoom, `TILE_MIN_ZOOM(${minZoom}) == metadata.minzoom(${meta.minzoom})`);
     assert.equal(maxZoom, meta.maxzoom, `TILE_MAX_ZOOM(${maxZoom}) == metadata.maxzoom(${meta.maxzoom})`);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  });
 });
 
 test('タイルURLテンプレートが「api/tiles/ + metadata.tiles[0]」の配置と一致する', () => {
-  const dir = makeFixture();
-  try {
-    const outDir = path.join(dir, 'tiles');
-    generateTiles({ minZoom: 6, maxZoom: 12, facilitiesDir: path.join(dir, 'facilities'), outDir });
-    const meta = JSON.parse(fs.readFileSync(path.join(outDir, 'metadata.json'), 'utf-8'));
+  withTiles({ minZoom: 6, maxZoom: 12 }, (meta) => {
     const expectedPath = `api/tiles/${meta.tiles[0]}`; // = api/tiles/{z}/{x}/{y}.pbf
     assert.ok(HTML.includes(expectedPath), `map.html がタイルパス ${expectedPath} を参照する`);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  });
 });
 
 test('ポップアップで参照する施設属性がすべて生成featureに存在する', () => {
-  const dir = makeFixture();
-  try {
-    const fc = buildFeatureCollection(path.join(dir, 'facilities'));
-    const props = fc.features[0].properties;
-    // map.html が p.<prop> として参照している属性を抽出する。
-    const referenced = new Set(
-      [...HTML.matchAll(/\bp\.([a-z_]+)\b/g)].map((m) => m[1]),
-    );
-    assert.ok(referenced.size >= 3, `map.html が施設属性を参照している (${[...referenced].join(',')})`);
+  const props = buildFeatureCollection(FACILITIES).features[0].properties;
+  // map.html が p.<prop> として参照している属性を抽出する。
+  const referenced = new Set([...HTML.matchAll(/\bp\.([a-z_]+)\b/g)].map((m) => m[1]));
+  assert.ok(referenced.size >= 3, `map.html が施設属性を参照している (${[...referenced].join(',')})`);
+  for (const key of referenced) {
+    assert.ok(key in props, `属性 ${key} が生成feature.properties に存在する`);
+  }
+});
+
+test('ヘッダーの統計が参照する metadata.stats のキーがすべて生成される', () => {
+  // 統計用の JSON は配信しないため、件数は metadata.json（TileJSON）から読む。
+  const referenced = new Set([...HTML.matchAll(/\bstats\.([a-z_]+)\b/g)].map((m) => m[1]));
+  assert.ok(referenced.size >= 1, `map.html が metadata.stats を参照している (${[...referenced].join(',')})`);
+  withTiles({ minZoom: 6, maxZoom: 12 }, (meta) => {
     for (const key of referenced) {
-      assert.ok(key in props, `属性 ${key} が生成feature.properties に存在する`);
+      assert.ok(key in meta.stats, `metadata.stats.${key} が生成される`);
     }
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
+    assert.ok('updated' in meta, 'metadata.updated が生成される（最終更新の表示に使う）');
+  });
+});
+
+// 廃止した配信形式（階層JSON・検索インデックス）を参照していないこと。
+test('廃止した配信形式を参照していない', () => {
+  for (const gone of ['facilities/index.json', 'search-index', 'data.json']) {
+    assert.ok(!HTML.includes(gone), `map.html が ${gone} を参照していない`);
   }
 });
 

@@ -1,26 +1,28 @@
-// 全国 食品営業許可 施設検索API クローラー（オーケストレーター）
+// 全国 食品営業許可 データクローラー（オーケストレーター）
 //
 // config/sources.yaml を単一の情報源として、取得 → パース → 正規化 → 出力 を束ねる。
 // 各段の実装は scripts/lib/ に分割してある:
-//   lib/config.js     設定ファイル(YAML)の読み込み
-//   lib/acquire.js    取得（ckan / get / post / resolve / i2fasglob）
-//   lib/parse.js      パース（CSV/TSV/XLSX、文字コード、ヘッダー行判定）
-//   lib/normalize.js  正規化（別名→内部キー、住所結合、日付、座標補正、都道府県/市区町村解決）
-//   lib/geocode.js    ジオコーディング（住所→座標の補完）
+//   lib/config.js        設定ファイル(YAML)の読み込み
+//   lib/acquire.js       取得（ckan / get / post / resolve / i2fasglob）
+//   lib/parse.js         パース（CSV/TSV/XLSX、文字コード、ヘッダー行判定）
+//   lib/normalize.js     正規化（別名→内部キー、住所結合、日付、座標補正、都道府県/市区町村解決）
+//   lib/geocode.js       ジオコーディング（住所→座標の補完）
+//   lib/city-normmap.js  市区町村名の名寄せ（表記ゆれ→公式名）
 //
-// 出力構造（都道府県 > 市区町村 > data.json）と派生成果物:
-//   api/facilities/index.json / {都道府県}/index.json / {都道府県}/{市区町村}/data.json
-//   api/search-index.json ほか（gen-search-index.js）
-//   api/tiles/{z}/{x}/{y}.pbf（gen-tiles.js — ベクトルタイル）
+// 配信物は2種類だけ（用途が無い階層JSONは配信しない）:
+//   api/facilities-all.csv[.gz]   全件の結合CSV（build-merged-csv.js）
+//   api/tiles/{z}/{x}/{y}.pbf     地図用ベクトルタイル + metadata.json（gen-tiles.js）
 //
 // 使い方:
 //   node scripts/crawl.js              通常実行（ダウンロード→ジオコーディング→生成）
 //   node scripts/crawl.js --dry-run    ダウンロードをスキップしキャッシュを使う
 //   node scripts/crawl.js --no-geocode ジオコーディングをスキップ
+//   node scripts/crawl.js --no-normmap 市区町村名の名寄せをスキップ（高速化・生表記のまま）
 //   node scripts/crawl.js --only=osaka-city,minato   指定キーのソースだけ処理
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { loadConfig, ROOT } from './lib/config.js';
 import { acquire } from './lib/acquire.js';
 import { parseSource } from './lib/parse.js';
@@ -29,18 +31,20 @@ import {
   toFacility,
   resolvePrefecture,
   resolveCity,
-  safeName,
 } from './lib/normalize.js';
 import { enrichWithGeocoding } from './lib/geocode.js';
-import { generateSearchIndex } from './gen-search-index.js';
+import { buildCityNormMap, applyPrefCity } from './lib/city-normmap.js';
+import { buildMergedCsv } from './build-merged-csv.js';
 import { generateTiles } from './gen-tiles.js';
 import { generateReadmeStats } from './gen-readme-stats.js';
 
 const CACHE_DIR = path.join(ROOT, '.cache');
-const OUT_DIR = path.join(ROOT, 'api', 'facilities');
+const API_DIR = path.join(ROOT, 'api');
+const CSV_PATH = path.join(API_DIR, 'facilities-all.csv');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const NO_GEOCODE = process.argv.includes('--no-geocode');
+const NO_NORMMAP = process.argv.includes('--no-normmap');
 // 施設0件のソースがあっても失敗させない（部分実行や意図的な空ソースの動作確認用）。
 const ALLOW_EMPTY_SOURCES = process.argv.includes('--allow-empty-sources');
 
@@ -51,11 +55,6 @@ const ONLY = (() => {
   return new Set(arg.slice('--only='.length).split(',').map((s) => s.trim()).filter(Boolean));
 })();
 
-function writeJSON(filePath, obj) {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(obj, null, 2) + '\n');
-}
-
 // 施設を1件も取り込めなかったソースを返す。
 // keptBySource に載っていない（＝処理前に落ちた）ソースも 0 件扱いにする。
 export function findEmptySources(sources, keptBySource) {
@@ -65,7 +64,7 @@ export function findEmptySources(sources, keptBySource) {
 async function main() {
   const { sources: allSources, columnMap } = loadConfig();
   const sources = allSources.filter((s) => !ONLY || ONLY.has(s.key));
-  console.log(`全国 食品営業許可 施設検索API クローラー${DRY_RUN ? ' (--dry-run)' : ''}`);
+  console.log(`全国 食品営業許可 データクローラー${DRY_RUN ? ' (--dry-run)' : ''}`);
   console.log(`対象ソース: ${sources.length}件${ONLY ? `（--only=${[...ONLY].join(',')}）` : ''}\n`);
 
   const facilities = [];
@@ -126,89 +125,34 @@ async function main() {
     await enrichWithGeocoding(facilities);
   }
 
-  // 都道府県 → 市区町村 → 施設 の3階層ツリーを組み立て
-  const tree = new Map(); // prefecture -> Map(city -> facility[])
-  const sourcesByPref = new Map(); // prefecture -> Set("source|license")
-  const sourcesByCity = new Map(); // "pref/city" -> Set("source|license")
-  for (const f of facilities) {
-    const pref = f._pref || '不明';
-    const city = f._city || '不明';
-    const srcKey = `${f._source || ''}|${f._license || ''}`;
-    delete f._pref;
-    delete f._city;
-    delete f._source;
-    delete f._license;
+  // 市区町村名の表記ゆれを公式名へ寄せ、各施設に pref / city / city_raw を確定させる。
+  // 以降の配信物（結合CSV・ベクトルタイル）は共通してこの値を使う。
+  console.log('\n▼ 市区町村名の名寄せ');
+  const normMap = NO_NORMMAP ? {} : await buildCityNormMap(facilities);
+  if (NO_NORMMAP) console.log('  スキップ (--no-normmap)');
+  const { colFixedCount, mergedCount } = applyPrefCity(facilities, normMap);
+  console.log(`  列ズレ補正: ${colFixedCount}件 / 市区町村名の名寄せ: ${mergedCount}件`);
 
-    if (!tree.has(pref)) tree.set(pref, new Map());
-    const byCity = tree.get(pref);
-    if (!byCity.has(city)) byCity.set(city, []);
-    byCity.get(city).push(f);
-
-    if (!sourcesByPref.has(pref)) sourcesByPref.set(pref, new Set());
-    sourcesByPref.get(pref).add(srcKey);
-    const ck = `${pref}/${city}`;
-    if (!sourcesByCity.has(ck)) sourcesByCity.set(ck, new Set());
-    sourcesByCity.get(ck).add(srcKey);
-  }
-
-  // "source|license" の Set を [{source, license}] 配列に変換
-  const toSourceList = (set) =>
-    [...set].map((s) => {
-      const [source, license] = s.split('|');
-      return { source, license: license || null };
-    });
-
-  // 出力ディレクトリをクリーンに作り直す
-  if (fs.existsSync(OUT_DIR)) fs.rmSync(OUT_DIR, { recursive: true, force: true });
-  fs.mkdirSync(OUT_DIR, { recursive: true });
+  // 配信物を作り直す。api/ ごと消してから書くことで、過去の生成物（旧形式の
+  // 階層JSON 等）が gh-pages に残り続けるのを防ぐ。
+  console.log('\n▼ 配信物の生成');
+  if (fs.existsSync(API_DIR)) fs.rmSync(API_DIR, { recursive: true, force: true });
+  fs.mkdirSync(API_DIR, { recursive: true });
 
   const updated = Math.floor(Date.now() / 1000);
+  const csv = await buildMergedCsv(facilities, { outPath: CSV_PATH });
+  const tiles = generateTiles(facilities, { updated, stats: csv });
+  generateReadmeStats({ updated, csv, tiles });
 
-  // 全ソースの一覧（トップ index.json 用）
-  const allSet = new Set();
-  for (const set of sourcesByPref.values()) for (const s of set) allSet.add(s);
-
-  // トップレベル index.json（都道府県名 → 市区町村名の配列）
-  const topData = {};
-  for (const [pref, byCity] of tree) topData[pref] = [...byCity.keys()].sort();
-  writeJSON(path.join(OUT_DIR, 'index.json'), {
-    meta: { updated, sources: toSourceList(allSet) },
-    data: topData,
-  });
-
-  let cityCount = 0;
-  for (const [pref, byCity] of tree) {
-    const prefDir = path.join(OUT_DIR, safeName(pref));
-
-    // 都道府県/index.json（市区町村名 → 施設数）
-    const counts = {};
-    for (const [city, list] of byCity) counts[city] = list.length;
-    writeJSON(path.join(prefDir, 'index.json'), {
-      meta: { updated, sources: toSourceList(sourcesByPref.get(pref)) },
-      data: counts,
-    });
-
-    // 都道府県/市区町村/data.json（施設配列）
-    for (const [city, list] of byCity) {
-      cityCount++;
-      writeJSON(path.join(prefDir, safeName(city), 'data.json'), {
-        meta: { updated, sources: toSourceList(sourcesByCity.get(`${pref}/${city}`)) },
-        data: list,
-      });
-    }
-  }
-
-  // 施設名検索用の索引・ベクトルタイル・README統計を生成する。
-  generateSearchIndex();
-  generateTiles();
-  generateReadmeStats();
-
-  console.log(`\n✅ 生成完了: ${tree.size}都道府県 / ${cityCount}市区町村 / ${facilities.length}施設`);
-  console.log(`   出力先: ${path.relative(ROOT, OUT_DIR)}`);
+  console.log(
+    `\n✅ 生成完了: ${csv.prefectures}都道府県 / ${csv.cities}市区町村 / ${csv.rowsOut}レコード`,
+  );
+  console.log(`   出力先: api/facilities-all.csv[.gz] / api/tiles/`);
 }
 
 // 直接実行された場合のみクロールを開始する（テストから import しても main は走らない）。
-if (import.meta.url === `file://${process.argv[1]}`) {
+// パスに %  や空白を含む場合でも一致するよう、pathToFileURL で同じ形式に揃えて比較する。
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((err) => {
     console.error('\n❌ エラー:', err.message);
     process.exit(1);

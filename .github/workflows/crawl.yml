@@ -51,22 +51,13 @@ jobs:
           node scripts/fetch-i2fas.mjs
         continue-on-error: true
 
+      # クロールから配信物（結合CSV・ベクトルタイル）の生成までを1コマンドで行う。
       - name: Crawl
         # 全ソース＋i2fas で施設が100万件超になりメモリを要するため、
         # Node のヒープ上限を引き上げる（GitHub Linux ランナーは 16GB RAM）。
         env:
           NODE_OPTIONS: --max-old-space-size=12288
         run: node scripts/crawl.js --allow-empty-sources ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}
-
-      # 全市区町村を結合した1本の配布用CSV（api/facilities-all.csv[.gz]）を生成する。
-      # 市区町村名は normalize-japanese-addresses で名寄せ済み。gh-pages でそのまま配信される。
-      - name: Build merged CSV
-        env:
-          NODE_OPTIONS: --max-old-space-size=12288
-        run: |
-          node scripts/build-city-normmap.js
-          node scripts/build-merged-csv.js
-          gzip -kf api/facilities-all.csv
 
       # 出典表示ページ（attribution.html）を config/sources.yaml から再生成する。
       # npm test で config との同期を検証するため、Validate より前に実行する。

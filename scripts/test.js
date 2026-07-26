@@ -1,17 +1,22 @@
-// api/ ディレクトリが正しく生成されたことを確認するバリデーションスクリプト
+// 生成した配信物が正しいことを確認するバリデーションスクリプト。
 //
-// 検証する構造（都道府県 > 市区町村 > data.json）:
-//   api/facilities/index.json                都道府県名 → 市区町村名の配列
-//   api/facilities/{都道府県}/index.json      市区町村名 → 施設数
-//   api/facilities/{都道府県}/{市区町村}/data.json  施設オブジェクトの配列
+// 検証対象は配信する2形式だけ:
+//   api/facilities-all.csv[.gz]   全件の結合CSV
+//   api/tiles/{z}/{x}/{y}.pbf     ベクトルタイル + metadata.json（TileJSON）
+//
+//   node scripts/test.js
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CSV_COLUMNS } from './build-merged-csv.js';
+import { readCsvRows } from './lib/csv-read.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const OUT_DIR = path.join(ROOT, 'api', 'facilities');
+const API_DIR = path.join(ROOT, 'api');
+const CSV_PATH = path.join(API_DIR, 'facilities-all.csv');
+const TILES_DIR = path.join(API_DIR, 'tiles');
 
 let failures = 0;
 function assert(cond, msg) {
@@ -23,168 +28,125 @@ function assert(cond, msg) {
   }
 }
 
-function readJSON(p) {
-  return JSON.parse(fs.readFileSync(p, 'utf-8'));
-}
+console.log('配信物バリデーション\n');
 
-function safeName(s) {
-  return String(s).replace(/[\\/:*?"<>|]/g, '_');
-}
-
-console.log('API バリデーション\n');
-
-// 1. トップレベル index.json が存在する
-const topPath = path.join(OUT_DIR, 'index.json');
-assert(fs.existsSync(topPath), 'api/facilities/index.json が存在する');
-
-if (failures > 0) {
-  console.error('\n❌ index.json が無いため中断');
+// --- 1. 結合CSV -------------------------------------------------------------
+assert(fs.existsSync(CSV_PATH), 'api/facilities-all.csv が存在する');
+if (!fs.existsSync(CSV_PATH)) {
+  console.error('\n❌ 結合CSV が無いため中断');
   process.exit(1);
 }
 
-const top = readJSON(topPath);
-
-// 2. meta.updated と data オブジェクトがある
-assert(typeof top.meta?.updated === 'number', 'トップ index.json に meta.updated (number) がある');
-assert(top.data && typeof top.data === 'object', 'トップ index.json に data オブジェクトがある');
-
-const prefectures = Object.keys(top.data);
-assert(prefectures.length >= 1, `少なくとも1つの都道府県がある (${prefectures.length}件)`);
-
-// 3. 都道府県ごとに index.json と各市区町村の data.json を検証
-let totalFacilities = 0;
-let totalCities = 0;
+const col = Object.fromEntries(CSV_COLUMNS.map((c, i) => [c, i]));
+let rowCount = 0;
 let withCoords = 0;
-let checkedFacilitySample = false;
-
-for (const pref of prefectures) {
-  const prefDir = path.join(OUT_DIR, safeName(pref));
-  const prefIndexPath = path.join(prefDir, 'index.json');
-  if (!fs.existsSync(prefIndexPath)) {
-    console.error(`  ✗ ${pref}/index.json が存在しない`);
+let header = null;
+const prefs = new Set();
+const cities = new Set();
+// 同種のエラーで何万行も出力しないよう、種類ごとに最初の数件だけ報告する。
+const reported = new Map();
+function reportOnce(kind, msg) {
+  const n = (reported.get(kind) || 0) + 1;
+  reported.set(kind, n);
+  if (n <= 3) {
+    console.error(`  ✗ ${msg}`);
     failures++;
+  }
+}
+
+for (const row of readCsvRows(CSV_PATH)) {
+  if (header === null) {
+    header = row;
     continue;
   }
-  const prefIndex = readJSON(prefIndexPath);
+  rowCount++;
 
-  // トップ index.json の市区町村一覧と、都道府県 index.json のキーが一致する
-  const citiesFromTop = [...top.data[pref]].sort();
-  const citiesFromIndex = Object.keys(prefIndex.data || {}).sort();
-  assert(
-    JSON.stringify(citiesFromTop) === JSON.stringify(citiesFromIndex),
-    `${pref}: トップ index と都道府県 index の市区町村一覧が一致する`,
-  );
+  if (row.length !== CSV_COLUMNS.length) {
+    reportOnce('cols', `${rowCount}行目: 列数が ${row.length}（期待 ${CSV_COLUMNS.length}）`);
+    continue;
+  }
 
-  for (const [city, count] of Object.entries(prefIndex.data || {})) {
-    totalCities++;
-    const dataPath = path.join(prefDir, safeName(city), 'data.json');
-    if (!fs.existsSync(dataPath)) {
-      console.error(`  ✗ ${pref}/${city}/data.json が存在しない`);
-      failures++;
-      continue;
+  const pref = row[col.prefecture];
+  const city = row[col.city];
+  if (!pref) reportOnce('pref', `${rowCount}行目: prefecture が空`);
+  if (!city) reportOnce('city', `${rowCount}行目: city が空`);
+  prefs.add(pref);
+  cities.add(`${pref}/${city}`);
+
+  // 座標: 両方空か、両方が日本の範囲内の数値であること。
+  const latRaw = row[col.lat];
+  const lngRaw = row[col.lng];
+  if (latRaw !== '' || lngRaw !== '') {
+    const lat = Number(latRaw);
+    const lng = Number(lngRaw);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < 20 || lat > 46 || lng < 122 || lng > 154) {
+      reportOnce('coord', `${rowCount}行目: 不正な座標 (${latRaw}, ${lngRaw}) - ${row[col.name]}`);
+    } else {
+      withCoords++;
     }
-    const cityData = readJSON(dataPath);
-    if (!Array.isArray(cityData.data)) {
-      console.error(`  ✗ ${pref}/${city}/data.json の data が配列でない`);
-      failures++;
-      continue;
-    }
-    totalFacilities += cityData.data.length;
+  }
 
-    // index.json の件数と data.json の要素数が一致する
-    if (cityData.data.length !== count) {
-      console.error(`  ✗ ${pref}/${city}: index の件数(${count})と data.json の要素数(${cityData.data.length})が不一致`);
-      failures++;
-    }
-
-    // 座標の検証: 値があれば数値かつ日本の範囲内であること
-    for (const f of cityData.data) {
-      const hasLat = f.lat != null;
-      const hasLng = f.lng != null;
-      if (hasLat || hasLng) {
-        if (
-          typeof f.lat !== 'number' || typeof f.lng !== 'number' ||
-          f.lat < 20 || f.lat > 46 || f.lng < 122 || f.lng > 154
-        ) {
-          console.error(`  ✗ ${pref}/${city}: 不正な座標 (${f.lat}, ${f.lng}) - ${f.name}`);
-          failures++;
-        } else {
-          withCoords++;
-        }
-      }
-
-      // geocoding_level は null または 1〜8 の整数であること
-      if (
-        f.geocoding_level != null &&
-        (!Number.isInteger(f.geocoding_level) || f.geocoding_level < 1 || f.geocoding_level > 8)
-      ) {
-        console.error(`  ✗ ${pref}/${city}: 不正な geocoding_level (${f.geocoding_level}) - ${f.name}`);
-        failures++;
-      }
-    }
-
-    if (!checkedFacilitySample && cityData.data.length > 0) {
-      assert(cityData.meta && typeof cityData.meta === 'object', `施設JSONに meta がある (${pref}/${city})`);
-      const sample = cityData.data[0];
-      assert(sample && 'name' in sample, '施設に name フィールドがある');
-      assert(sample && 'address' in sample, '施設に address フィールドがある');
-      assert(sample && 'business_type' in sample, '施設に business_type フィールドがある');
-      assert(sample && 'lat' in sample && 'lng' in sample, '施設に lat / lng フィールドがある');
-      assert(sample && 'geocoding_level' in sample, '施設に geocoding_level フィールドがある');
-      checkedFacilitySample = true;
-    }
+  // geocoding_level は空 または 1〜8 の整数。
+  const lv = row[col.geocoding_level];
+  if (lv !== '' && !(Number.isInteger(Number(lv)) && Number(lv) >= 1 && Number(lv) <= 8)) {
+    reportOnce('level', `${rowCount}行目: 不正な geocoding_level (${lv})`);
   }
 }
 
-assert(checkedFacilitySample, '少なくとも1つの施設サンプルを検証した');
-assert(withCoords > 0, `座標を持つ施設が存在する (${withCoords}件)`);
-
-// 4. 施設名検索用の索引（マニフェスト＋都道府県別 shard）を検証
-const indexPath = path.join(ROOT, 'api', 'search-index.json');
-assert(fs.existsSync(indexPath), 'api/search-index.json（マニフェスト）が存在する');
-if (fs.existsSync(indexPath)) {
-  const manifest = readJSON(indexPath);
-  assert(Array.isArray(manifest.prefectures), 'search-index マニフェストに prefectures 配列がある');
-  assert(
-    Array.isArray(manifest.meta?.schema) && manifest.meta.schema[0] === 'name',
-    'search-index の meta.schema が定義されている',
-  );
-  assert(manifest.prefectures?.length > 0, `search-index に都道府県 shard がある (${manifest.prefectures?.length ?? 0}件)`);
-
-  // 各 shard ファイルが存在し 100MB 未満であることを確認（GitHub のファイル上限対策）。
-  let idxTotal = 0;
-  let sampleChecked = false;
-  for (const p of manifest.prefectures ?? []) {
-    const shardPath = path.join(ROOT, 'api', p.file);
-    if (!fs.existsSync(shardPath)) {
-      console.error(`  ✗ search-index shard が存在しない: ${p.file}`);
-      failures++;
-      continue;
-    }
-    const sizeMB = fs.statSync(shardPath).size / (1024 * 1024);
-    if (sizeMB >= 100) {
-      console.error(`  ✗ search-index shard が100MB以上: ${p.file} (${sizeMB.toFixed(1)}MB)`);
-      failures++;
-    }
-    const shard = readJSON(shardPath);
-    idxTotal += shard.data?.length ?? 0;
-    if (!sampleChecked && shard.data?.length > 0) {
-      const [name, , lat, lng] = shard.data[0];
-      assert(typeof name === 'string' && name !== '', 'search-index shard の行に施設名がある');
-      assert(
-        typeof lat === 'number' && typeof lng === 'number' &&
-          lat >= 20 && lat <= 46 && lng >= 122 && lng <= 154,
-        'search-index shard の座標が日本の範囲内である',
-      );
-      sampleChecked = true;
-    }
-  }
-  assert(idxTotal > 0, `search-index に施設が存在する (${idxTotal}件)`);
-  assert(idxTotal === manifest.meta?.count, `マニフェストの count(${manifest.meta?.count}) と shard 合計(${idxTotal}) が一致する`);
+// BOM は readCsvRows が除去するため、ヘッダーは列名だけと一致する。
+assert(
+  JSON.stringify(header) === JSON.stringify(CSV_COLUMNS),
+  `CSV ヘッダーが定義どおり（${CSV_COLUMNS.length}列）`,
+);
+assert(
+  fs.readFileSync(CSV_PATH, { encoding: 'utf-8', start: 0, end: 3 }).startsWith('﻿'),
+  'CSV が UTF-8 BOM 付き（Excel でそのまま開ける）',
+);
+assert(rowCount > 0, `CSV にレコードがある (${rowCount.toLocaleString('en-US')}件)`);
+assert(withCoords > 0, `座標を持つレコードがある (${withCoords.toLocaleString('en-US')}件)`);
+assert(prefs.size >= 1, `都道府県が1件以上ある (${prefs.size})`);
+for (const [kind, n] of reported) {
+  if (n > 3) console.error(`  … ${kind} のエラーは他に ${n - 3} 件`);
 }
 
-console.log(`\n施設総数: ${totalFacilities}件 / ${totalCities}市区町村 / ${prefectures.length}都道府県`);
-console.log(`座標あり: ${withCoords}件 (${((withCoords / totalFacilities) * 100).toFixed(1)}%)`);
+// gzip 版も配信するため存在と圧縮を確認する。
+const gzPath = `${CSV_PATH}.gz`;
+assert(fs.existsSync(gzPath), 'api/facilities-all.csv.gz が存在する');
+if (fs.existsSync(gzPath)) {
+  assert(fs.statSync(gzPath).size < fs.statSync(CSV_PATH).size, 'gzip 版が非圧縮版より小さい');
+}
+
+// --- 2. ベクトルタイル ------------------------------------------------------
+const metaPath = path.join(TILES_DIR, 'metadata.json');
+assert(fs.existsSync(metaPath), 'api/tiles/metadata.json が存在する');
+if (fs.existsSync(metaPath)) {
+  const meta = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+  assert(meta.format === 'pbf', 'metadata.json の format が pbf');
+  assert(
+    Array.isArray(meta.tiles) && meta.tiles[0] === '{z}/{x}/{y}.pbf',
+    'metadata.json の tiles テンプレートが {z}/{x}/{y}.pbf',
+  );
+  assert(meta.vector_layers?.[0]?.id === 'facilities', 'レイヤ facilities が定義されている');
+  assert(
+    Number.isInteger(meta.minzoom) && Number.isInteger(meta.maxzoom) && meta.minzoom <= meta.maxzoom,
+    `ズーム範囲が妥当 (z${meta.minzoom}-${meta.maxzoom})`,
+  );
+  assert(meta.stats?.records === rowCount, `metadata.stats.records(${meta.stats?.records}) が CSV 行数と一致`);
+  assert(meta.stats?.points === withCoords, `metadata.stats.points(${meta.stats?.points}) が座標ありレコード数と一致`);
+
+  // 最小ズームのタイルが1枚以上あり、非空であること。
+  const zDir = path.join(TILES_DIR, String(meta.minzoom));
+  const pbfs = fs.existsSync(zDir)
+    ? fs.readdirSync(zDir).flatMap((x) => fs.readdirSync(path.join(zDir, x)).map((y) => path.join(zDir, x, y)))
+    : [];
+  assert(pbfs.length > 0, `z${meta.minzoom} のタイルが存在する (${pbfs.length}枚)`);
+  assert(pbfs.every((p) => fs.statSync(p).size > 0), 'タイルがすべて非空である');
+}
+
+console.log(
+  `\nレコード: ${rowCount.toLocaleString('en-US')}件 / ${cities.size}市区町村 / ${prefs.size}都道府県`,
+);
+console.log(`座標あり: ${withCoords.toLocaleString('en-US')}件 (${((withCoords / rowCount) * 100).toFixed(1)}%)`);
 
 if (failures > 0) {
   console.error(`\n❌ ${failures}件のチェックに失敗`);

@@ -1,17 +1,14 @@
 // ベクトルタイル生成（z/x/y .pbf ディレクトリ）
 //
-// api/facilities 配下の全 data.json を読み、座標を持つ施設を点(Point)として
-// Mapbox Vector Tile（MVT）に焼き、GitHub Pages から直接配信できる z/x/y 形式で出力する。
+// 座標を持つ施設を点(Point)として Mapbox Vector Tile（MVT）に焼き、
+// GitHub Pages から直接配信できる z/x/y 形式で出力する。
 //   api/tiles/{z}/{x}/{y}.pbf   MapLibre の tiles:["{z}/{x}/{y}.pbf"] でそのまま読める
-//   api/tiles/metadata.json     TileJSON（レイヤ・ズーム範囲・bounds）
+//   api/tiles/metadata.json     TileJSON（レイヤ・ズーム範囲・bounds・データ統計）
 //
 // tippecanoe 等のシステムバイナリは不要（pure JS: geojson-vt + vt-pbf）。
 // タイルは非圧縮 pbf で書くため、GitHub Pages で Content-Encoding 設定なしにそのまま配信できる。
 //
-// 使い方:
-//   node scripts/gen-tiles.js          既存の api/facilities から生成
-//   TILES_MIN_ZOOM=6 TILES_MAX_ZOOM=12 node scripts/gen-tiles.js   ズーム範囲を指定
-//   （crawl.js の最後でも自動生成される）
+// 入力はクロール結果の施設配列（メモリ上）。crawl.js から呼ばれる。
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,7 +22,6 @@ const fromGeojsonVt = vtpbf.fromGeojsonVt || vtpbfNs.fromGeojsonVt;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const FACILITIES_DIR = path.join(ROOT, 'api', 'facilities');
 const TILES_DIR = path.join(ROOT, 'api', 'tiles');
 const LAYER = 'facilities';
 
@@ -45,45 +41,45 @@ export function lonLatToTile(lng, lat, z) {
   return [x, y];
 }
 
-// facilities ディレクトリの全 data.json から、座標を持つ施設の GeoJSON FeatureCollection を組み立てる。
-export function buildFeatureCollection(facilitiesDir = FACILITIES_DIR) {
+/** 施設配列から、座標を持つ施設だけの GeoJSON FeatureCollection を組み立てる。 */
+export function buildFeatureCollection(facilities) {
   const features = [];
-  for (const pref of fs.readdirSync(facilitiesDir).sort()) {
-    const prefDir = path.join(facilitiesDir, pref);
-    if (!fs.statSync(prefDir).isDirectory()) continue;
-    for (const city of fs.readdirSync(prefDir).sort()) {
-      const dataPath = path.join(prefDir, city, 'data.json');
-      if (!fs.existsSync(dataPath)) continue;
-      const json = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
-      for (const f of json.data ?? []) {
-        if (typeof f.lat !== 'number' || typeof f.lng !== 'number') continue;
-        features.push({
-          type: 'Feature',
-          geometry: { type: 'Point', coordinates: [f.lng, f.lat] },
-          properties: { name: f.name || '', business_type: f.business_type || '', pref, city },
-        });
-      }
-    }
+  for (const f of facilities) {
+    if (typeof f.lat !== 'number' || typeof f.lng !== 'number') continue;
+    features.push({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [f.lng, f.lat] },
+      properties: {
+        name: f.name || '',
+        business_type: f.business_type || '',
+        pref: f.pref || '',
+        city: f.city || '',
+      },
+    });
   }
   return { type: 'FeatureCollection', features };
 }
 
-/** facilities ツリーから z/x/y ベクトルタイルを生成する。書き出したタイル数を返す。 */
-export function generateTiles({
+/**
+ * 施設配列から z/x/y ベクトルタイルと TileJSON を生成する。
+ *
+ * `stats`（結合CSV 側で集計した件数）は metadata.json に埋め込み、
+ * プレビュー地図(index.html)が JSON データを別途配信せずに件数を表示できるようにする。
+ *
+ * 生成結果 `{ tiles, points, bytes }` を返す。
+ */
+export function generateTiles(facilities, {
   minZoom = MIN_ZOOM,
   maxZoom = MAX_ZOOM,
-  facilitiesDir = FACILITIES_DIR,
   outDir = TILES_DIR,
+  updated = Math.floor(Date.now() / 1000),
+  stats = null,
+  log = console.log,
 } = {}) {
-  if (!fs.existsSync(facilitiesDir)) {
-    console.warn('  api/facilities が無いため ベクトルタイルの生成をスキップ');
-    return 0;
-  }
-
-  const fc = buildFeatureCollection(facilitiesDir);
+  const fc = buildFeatureCollection(facilities);
   if (fc.features.length === 0) {
     console.warn('  座標を持つ施設が無いため ベクトルタイルの生成をスキップ');
-    return 0;
+    return { tiles: 0, points: 0, bytes: 0 };
   }
 
   // 古いタイルを消してから作り直す（点が減った場合の取り残しを防ぐ）。
@@ -116,7 +112,8 @@ export function generateTiles({
     bytes += buf.length;
   }
 
-  // TileJSON（利用側は tiles テンプレートと vector_layers を参照）
+  // TileJSON（利用側は tiles テンプレートと vector_layers を参照）。
+  // stats はプレビュー地図が読む拡張フィールド。
   const metadata = {
     tilejson: '2.2.0',
     name: 'japan-facilities',
@@ -130,17 +127,19 @@ export function generateTiles({
     vector_layers: [
       { id: LAYER, fields: { name: 'String', business_type: 'String', pref: 'String', city: 'String' } },
     ],
+    updated,
+    stats: {
+      points: fc.features.length,
+      records: stats?.rowsOut ?? null,
+      prefectures: stats?.prefectures ?? null,
+      cities: stats?.cities ?? null,
+    },
   };
   fs.writeFileSync(path.join(outDir, 'metadata.json'), JSON.stringify(metadata, null, 2) + '\n');
 
-  console.log(
+  log(
     `  ベクトルタイル: ${fc.features.length}点 → ${written}タイル（z${minZoom}-${maxZoom}, ` +
       `計 ${(bytes / 1024 / 1024).toFixed(1)} MB）→ api/tiles/`,
   );
-  return written;
-}
-
-// 直接実行された場合は生成する。
-if (import.meta.url === `file://${process.argv[1]}`) {
-  generateTiles();
+  return { tiles: written, points: fc.features.length, bytes };
 }
