@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { buildMergedCsv, CSV_COLUMNS, csvCell } from './build-merged-csv.js';
+import { generateTiles } from './gen-tiles.js';
 import { readCsvRows } from './lib/csv-read.js';
 import { resolvePrefCity, applyPrefCity, collectCityPairs } from './lib/city-normmap.js';
 
@@ -113,6 +114,47 @@ await test('CSV: 出典を除く全列一致の重複を1行に寄せる', async
   }
 });
 
+// ベクトルタイルは stats.unique から作る。ここが CSV に書いた集合と食い違うと、
+// metadata.json の records（CSV基準）と points（タイル基準）がズレて配信物の
+// バリデーションが落ちる。
+await test('CSV: unique が実際に書き出した施設と一致する', async () => {
+  const kept = fac();
+  const other = fac({ business_type: '喫茶店営業' });
+  const { dir, rows, stats } = await writeCsv([
+    kept,
+    fac(), // 完全重複
+    fac({ _source: '別ソース' }), // 出典だけ違う＝同じ施設
+    other,
+  ]);
+  try {
+    assert.equal(stats.unique.length, stats.rowsOut, 'unique の件数が CSV 行数と一致する');
+    assert.equal(stats.unique.length, rows.length);
+    assert.deepEqual(
+      stats.unique.map((f) => f.business_type),
+      [kept.business_type, other.business_type],
+      '重複は除かれ、最初に出会った施設が残る',
+    );
+    assert.equal(stats.unique[0], kept, '施設オブジェクトの参照をそのまま返す');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+await test('CSV: 座標つきの重複は unique から落ちる（タイルの点数が CSV と揃う）', async () => {
+  const { dir, stats } = await writeCsv([
+    fac(),
+    fac(), // 座標を持つ完全重複
+    fac({ name: '店B', lat: null, lng: null }),
+  ]);
+  try {
+    const withCoords = stats.unique.filter((f) => f.lat != null && f.lng != null).length;
+    assert.equal(stats.dupSkipped, 1);
+    assert.equal(withCoords, 1, '重複を数え上げず、座標ありは1件');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 await test('CSV: 都道府県・市区町村の異なり数を数える', async () => {
   const { dir, stats } = await writeCsv([
     fac(),
@@ -184,6 +226,50 @@ await test('collectCityPairs: ユニークな (都道府県, 市区町村) を�
   assert.equal(pairs.length, 3);
   assert.equal(pairs.find((p) => p.city === '港区').addr, '東京都港区赤坂1-1', '空でない住所を代表にする');
   assert.ok(pairs.some((p) => p.pref === '不明' && p.city === '不明'));
+});
+
+// --- 配信物どうしの整合 ---
+// scripts/test.js が本番データで確認している不変条件を、小さなフィクスチャで先に潰す。
+// 実際に metadata.stats.points（タイル基準）と CSV の座標あり件数がズレて
+// クロールが失敗したことがある（タイルだけ重複除去前の配列から作っていた）。
+await test('配信物: metadata.stats が CSV の件数と一致する', async () => {
+  const { dir, outPath, stats, rows } = await writeCsv(
+    [
+      fac(),
+      fac(), // 座標つきの完全重複
+      fac({ name: '店B' }),
+      fac({ name: '店C', lat: null, lng: null }), // 座標なし
+    ],
+    { gzip: false },
+  );
+  try {
+    const outDir = path.join(path.dirname(outPath), 'tiles');
+    generateTiles(stats.unique, { minZoom: 12, maxZoom: 12, outDir, stats, log: () => {} });
+    const meta = JSON.parse(fs.readFileSync(path.join(outDir, 'metadata.json'), 'utf-8'));
+
+    const withCoords = rows.filter((r) => r[col.lat] !== '' && r[col.lng] !== '').length;
+    assert.equal(meta.stats.records, rows.length, 'records が CSV 行数と一致する');
+    assert.equal(meta.stats.points, withCoords, 'points が CSV の座標あり件数と一致する');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+await test('配信物: 重複除去前の配列からタイルを作ろうとすると止まる', async () => {
+  const facilities = [fac(), fac()];
+  const { dir, outPath, stats } = await writeCsv(facilities, { gzip: false });
+  try {
+    assert.throws(
+      () => generateTiles(facilities, {
+        outDir: path.join(path.dirname(outPath), 'tiles'),
+        stats,
+        log: () => {},
+      }),
+      /stats\.unique/,
+    );
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 console.log(`\n✅ 結合CSV / 名寄せ テスト: ${passed}件すべて合格`);
