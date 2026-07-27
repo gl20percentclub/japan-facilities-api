@@ -18,6 +18,11 @@ on:
 permissions:
   contents: write
 
+# gh-pages への push が pages.yml と競合しないよう、配信は常に1本ずつ流す。
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 jobs:
   crawl:
     runs-on: ubuntu-latest
@@ -88,10 +93,13 @@ jobs:
           echo "::warning::README stats の push に失敗（gh-pages への配信は別ステップで実施）"
 
       # 生成した api/ を gh-pages へ配信する（データの唯一の配信先）。
+      # publish_dir が . なので .gitignore も配信対象に含まれてしまう。gh-pages 側では
+      # actions-gh-pages が git add --all するため、api/ を無視する .gitignore が
+      # 配信先に置かれると生成物が一切コミットされない。必ず除外する。
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .
           publish_branch: gh-pages
-          exclude_assets: 'node_modules,.cache,scripts,.github'
+          exclude_assets: 'node_modules,.cache,scripts,.github,.gitignore'
