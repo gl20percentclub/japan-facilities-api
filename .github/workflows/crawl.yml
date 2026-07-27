@@ -18,6 +18,11 @@ on:
 permissions:
   contents: write
 
+# gh-pages への push が pages.yml と競合しないよう、配信は常に1本ずつ流す。
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 jobs:
   crawl:
     runs-on: ubuntu-latest

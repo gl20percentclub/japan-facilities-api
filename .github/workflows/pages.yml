@@ -1,0 +1,44 @@
+name: Deploy Pages
+
+# 静的ページ（LP・プレビュー地図・出典表示）を main への push で gh-pages に反映する。
+# データ（api/）の生成は重いため crawl.yml 側で週次に行う。ここではページだけを
+# 上書きし、既存の api/ には触れない（keep_files: true）。
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'map.html'
+      - 'attribution.html'
+      - '_headers'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# crawl.yml の配信ステップと同じグループ。gh-pages への同時 push を避ける。
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # keep_files: true なので gh-pages 上の api/ は残したまま、ページだけ上書きされる。
+      # 反面ファイル削除は反映されないため、リネームや削除の掃除は crawl.yml の
+      # 配信（keep_files: false）に任せる。
+      # .gitignore は api/ を無視するため、配信先に置くと次回以降の api/ 更新が
+      # コミットされなくなる。crawl.yml と同じく除外する。
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
+          keep_files: true
+          exclude_assets: 'node_modules,.cache,scripts,.github,.gitignore'
