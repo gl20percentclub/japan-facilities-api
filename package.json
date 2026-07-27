@@ -1,14 +1,13 @@
 {
-  "name": "okinawa-facilities-api",
+  "name": "japan-facilities-data",
   "type": "module",
   "scripts": {
     "build": "node scripts/crawl.js",
     "build:dry": "node scripts/crawl.js --dry-run",
-    "build:search-index": "node scripts/gen-search-index.js",
-    "build:tiles": "node scripts/gen-tiles.js",
-    "build:readme-stats": "node scripts/gen-readme-stats.js",
+    "build:attribution": "node scripts/gen-attribution.js",
     "fetch:i2fas": "node scripts/fetch-i2fas.mjs",
-    "test": "node scripts/crawl.test.js && node scripts/lib/config.test.js && node scripts/gen-tiles.test.js && node scripts/preview-map.test.js && node scripts/test.js && node scripts/gen-readme-stats.test.js"
+    "test:unit": "node scripts/crawl.test.js && node scripts/lib/config.test.js && node scripts/build-merged-csv.test.js && node scripts/gen-tiles.test.js && node scripts/preview-map.test.js && node scripts/gen-readme-stats.test.js && node scripts/gen-attribution.test.js && node scripts/workflows.test.js",
+    "test": "npm run test:unit && node scripts/test.js"
   },
   "dependencies": {
     "@geolonia/normalize-japanese-addresses": "^3.1.3",
