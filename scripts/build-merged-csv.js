@@ -1,8 +1,10 @@
-// 全件配布用の結合CSV生成（api/facilities-all.csv[.gz]）。
+// 全件配布用の結合CSV生成（api/facilities-all.csv）。
 //
 // 全国の施設レコードを1本の CSV に書き出す。都道府県・市区町村は名寄せ済みの値
 // （lib/city-normmap.js が付与した pref / city）を使い、元データの生表記は
 // city_raw 列に残す。
+//
+// 配布形式は BOM なし UTF-8 の CSV 1本のみ（gzip 圧縮版は配布しない）。
 //
 // 出力時に以下の浄化を行う:
 //   - 全列完全一致の重複レコードを除去（出典・ライセンス列は判定から除く。
@@ -15,8 +17,6 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import zlib from 'node:zlib';
-import { pipeline } from 'node:stream/promises';
 
 /** 結合CSV の列（この順で出力する）。 */
 export const CSV_COLUMNS = [
@@ -54,14 +54,13 @@ function write(stream, chunk) {
 }
 
 /**
- * 結合CSV（と gzip 版）を書き出す。
- * 統計 `{ rowsIn, rowsOut, dupSkipped, prefectures, cities, bytes, gzipBytes }` を返す。
+ * 結合CSV を書き出す（BOM なし UTF-8）。
+ * 統計 `{ rowsIn, rowsOut, dupSkipped, prefectures, cities, bytes }` を返す。
  */
-export async function buildMergedCsv(facilities, { outPath, gzip = true, log = console.log } = {}) {
+export async function buildMergedCsv(facilities, { outPath, log = console.log } = {}) {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   const out = fs.createWriteStream(outPath, { encoding: 'utf-8' });
 
-  await write(out, '﻿'); // Excel 互換 UTF-8 BOM
   await write(out, CSV_COLUMNS.join(',') + '\n');
 
   let rowsIn = 0;
@@ -97,24 +96,12 @@ export async function buildMergedCsv(facilities, { outPath, gzip = true, log = c
   });
 
   const bytes = fs.statSync(outPath).size;
-  let gzipBytes = 0;
-  if (gzip) {
-    // 540MB 級になるためストリームで圧縮する（メモリに載せない）。
-    const gzPath = `${outPath}.gz`;
-    await pipeline(
-      fs.createReadStream(outPath),
-      zlib.createGzip({ level: 6 }),
-      fs.createWriteStream(gzPath),
-    );
-    gzipBytes = fs.statSync(gzPath).size;
-  }
 
   log(
     `  結合CSV: ${rowsOut.toLocaleString('en-US')}行` +
       `（重複 ${dupSkipped.toLocaleString('en-US')}行を除去）` +
       ` / ${prefs.size}都道府県 / ${cities.size}市区町村` +
-      ` / ${(bytes / 1024 / 1024).toFixed(1)} MB` +
-      (gzip ? `（gzip ${(gzipBytes / 1024 / 1024).toFixed(1)} MB）` : ''),
+      ` / ${(bytes / 1024 / 1024).toFixed(1)} MB`,
   );
 
   return {
@@ -124,6 +111,5 @@ export async function buildMergedCsv(facilities, { outPath, gzip = true, log = c
     prefectures: prefs.size,
     cities: cities.size,
     bytes,
-    gzipBytes,
   };
 }

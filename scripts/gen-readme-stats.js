@@ -36,7 +36,6 @@ function num(n) {
  */
 export function renderStats(s) {
   const date = s.updated ? new Date(s.updated * 1000).toISOString().slice(0, 10) : '—';
-  const gz = s.csv.gzipBytes ? `（gzip ${humanSize(s.csv.gzipBytes)}）` : '';
   return [
     `> **最終更新: ${date}**`,
     '>',
@@ -46,7 +45,7 @@ export function renderStats(s) {
     `> | 座標を持つ施設 | ${num(s.tiles.points)} 件 |`,
     `> | 都道府県 | ${num(s.csv.prefectures)} |`,
     `> | 市区町村 | ${num(s.csv.cities)} |`,
-    `> | 結合CSV | ${humanSize(s.csv.bytes)}${gz} |`,
+    `> | 結合CSV | ${humanSize(s.csv.bytes)} |`,
     `> | ベクトルタイル | ${num(s.tiles.tiles)} 枚 / ${humanSize(s.tiles.bytes)} |`,
   ].join('\n');
 }

@@ -24,7 +24,6 @@ const fixed = {
     prefectures: 47,
     cities: 1741,
     bytes: 540 * 1024 * 1024,
-    gzipBytes: 60 * 1024 * 1024,
   },
   tiles: { tiles: 12345, points: 1106198, bytes: 250 * 1024 * 1024 },
 };
@@ -35,12 +34,9 @@ assert(md.includes('| 施設レコード数 | 1,495,048 件 |'), '施設レコ�
 assert(md.includes('| 座標を持つ施設 | 1,106,198 件 |'), '座標ありの件数が出る');
 assert(md.includes('| 都道府県 | 47 |'), '都道府県数が出る');
 assert(md.includes('| 市区町村 | 1,741 |'), '市区町村数が出る');
-assert(md.includes('約 540.0 MB（gzip 約 60.0 MB）'), 'CSV サイズが gzip 併記で出る');
+assert(md.includes('| 結合CSV | 約 540.0 MB |'), 'CSV サイズが出る');
+assert(!md.includes('gzip'), 'gzip 表記は出さない（非圧縮CSVのみ配布）');
 assert(md.includes('| ベクトルタイル | 12,345 枚 / 約 250.0 MB |'), 'タイル枚数とサイズが出る');
-
-// gzip が無い場合は併記しない。
-const noGz = renderStats({ ...fixed, csv: { ...fixed.csv, gzipBytes: 0 } });
-assert(!noGz.includes('gzip'), 'gzipBytes が 0 なら gzip 表記を出さない');
 
 // updated が無い場合はダッシュ表記。
 const noDate = renderStats({ ...fixed, updated: 0 });

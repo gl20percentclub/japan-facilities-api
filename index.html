@@ -237,14 +237,13 @@
         ベース URL は <code>https://gl20percentclub.github.io/japan-facilities-api/api/</code>。
       </p>
 
-      <p class="step">1. 全件CSV をダウンロードする（gzip 約 60MB）</p>
-<pre><code>curl -O https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz
-gunzip facilities-all.csv.gz</code></pre>
+      <p class="step">1. 全件CSV をダウンロードする（約 540MB）</p>
+<pre><code>curl -O https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv</code></pre>
 
       <p class="step">2. pandas で読み込む（URL 直指定でもいけます）</p>
 <pre><code>import pandas as pd
 
-df = pd.read_csv('https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz')
+df = pd.read_csv('https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv')
 <span class="c"># 那覇市の飲食店営業だけ抜き出す</span>
 naha = df[(df.city == '那覇市') &amp; (df.business_type == '飲食店営業')]
 print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
@@ -280,8 +279,8 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
           <tbody>
             <tr>
               <td>全件 CSV</td>
-              <td><code>api/facilities-all.csv.gz</code>（約 60MB / 非圧縮 約 540MB）</td>
-              <td>Excel・pandas・BI ツール・DB 取り込みで分析する。全項目入り・UTF-8 BOM 付きです。</td>
+              <td><code>api/facilities-all.csv</code>（約 540MB）</td>
+              <td>pandas・BI ツール・DB 取り込みで分析する。全項目入り・BOM なし UTF-8 です。</td>
             </tr>
             <tr>
               <td>ベクトルタイル</td>

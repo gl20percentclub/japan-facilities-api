@@ -11,7 +11,7 @@
 
 [公式サイト](https://gl20percentclub.github.io/japan-facilities-api/) ·
 [地図で見る](https://gl20percentclub.github.io/japan-facilities-api/map.html) ·
-[CSVをダウンロード](https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz) ·
+[CSVをダウンロード](https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv) ·
 [収録状況](docs/COVERAGE.md) ·
 [出典・ライセンス](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)
 
@@ -49,23 +49,20 @@
 
 | ファイル | URL |
 |---|---|
-| gzip圧縮版（推奨） | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz |
-| 非圧縮版 | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv |
+| 全件CSV | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv |
 
-- 文字コード: UTF-8 BOM付き
-- Excelで直接読み込み可能
+- 文字コード: UTF-8（BOMなし）
 - 全列が一致する重複レコードは除去済み
 
 ```bash
-curl -O https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz
-gunzip facilities-all.csv.gz
+curl -O https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz"
+    "https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv"
 )
 ```
 
