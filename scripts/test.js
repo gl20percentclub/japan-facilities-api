@@ -93,14 +93,13 @@ for (const row of readCsvRows(CSV_PATH)) {
   }
 }
 
-// BOM は readCsvRows が除去するため、ヘッダーは列名だけと一致する。
 assert(
   JSON.stringify(header) === JSON.stringify(CSV_COLUMNS),
   `CSV ヘッダーが定義どおり（${CSV_COLUMNS.length}列）`,
 );
 assert(
-  fs.readFileSync(CSV_PATH, { encoding: 'utf-8', start: 0, end: 3 }).startsWith('﻿'),
-  'CSV が UTF-8 BOM 付き（Excel でそのまま開ける）',
+  !fs.readFileSync(CSV_PATH, { encoding: 'utf-8', start: 0, end: 3 }).startsWith('﻿'),
+  'CSV が BOM なし UTF-8',
 );
 assert(rowCount > 0, `CSV にレコードがある (${rowCount.toLocaleString('en-US')}件)`);
 assert(withCoords > 0, `座標を持つレコードがある (${withCoords.toLocaleString('en-US')}件)`);
@@ -109,12 +108,8 @@ for (const [kind, n] of reported) {
   if (n > 3) console.error(`  … ${kind} のエラーは他に ${n - 3} 件`);
 }
 
-// gzip 版も配信するため存在と圧縮を確認する。
-const gzPath = `${CSV_PATH}.gz`;
-assert(fs.existsSync(gzPath), 'api/facilities-all.csv.gz が存在する');
-if (fs.existsSync(gzPath)) {
-  assert(fs.statSync(gzPath).size < fs.statSync(CSV_PATH).size, 'gzip 版が非圧縮版より小さい');
-}
+// 配布は非圧縮CSV のみ。gzip 版が残っていると配信物が二重になるため、無いことを確認する。
+assert(!fs.existsSync(`${CSV_PATH}.gz`), 'api/facilities-all.csv.gz を配信しない');
 
 // --- 2. ベクトルタイル ------------------------------------------------------
 const metaPath = path.join(TILES_DIR, 'metadata.json');
