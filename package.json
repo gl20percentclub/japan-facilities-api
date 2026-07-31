@@ -1,5 +1,5 @@
 {
-  "name": "japan-facilities-data",
+  "name": "japan-food-facilities-data",
   "type": "module",
   "scripts": {
     "build": "node scripts/crawl.js",
