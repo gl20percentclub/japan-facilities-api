@@ -23,9 +23,9 @@ import { loadConfig, ROOT } from './lib/config.js';
 export const OUTPUT_PATH = path.join(ROOT, 'attribution.html');
 
 /** 公開サイトの URL（一括表記の例で使う）。 */
-const SITE_URL = 'https://gl20percentclub.github.io/japan-facilities-api/';
+const SITE_URL = 'https://gl20percentclub.github.io/japan-food-facilities-api/';
 /** リポジトリ URL（ページ内リンクで使う）。 */
-const REPO_URL = 'https://github.com/gl20percentclub/japan-facilities-api';
+const REPO_URL = 'https://github.com/gl20percentclub/japan-food-facilities-api';
 
 /** 都道府県名（`source` の先頭から提供者を推定する際に使う）。 */
 const PREFECTURES = [
@@ -341,8 +341,8 @@ export function renderHtml(entries) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>出典・ライセンス表示 — Japan Facilities API</title>
-  <meta name="description" content="Japan Facilities API が収録する全データソースの出典URL・ライセンスと、各データの出典表示形式に沿った表示文の一覧です。">
+  <title>出典・ライセンス表示 — Japan Food Facilities API</title>
+  <meta name="description" content="Japan Food Facilities API が収録する全データソースの出典URL・ライセンスと、各データの出典表示形式に沿った表示文の一覧です。">
   <style>
     :root {
       --accent: #e8563f;
@@ -470,7 +470,7 @@ export function renderHtml(entries) {
   <div class="wrap">
     <h1>出典・ライセンス表示（Attribution）</h1>
     <p class="lead">
-      <a href="${SITE_URL}">Japan Facilities API</a> は、各自治体・省庁が公開する食品営業許可・届出のオープンデータを
+      <a href="${SITE_URL}">Japan Food Facilities API</a> は、各自治体・省庁が公開する食品営業許可・届出のオープンデータを
       取得し、全国共通フォーマットへの正規化と緯度経度の付与を行って配信しています。
       本ページは収録している全 ${entries.length} ソースの出典 URL とライセンス、および
       各データが求める出典表示形式に沿った表示文の一覧です。
@@ -483,7 +483,7 @@ export function renderHtml(entries) {
     </p>
     <p>全国データをまとめて利用する場合は、次の一括表記でも構いません（個別ソースの一覧として本ページを参照させてください）。</p>
     <div class="callout">
-      <code>出典：Japan Facilities API（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）<br>${SITE_URL}attribution.html</code>
+      <code>出典：Japan Food Facilities API（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）<br>${SITE_URL}attribution.html</code>
     </div>
     <p class="lead" style="margin-top:12px">
       緯度経度は本サービスが住所からジオコーディングして独自に付与した参考情報であり、各自治体が提供しているものではありません。

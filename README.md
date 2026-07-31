@@ -1,19 +1,19 @@
 <div align="center">
 
-# 🍽️ Japan Facilities Data
+# 🍽️ Japan Food Facilities Data
 
 **全国の食品営業許可・届出データを、共通形式で無料配信するオープンデータプロジェクト**
 
-[![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/graphs/contributors)
+[![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/graphs/contributors)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-facilities-api)](https://github.com/gl20percentclub/japan-facilities-api/issues)
+[![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/issues)
 [![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#更新頻度)
 
-[公式サイト](https://gl20percentclub.github.io/japan-facilities-api/) ·
-[地図で見る](https://gl20percentclub.github.io/japan-facilities-api/map.html) ·
-[CSVをダウンロード](https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv) ·
+[公式サイト](https://gl20percentclub.github.io/japan-food-facilities-api/) ·
+[地図で見る](https://gl20percentclub.github.io/japan-food-facilities-api/map.html) ·
+[CSVをダウンロード](https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv) ·
 [収録状況](docs/COVERAGE.md) ·
-[出典・ライセンス](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)
+[出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)
 
 </div>
 
@@ -49,20 +49,20 @@
 
 | ファイル | URL |
 |---|---|
-| 全件CSV | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv |
+| 全件CSV | https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv |
 
 - 文字コード: UTF-8（BOMなし）
 - 全列が一致する重複レコードは除去済み
 
 ```bash
-curl -O https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv
+curl -O https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv"
+    "https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv"
 )
 ```
 
@@ -76,7 +76,7 @@ df = pd.read_csv(
 map.addSource("facilities", {
   type: "vector",
   tiles: [
-    "https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf",
+    "https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf",
   ],
   minzoom: 6,
   maxzoom: 12,
@@ -85,9 +85,9 @@ map.addSource("facilities", {
 
 - レイヤー名: `facilities`
 - 主な属性: `name` / `business_type` / `pref` / `city`
-- 詳細: [`api/tiles/metadata.json`](https://gl20percentclub.github.io/japan-facilities-api/api/tiles/metadata.json)
+- 詳細: [`api/tiles/metadata.json`](https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/metadata.json)
 
-収録データは[プレビュー地図](https://gl20percentclub.github.io/japan-facilities-api/map.html)でも確認できます。
+収録データは[プレビュー地図](https://gl20percentclub.github.io/japan-food-facilities-api/map.html)でも確認できます。
 
 ## データ項目
 
@@ -166,8 +166,8 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 ```html
 出典:
-<a href="https://github.com/gl20percentclub/japan-facilities-api">
-  Japan Facilities Data
+<a href="https://github.com/gl20percentclub/japan-food-facilities-api">
+  Japan Food Facilities Data
 </a>
 （各自治体の食品営業許可オープンデータを加工して作成）
 ```
@@ -175,12 +175,12 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 地図上では、次のように表示できます。
 
 ```text
-© Japan Facilities Data（各自治体オープンデータ）
+© Japan Food Facilities Data（各自治体オープンデータ）
 ```
 
 特定自治体のデータだけを利用する場合は、CSVの `sources` 列に記載された自治体名も併記してください。
 
-自治体ごとの出典表示文は、[出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)で確認できます。
+自治体ごとの出典表示文は、[出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)で確認できます。
 
 ## 免責事項
 
