@@ -2,7 +2,7 @@
 
 AI コーディングエージェント（Claude Code / Codex 等）向けのガイド。
 このリポジトリは、全国の食品営業許可・届出データを収集・正規化し、
-**全件CSV**・**ベクトルタイル**・**検索用Parquet** の3形式で GitHub Pages から無料配信するオープンデータプロジェクト。
+**全件CSV** と **ベクトルタイル** の2形式で GitHub Pages から無料配信するオープンデータプロジェクト。
 
 ## このデータでアプリを作る場合
 
@@ -14,12 +14,11 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
   - 列: `prefecture, city, city_raw, name, name_kana, business_type, address, lat, lng, geocoding_level, phone, license_no, license_date, expire_date, sources, licenses`
 - ベクトルタイル（MVT）: `https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf`
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`
-- 検索用 Parquet（都道府県別・列は CSV と同一）: `https://gl20percentclub.github.io/japan-food-facilities-api/api/parquet/{JISコード}.parquet`
-  - 例: `13.parquet` = 東京都、`99.parquet` = 都道府県不明。一覧は同ディレクトリの `manifest.json`
-  - DuckDB（CLI / Python / Wasm）の `read_parquet()` でそのまま検索できる。
-    ブラウザで試すには `playground.html`（検索プレイグラウンド）
-- サーバー型の検索 API や市区町村別 JSON は**配信していない**。キーワード検索は Parquet、
-  一括抽出は CSV（DuckDB 推奨）、地図表示はタイルを使う。ブラウザから非圧縮 CSV を直接 fetch しない
+- 市区町村別 JSON や検索 API は**このリポジトリからは配信していない**。データ抽出は
+  CSV（DuckDB 推奨）、地図表示はタイルを使う。ブラウザから非圧縮 CSV を直接 fetch しない
+- キーワード・近傍検索は [geosearch](https://github.com/naogify/geosearch) の検索 API を
+  使った `playground.html`（検索プレイグラウンド）で試せる。API のエンドポイントは
+  `playground.html` の `DEFAULT_API_URL`（または `?api=` パラメータ）で設定する
 - データは CC BY 4.0。出典表示: 「© Japan Facilities Data（各自治体オープンデータ）」
 
 ## 開発コマンド
@@ -41,7 +40,7 @@ npm run build:attribution  # attribution.html を config/sources.yaml から再�
 
 ```
 config/sources.yaml     # データソース定義（単一の情報源）。自治体の追加はここ
-scripts/crawl.js        # クローラー本体（取得→正規化→CSV・タイル・Parquet生成のオーケストレーター）
+scripts/crawl.js        # クローラー本体（取得→正規化→CSV・タイル生成のオーケストレーター）
 scripts/lib/            # 取得・パース・正規化・ジオコーディング・名寄せの各実装
 scripts/*.test.js       # ユニットテスト（自前 assert、純粋関数を固定入力で検証）
 docs/COVERAGE.md        # 自治体ごとの収録状況（自動生成）
