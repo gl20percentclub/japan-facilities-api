@@ -31,8 +31,3 @@
 - [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
 - [タイルメタデータ](https://gl20percentclub.github.io/japan-facilities-api/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
 - [出典・ライセンス表示](https://gl20percentclub.github.io/japan-facilities-api/attribution.html): 利用時に必要な出典表示の文例
-
-## 関連ツール
-
-- [geosearch](https://github.com/naogify/geosearch): この CSV をキーワード・位置情報で検索できる
-  API（SQLite in Lambda）とタイル配信に変換する IaC。全文検索が必要な場合はこちら

@@ -113,11 +113,6 @@ ${stats}
 - [収録状況](${RAW}/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
 - [タイルメタデータ](${PAGES}/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
 - [出典・ライセンス表示](${PAGES}/attribution.html): 利用時に必要な出典表示の文例
-
-## 関連ツール
-
-- [geosearch](https://github.com/naogify/geosearch): この CSV をキーワード・位置情報で検索できる
-  API（SQLite in Lambda）とタイル配信に変換する IaC。全文検索が必要な場合はこちら
 `;
 }
 
@@ -188,8 +183,8 @@ map.addLayer({
 - \`geocoding_level\` が小さいほど座標は大まか（1=都道府県、2=市区町村、3=町丁目、8=街区・地番）。
   建物単位の精度が必要なら level を確認する。
 - 同一施設が業種違いで複数レコード存在する。ユニーク施設が必要なら name + lat/lng で重複排除する。
-- キーワード検索・位置検索（「近くのラーメン屋」等）を提供したい場合は、静的 CSV では
-  実現できないため [geosearch](https://github.com/naogify/geosearch) の検索 API を利用する。
+- キーワード検索・位置検索（「近くのラーメン屋」等）を提供したい場合は、静的配信のみの
+  ため検索 API は無い。CSV を SQLite や PostgreSQL 等に取り込んで自前の検索を実装する。
 - データ利用時は出典表示が必要（CC BY 4.0）:
   「© Japan Facilities Data（各自治体オープンデータ）」
 `;
