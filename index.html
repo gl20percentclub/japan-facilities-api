@@ -172,6 +172,7 @@
       </p>
       <div class="cta">
         <a class="btn primary" href="#quickstart">クイックスタート</a>
+        <a class="btn ghost" href="./playground.html">検索プレイグラウンド</a>
         <a class="btn ghost" href="./map.html">地図で見てみる</a>
         <a class="btn ghost" href="https://github.com/gl20percentclub/japan-food-facilities-api">GitHub</a>
       </div>
@@ -216,8 +217,8 @@
         </div>
         <div class="card">
           <span class="ico">📦</span>
-          <h3>2つの形式で</h3>
-          <p>分析用の全件 CSV と、地図用のベクトルタイル。用途に合わせて選べます。</p>
+          <h3>3つの形式で</h3>
+          <p>分析用の全件 CSV、地図用のベクトルタイル、検索用の都道府県別 Parquet。用途に合わせて選べます。</p>
         </div>
         <div class="card">
           <span class="ico">🆓</span>
@@ -233,7 +234,7 @@
     <div class="wrap">
       <h2>クイックスタート</h2>
       <p class="lead">
-        配信しているのは <strong>全件CSV</strong> と <strong>ベクトルタイル</strong> の2つだけです。
+        配信しているのは <strong>全件CSV</strong>・<strong>ベクトルタイル</strong>・<strong>検索用 Parquet</strong> の3つだけです。
         ベース URL は <code>https://gl20percentclub.github.io/japan-food-facilities-api/api/</code>。
       </p>
 
@@ -270,7 +271,7 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
   <section id="formats">
     <div class="wrap">
       <h2>配信している形式</h2>
-      <p class="lead">用途に合わせて2つから選べます。どちらも同じベース URL 配下の静的ファイルです。</p>
+      <p class="lead">用途に合わせて3つから選べます。いずれも同じベース URL 配下の静的ファイルです。</p>
       <div class="table-scroll">
         <table class="formats">
           <thead>
@@ -287,11 +288,16 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
               <td><code>api/tiles/{z}/{x}/{y}.pbf</code>（z6–12）</td>
               <td>地図にそのまま重ねる。MapLibre GL JS から直接読めます。</td>
             </tr>
+            <tr>
+              <td>検索用 Parquet</td>
+              <td><code>api/parquet/{都道府県コード}.parquet</code></td>
+              <td>DuckDB（CLI / Python / ブラウザ）から SQL でそのまま検索。<a href="./playground.html">プレイグラウンド</a>で試せます。</td>
+            </tr>
           </tbody>
         </table>
       </div>
       <p class="lead" style="margin:20px 0 0">
-        地域や業種を絞りたい場合は、CSV をダウンロードしてフィルタしてください。
+        地域や業種を絞りたい場合は、<a href="./playground.html">検索プレイグラウンド</a>で SQL を組み立てるか、CSV をダウンロードしてフィルタしてください。
         各列の詳細は <a href="https://github.com/gl20percentclub/japan-food-facilities-api#どんなデータか">README</a>、
         自治体ごとの収録状況は <a href="https://github.com/gl20percentclub/japan-food-facilities-api/blob/main/docs/COVERAGE.md">収録状況一覧</a> を参照してください。
       </p>
@@ -340,6 +346,7 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
     <div class="wrap">
       <p>
         <a href="./map.html">プレビュー地図</a> ·
+        <a href="./playground.html">検索プレイグラウンド</a> ·
         <a href="./attribution.html">出典・ライセンス</a> ·
         <a href="https://github.com/gl20percentclub/japan-food-facilities-api">GitHub</a> ·
         <a href="https://github.com/gl20percentclub/japan-food-facilities-api/issues">Issues</a>
