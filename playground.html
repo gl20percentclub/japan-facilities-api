@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>🛝 検索プレイグラウンド — Japan Food Facilities API</title>
-  <meta name="description" content="日本全国の飲食施設オープンデータ（食品営業許可・届出）を、ブラウザ内の DuckDB からその場で検索できるプレイグラウンドです。サーバー不要・登録不要。">
+  <meta name="description" content="日本全国の飲食施設オープンデータ（食品営業許可・届出）を、検索APIでキーワード・近傍検索できるプレイグラウンドです。登録不要。">
 
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
   <style>
@@ -46,7 +46,7 @@
       -webkit-font-smoothing: antialiased;
     }
     a { color: var(--accent); }
-    code, pre, textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
     /* --- ヘッダー --- */
@@ -57,7 +57,7 @@
     header .links a { margin-right: 10px; text-decoration: none; }
     header .links a:hover { text-decoration: underline; }
 
-    /* --- データ未生成などのお知らせ --- */
+    /* --- API 未設定などのお知らせ --- */
     .notice {
       display: none;
       border: 1px solid var(--border);
@@ -70,7 +70,7 @@
     }
     .notice.visible { display: block; }
 
-    /* --- 2カラムレイアウト（左: クエリ / 右: 結果） --- */
+    /* --- 2カラムレイアウト（左: 検索 / 右: 結果） --- */
     .grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; padding-bottom: 48px; }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
@@ -95,7 +95,7 @@
       border-radius: 8px;
       padding: 8px 10px;
     }
-    .row2 { display: grid; grid-template-columns: 1fr 110px; gap: 10px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .btn {
       display: inline-block;
       font-size: 14px;
@@ -113,20 +113,19 @@
     .btn.ghost { color: var(--accent); background: transparent; }
     .btn.small { font-size: 12px; padding: 5px 12px; }
 
-    /* --- SQL エディタ --- */
-    #sql {
-      width: 100%;
-      min-height: 150px;
-      font-size: 12.5px;
+    /* --- リクエスト URL 表示 --- */
+    #request-url {
+      display: block;
+      font-size: 11.5px;
       line-height: 1.6;
       color: var(--code-ink);
       background: var(--code-bg);
-      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 10px 12px;
-      resize: vertical;
+      word-break: break-all;
+      white-space: pre-wrap;
     }
-    .sql-note { font-size: 11.5px; color: var(--muted); margin: 6px 0 10px; }
+    .req-note { font-size: 11.5px; color: var(--muted); margin: 6px 0 0; }
     details.examples { font-size: 12.5px; margin-top: 12px; }
     details.examples summary { cursor: pointer; color: var(--sub); }
     details.examples pre {
@@ -146,7 +145,7 @@
     .result-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
     .table-scroll {
       overflow: auto;
-      max-height: 420px;
+      max-height: 380px;
       border: 1px solid var(--border);
       border-radius: 8px;
       background: var(--bg);
@@ -154,11 +153,12 @@
     table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
     th, td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
     thead th { position: sticky; top: 0; background: var(--panel); z-index: 1; }
+    tbody tr { cursor: pointer; }
     tbody tr:hover { background: rgba(232, 86, 63, 0.06); }
 
     /* --- 地図 --- */
     #map {
-      height: 380px;
+      height: 400px;
       margin-top: 16px;
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -181,86 +181,92 @@
     <div class="wrap">
       <h1>🛝 検索プレイグラウンド</h1>
       <p class="sub">
-        全国の飲食施設データ（食品営業許可・届出）を、ブラウザ内の
-        <a href="https://duckdb.org/docs/api/wasm/overview" target="_blank" rel="noopener">DuckDB-WASM</a>
-        からその場で SQL 検索できます。都道府県別の Parquet ファイルを HTTP Range リクエストで
-        必要な部分だけ読むため、サーバーも登録も不要です。
+        全国の飲食施設データ（食品営業許可・届出）を、検索API でその場で検索できます。
+        キーワード（名称・カナ・住所・市区町村を横断）に加えて、地図の表示範囲内（bbox）や
+        中心から近い順（center + radius）の検索も試せます。登録・APIキー不要です。
       </p>
       <p class="links">
         <a href="./">トップ</a>
         <a href="./map.html">プレビュー地図</a>
         <a href="./attribution.html">出典・ライセンス</a>
-        <a href="https://github.com/gl20percentclub/japan-facilities-api" target="_blank" rel="noopener">GitHub</a>
-        <span id="meta-line"></span>
+        <a href="https://github.com/gl20percentclub/japan-food-facilities-api" target="_blank" rel="noopener">GitHub</a>
       </p>
     </div>
   </header>
 
   <div class="wrap">
-    <!-- 検索データ（api/parquet/）がまだ配信されていない場合の案内 -->
-    <div class="notice" id="notice-no-data">
-      <strong>検索用データ（Parquet）がまだ配信されていません。</strong><br>
-      次回の週次クロールで <code>api/parquet/</code> が生成されると、このページで検索できるようになります。
-      それまでは<a href="./map.html">プレビュー地図</a>や
-      <a href="./api/facilities-all.csv">全件CSV</a> をご利用ください。
+    <!-- 検索APIのエンドポイントが未設定の場合の案内 -->
+    <div class="notice" id="notice-no-api">
+      <strong>検索APIのエンドポイントが設定されていません。</strong><br>
+      このページの URL に <code>?api=&lt;検索APIのURL&gt;</code> を付けてアクセスするか、
+      <code>playground.html</code> 内の <code>DEFAULT_API_URL</code> を設定してください。
     </div>
 
     <div class="grid">
-      <!-- ================= 左: クエリ ================= -->
+      <!-- ================= 左: 検索 ================= -->
       <div>
         <div class="panel">
-          <h2>🔍 かんたん検索</h2>
+          <h2>🔍 検索</h2>
           <div class="field">
-            <label for="pref">都道府県（Parquet ファイル単位で読み込みます）</label>
-            <select id="pref"></select>
-          </div>
-          <div class="field">
-            <label for="keyword">キーワード（名称・カナ・住所を部分一致）</label>
-            <input id="keyword" type="text" placeholder="例: ラーメン">
+            <label for="keyword">キーワード（名称・カナ・住所・市区町村。スペース区切りで複数語）</label>
+            <input id="keyword" type="text" placeholder="例: 渋谷 ラーメン">
           </div>
           <div class="field row2">
             <div>
-              <label for="btype">業種（部分一致・空欄で全業種）</label>
-              <input id="btype" type="text" placeholder="例: 飲食店営業">
+              <label for="scope">検索範囲</label>
+              <select id="scope">
+                <option value="all">全国</option>
+                <option value="bbox">地図の表示範囲内</option>
+                <option value="center">地図の中心から近い順</option>
+              </select>
             </div>
             <div>
               <label for="limit">上限件数</label>
               <select id="limit">
+                <option>50</option>
                 <option>100</option>
-                <option>500</option>
-                <option>1000</option>
+                <option>200</option>
               </select>
             </div>
+          </div>
+          <div class="field" id="radius-field" hidden>
+            <label for="radius">半径（「近い順」のとき）</label>
+            <select id="radius">
+              <option value="1000">1km</option>
+              <option value="5000">5km</option>
+              <option value="10000" selected>10km</option>
+              <option value="50000">50km</option>
+            </select>
           </div>
           <button class="btn primary" id="search" disabled>検索</button>
         </div>
 
         <div class="panel" style="margin-top:16px">
-          <h2>🦆 SQL（編集して実行できます）</h2>
-          <textarea id="sql" spellcheck="false"></textarea>
-          <p class="sql-note">
-            かんたん検索を使うと SQL がここに反映されます。列は全件CSVと同じ
-            <code>prefecture / city / city_raw / name / name_kana / business_type / address /
-            lat / lng / geocoding_level / phone / license_no / license_date / expire_date /
-            sources / licenses</code> の16列です。
+          <h2>📡 API リクエスト</h2>
+          <code id="request-url">—</code>
+          <p class="req-note">
+            この GET リクエストがそのまま検索 API の使い方です。curl やアプリからも同じ URL で呼べます。
+            レスポンスは <code>{ count, results: [{ name, name_kana, prefecture, city, address,
+            business_type, lat, lng, level }] }</code> の JSON です。
           </p>
-          <button class="btn ghost" id="run-sql" disabled>SQL を実行</button>
 
           <details class="examples">
-            <summary>SQL の例を見る</summary>
-            <pre id="example-sql"># 業種ごとの件数を集計
-SELECT business_type, count(*) AS n
-FROM read_parquet('&lt;都道府県のParquet URL&gt;')
-GROUP BY 1 ORDER BY n DESC LIMIT 20;
+            <summary>curl での例を見る</summary>
+            <pre># キーワード検索
+curl -sG "&lt;検索APIのURL&gt;" \
+  --data-urlencode "q=ラーメン" \
+  --data-urlencode "limit=5"
 
-# 市区町村で絞り込み
-SELECT name, address, phone
-FROM read_parquet('&lt;都道府県のParquet URL&gt;')
-WHERE city = '那覇市' AND business_type LIKE '%飲食店%'
-LIMIT 100;
+# 東京駅周辺 10km の「カフェ」を近い順に
+curl -sG "&lt;検索APIのURL&gt;" \
+  --data-urlencode "q=カフェ" \
+  --data-urlencode "center=139.767,35.681" \
+  --data-urlencode "radius=10000"
 
-# 同じ Parquet は DuckDB CLI や Python からも読めます
-# duckdb -c "SELECT count(*) FROM read_parquet('https://…/api/parquet/13.parquet')"</pre>
+# 地図の表示範囲（bbox = minLng,minLat,maxLng,maxLat）で絞る
+curl -sG "&lt;検索APIのURL&gt;" \
+  --data-urlencode "q=カフェ" \
+  --data-urlencode "bbox=139.60,35.60,139.80,35.75"</pre>
           </details>
         </div>
       </div>
@@ -272,7 +278,7 @@ LIMIT 100;
             <h2 style="margin:0">📋 結果</h2>
             <button class="btn ghost small" id="download" disabled>CSV ダウンロード</button>
           </div>
-          <p id="status">都道府県を選んでキーワードを入れ、「検索」を押してください。</p>
+          <p id="status">キーワードを入れて「検索」を押してください。</p>
           <div class="table-scroll">
             <table id="results">
               <thead></thead>
@@ -292,25 +298,28 @@ LIMIT 100;
   </footer>
 
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-  <script type="module">
+  <script>
     // ================= 設定 =================
-    // 検索用 Parquet の配信ベース URL（このページと同じ gh-pages 上）。
-    // 相対で解決するためローカル配信でもそのまま動く。
-    const PARQUET_BASE = new URL('./api/parquet/', location.href).href;
-    // DuckDB-WASM は jsDelivr から読み込む（バージョンは動作確認済みのものに固定）。
-    const DUCKDB_CDN = 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.32.0/+esm';
+    // 検索 API（geosearch: SQLite FTS5 + R*Tree in Lambda）のエンドポイント。
+    // デプロイの CDK 出力 SearchApiUrl を設定する。URL の ?api= で上書きもできる
+    // （例: playground.html?api=https://xxxx.execute-api.ap-northeast-1.amazonaws.com/）。
+    const DEFAULT_API_URL = '';
+    const API_URL = new URLSearchParams(location.search).get('api') || DEFAULT_API_URL;
+
+    // 結果テーブル・CSV に出す列（検索 API のレスポンス results[] のフィールド）。
+    const RESULT_FIELDS = [
+      'name', 'business_type', 'prefecture', 'city', 'address',
+      'name_kana', 'lat', 'lng', 'level',
+    ];
 
     // ================= 状態 =================
-    let manifest = null;   // api/parquet/manifest.json の内容
-    let db = null;         // AsyncDuckDB（初回検索時に遅延初期化）
-    let conn = null;       // DuckDB コネクション
-    let lastRows = [];     // 直近の検索結果（CSV ダウンロード用）
-    let lastCols = [];     // 直近の結果の列名
+    let lastRows = []; // 直近の検索結果（CSV ダウンロード・地図連動用）
 
     const $ = (id) => document.getElementById(id);
 
     // ================= 地図 =================
     // 国土地理院 淡色地図をベースに、検索結果を GeoJSON ソースとして重ねる。
+    // bbox / center 検索の範囲はこの地図の表示状態から取る。
     const map = new maplibregl.Map({
       container: 'map',
       style: {
@@ -341,29 +350,35 @@ LIMIT 100;
           },
         ],
       },
-      center: [137.5, 36.5],
-      zoom: 4.2,
+      center: [139.767, 35.681], // 初期表示は東京駅周辺
+      zoom: 9,
       attributionControl: { compact: true },
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+    map.addControl(new maplibregl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+    }), 'top-right');
 
     // 結果の点をクリックしたら施設情報をポップアップ表示する。
-    map.on('click', 'results-circle', (e) => {
-      const p = e.features[0].properties || {};
-      const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) =>
-        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    function showPopup(lngLat, p) {
       const rows = [];
       if (p.business_type) rows.push(`<p class="fac-row">業種: ${esc(p.business_type)}</p>`);
       if (p.address) rows.push(`<p class="fac-row">住所: ${esc(p.address)}</p>`);
       new maplibregl.Popup({ offset: 8, maxWidth: '280px' })
-        .setLngLat(e.lngLat)
+        .setLngLat(lngLat)
         .setHTML(`<p class="fac-name">${esc(p.name) || '（名称なし）'}</p>${rows.join('')}`)
         .addTo(map);
-    });
+    }
+    map.on('click', 'results-circle', (e) => showPopup(e.lngLat, e.features[0].properties || {}));
     map.on('mouseenter', 'results-circle', () => { map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', 'results-circle', () => { map.getCanvas().style.cursor = ''; });
 
-    // ================= 初期化 =================
+    // 地図が動いたら、範囲を使う検索モードのリクエスト URL 表示を追随させる。
+    map.on('moveend', updateRequestUrl);
+
+    // ================= リクエスト組み立て =================
     /** ステータス行を更新する。kind は '' | 'ok' | 'err'。 */
     function setStatus(msg, kind = '') {
       const el = $('status');
@@ -371,145 +386,65 @@ LIMIT 100;
       el.className = kind;
     }
 
-    /** manifest.json を読み、都道府県セレクトとメタ情報を組み立てる。 */
-    async function init() {
-      let res;
-      try {
-        res = await fetch(`${PARQUET_BASE}manifest.json`);
-      } catch {
-        res = null;
-      }
-      if (!res || !res.ok) {
-        // データ未生成（次回クロール前）の場合は案内だけ出して検索を無効のままにする。
-        $('notice-no-data').classList.add('visible');
-        setStatus('検索用データが見つかりませんでした。');
-        return;
-      }
-      manifest = await res.json();
+    /** 小数を URL 用に丸める（座標は5桁 ≒ 1m 精度で十分）。 */
+    const r5 = (n) => Math.round(n * 1e5) / 1e5;
 
-      // 都道府県セレクト: manifest のファイル一覧（JIS コード順）から生成する。
-      const sel = $('pref');
-      for (const f of manifest.files) {
-        const opt = document.createElement('option');
-        opt.value = f.path;
-        opt.textContent = `${f.prefecture}（${f.records.toLocaleString('ja-JP')}件）`;
-        sel.appendChild(opt);
+    /**
+     * フォームと地図の状態から検索 API のクエリパラメータを組み立てる。
+     * scope=bbox は地図の表示範囲、scope=center は地図中心 + 半径を使う。
+     */
+    function buildParams() {
+      const params = new URLSearchParams();
+      const q = $('keyword').value.trim();
+      if (q) params.set('q', q);
+
+      const scope = $('scope').value;
+      if (scope === 'bbox') {
+        const b = map.getBounds();
+        params.set('bbox', [r5(b.getWest()), r5(b.getSouth()), r5(b.getEast()), r5(b.getNorth())].join(','));
+      } else if (scope === 'center') {
+        const c = map.getCenter();
+        params.set('center', `${r5(c.lng)},${r5(c.lat)}`);
+        params.set('radius', $('radius').value);
       }
-      // 全国横断はすべての Parquet を読むため転送量が大きいことを明示する。
-      const all = document.createElement('option');
-      all.value = '*';
-      all.textContent = `全国（${manifest.records.toLocaleString('ja-JP')}件・転送量大）`;
-      sel.appendChild(all);
 
-      // ヘッダーに総件数と最終更新日を表示する。
-      const d = new Date(manifest.updated * 1000);
-      const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      $('meta-line').textContent = `· 全 ${manifest.records.toLocaleString('ja-JP')} 件 / 最終更新 ${ymd}`;
-
-      $('search').disabled = false;
-      $('run-sql').disabled = false;
-      buildSql();
+      params.set('limit', $('limit').value);
+      return params;
     }
 
-    // ================= SQL 生成 =================
-    /** SQL 文字列リテラル用のエスケープ（シングルクォートを二重化）。 */
-    function escapeSql(s) {
-      return String(s).replace(/'/g, "''");
-    }
-
-    /** 選択中の都道府県に対応する read_parquet(...) のソース式を返す。 */
-    function parquetSource() {
-      const v = $('pref').value;
-      if (v === '*') {
-        // 全国: 全ファイルの URL リストを渡す（DuckDB が並列に読む）。
-        const urls = manifest.files.map((f) => `'${PARQUET_BASE}${f.path}'`).join(',\n    ');
-        return `read_parquet([\n    ${urls}\n  ])`;
-      }
-      return `read_parquet('${PARQUET_BASE}${v}')`;
-    }
-
-    /** かんたん検索フォームの内容から SQL を組み立て、エディタに反映する。 */
-    function buildSql() {
-      if (!manifest) return '';
-      const keyword = $('keyword').value.trim();
-      const btype = $('btype').value.trim();
-      const limit = Number($('limit').value) || 100;
-
-      const where = [];
-      if (keyword) {
-        // 名称・カナ・住所のいずれかに部分一致（NULL 列は LIKE が偽になるだけで安全）。
-        const k = escapeSql(keyword);
-        where.push(`(name LIKE '%${k}%' OR name_kana LIKE '%${k}%' OR address LIKE '%${k}%')`);
-      }
-      if (btype) where.push(`business_type LIKE '%${escapeSql(btype)}%'`);
-
-      const sql = [
-        'SELECT name, business_type, prefecture, city, address, phone,',
-        '       lat, lng, geocoding_level',
-        `FROM ${parquetSource()}`,
-        where.length ? `WHERE ${where.join('\n  AND ')}` : null,
-        `LIMIT ${limit};`,
-      ].filter(Boolean).join('\n');
-
-      $('sql').value = sql;
-      return sql;
-    }
-
-    // ================= DuckDB =================
-    /** DuckDB-WASM を遅延初期化して接続を返す（2回目以降は使い回す）。 */
-    async function ensureConn() {
-      if (conn) return conn;
-      setStatus('検索エンジン（DuckDB-WASM）を初期化しています…（初回のみ数MBの読み込み）');
-      const duckdb = await import(DUCKDB_CDN);
-      // jsDelivr 配布のバンドルからブラウザに合うもの（WASM + Worker）を選ぶ。
-      const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
-      // Worker は別オリジン(jsDelivr)のスクリプトを直接 new できないため、
-      // importScripts する小さな Blob 経由で起動する（duckdb-wasm の定石）。
-      const workerUrl = URL.createObjectURL(
-        new Blob([`importScripts("${bundle.mainWorker}");`], { type: 'text/javascript' }),
-      );
-      db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(duckdb.LogLevel.WARNING), new Worker(workerUrl));
-      await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-      URL.revokeObjectURL(workerUrl);
-      conn = await db.connect();
-      return conn;
+    /** 現在のフォーム内容で実行される GET リクエストの URL 表示を更新する。 */
+    function updateRequestUrl() {
+      const base = API_URL || '<検索APIのURL>';
+      $('request-url').textContent = `GET ${base}?${buildParams().toString()}`;
     }
 
     // ================= 検索実行 =================
-    /** SQL を実行して、テーブル・地図・ダウンロードボタンを更新する。 */
-    async function run(sql) {
+    /** 検索 API を呼び、テーブル・地図・ダウンロードボタンを更新する。 */
+    async function run() {
+      if (!API_URL) return;
       $('search').disabled = true;
-      $('run-sql').disabled = true;
       try {
-        const c = await ensureConn();
-        setStatus('検索中…（必要な列だけを HTTP Range で取得しています）');
+        setStatus('検索中…');
         const t0 = performance.now();
-        const result = await c.query(sql);
+        const res = await fetch(`${API_URL}?${buildParams().toString()}`);
         const ms = Math.round(performance.now() - t0);
+        const body = await res.json();
+        // 400 はクエリ起因のエラー。API が返す error メッセージをそのまま見せる。
+        if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
 
-        // Arrow テーブル → プレーンな行オブジェクト配列（BigInt は Number に落とす）。
-        lastCols = result.schema.fields.map((f) => f.name);
-        lastRows = result.toArray().map((row) => {
-          const o = row.toJSON();
-          for (const k of Object.keys(o)) {
-            if (typeof o[k] === 'bigint') o[k] = Number(o[k]);
-          }
-          return o;
-        });
-
+        lastRows = body.results || [];
         renderTable();
         renderMap();
         $('download').disabled = lastRows.length === 0;
-        setStatus(`${lastRows.length.toLocaleString('ja-JP')}件ヒット（${ms.toLocaleString('ja-JP')}ms）`, 'ok');
+        setStatus(`${(body.count ?? lastRows.length).toLocaleString('ja-JP')}件ヒット（${ms.toLocaleString('ja-JP')}ms）`, 'ok');
       } catch (err) {
         setStatus(`エラー: ${err.message}`, 'err');
       } finally {
         $('search').disabled = false;
-        $('run-sql').disabled = false;
       }
     }
 
-    /** 結果テーブルを描画する（列は実行した SQL の SELECT 句に追随する）。 */
+    /** 結果テーブルを描画する（行クリックで地図がその施設へ移動する）。 */
     function renderTable() {
       const thead = document.querySelector('#results thead');
       const tbody = document.querySelector('#results tbody');
@@ -517,7 +452,7 @@ LIMIT 100;
       tbody.innerHTML = '';
 
       const tr = document.createElement('tr');
-      for (const c of lastCols) {
+      for (const c of RESULT_FIELDS) {
         const th = document.createElement('th');
         th.textContent = c;
         tr.appendChild(th);
@@ -526,40 +461,46 @@ LIMIT 100;
 
       for (const row of lastRows) {
         const tr = document.createElement('tr');
-        for (const c of lastCols) {
+        for (const c of RESULT_FIELDS) {
           const td = document.createElement('td');
           const v = row[c];
           td.textContent = v === null || v === undefined ? '' : String(v);
           tr.appendChild(td);
         }
+        // 座標があれば、行クリックで地図をその施設へ寄せてポップアップを出す。
+        tr.addEventListener('click', () => {
+          if (!Number.isFinite(row.lat) || !Number.isFinite(row.lng)) return;
+          map.flyTo({ center: [row.lng, row.lat], zoom: Math.max(map.getZoom(), 14) });
+          showPopup([row.lng, row.lat], row);
+        });
         tbody.appendChild(tr);
       }
     }
 
-    /** 座標を持つ結果を地図に重ね、結果の範囲へズームする。 */
+    /** 座標を持つ結果を地図に重ね、範囲検索でなければ結果の範囲へズームする。 */
     function renderMap() {
       const features = [];
-      // 地図の範囲計算用 [west, south, east, north]
-      let bbox = null;
+      let bbox = null; // [west, south, east, north]
       for (const row of lastRows) {
-        const lat = Number(row.lat);
-        const lng = Number(row.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+        if (!Number.isFinite(row.lat) || !Number.isFinite(row.lng)) continue;
         features.push({
           type: 'Feature',
-          geometry: { type: 'Point', coordinates: [lng, lat] },
+          geometry: { type: 'Point', coordinates: [row.lng, row.lat] },
           properties: { name: row.name, business_type: row.business_type, address: row.address },
         });
-        if (!bbox) bbox = [lng, lat, lng, lat];
+        if (!bbox) bbox = [row.lng, row.lat, row.lng, row.lat];
         else {
-          bbox[0] = Math.min(bbox[0], lng);
-          bbox[1] = Math.min(bbox[1], lat);
-          bbox[2] = Math.max(bbox[2], lng);
-          bbox[3] = Math.max(bbox[3], lat);
+          bbox[0] = Math.min(bbox[0], row.lng);
+          bbox[1] = Math.min(bbox[1], row.lat);
+          bbox[2] = Math.max(bbox[2], row.lng);
+          bbox[3] = Math.max(bbox[3], row.lat);
         }
       }
       map.getSource('results').setData({ type: 'FeatureCollection', features });
-      if (bbox) map.fitBounds(bbox, { padding: 60, maxZoom: 15, duration: 600 });
+      // 地図の表示範囲を使った検索では視点を動かさない（範囲がずれると混乱するため）。
+      if (bbox && $('scope').value === 'all') {
+        map.fitBounds(bbox, { padding: 60, maxZoom: 15, duration: 600 });
+      }
     }
 
     // ================= CSV ダウンロード =================
@@ -572,9 +513,9 @@ LIMIT 100;
 
     /** 直近の検索結果を CSV（UTF-8 BOM 付き・Excel 対応）としてダウンロードする。 */
     function downloadCsv() {
-      const lines = [lastCols.join(',')];
+      const lines = [RESULT_FIELDS.join(',')];
       for (const row of lastRows) {
-        lines.push(lastCols.map((c) => csvCell(row[c])).join(','));
+        lines.push(RESULT_FIELDS.map((c) => csvCell(row[c])).join(','));
       }
       const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
       const a = document.createElement('a');
@@ -585,20 +526,30 @@ LIMIT 100;
     }
 
     // ================= イベント =================
-    // フォームの変更は SQL エディタへ即時反映する（SQL を直接編集した後でも
-    // フォームを触れば作り直される、という分かりやすい挙動にする）。
-    for (const id of ['pref', 'keyword', 'btype', 'limit']) {
-      $(id).addEventListener('input', buildSql);
+    // フォームの変更はリクエスト URL 表示へ即時反映する。
+    for (const id of ['keyword', 'scope', 'limit', 'radius']) {
+      $(id).addEventListener('input', updateRequestUrl);
     }
-    $('search').addEventListener('click', () => run(buildSql()));
-    $('run-sql').addEventListener('click', () => run($('sql').value));
+    // 「近い順」のときだけ半径セレクトを見せる。
+    $('scope').addEventListener('input', () => {
+      $('radius-field').hidden = $('scope').value !== 'center';
+    });
+    $('search').addEventListener('click', run);
     // キーワード欄で Enter でも検索できるようにする。
     $('keyword').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') run(buildSql());
+      if (e.key === 'Enter') run();
     });
     $('download').addEventListener('click', downloadCsv);
 
-    init();
+    // ================= 初期化 =================
+    if (API_URL) {
+      $('search').disabled = false;
+    } else {
+      // エンドポイント未設定なら案内を出し、検索は無効のままにする。
+      $('notice-no-api').classList.add('visible');
+      setStatus('検索APIのエンドポイントが未設定です。');
+    }
+    updateRequestUrl();
   </script>
 </body>
 </html>
