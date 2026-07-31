@@ -76,6 +76,13 @@ export function generateTiles(facilities, {
   stats = null,
   log = console.log,
 } = {}) {
+  // metadata.json には CSV 側で数えた records と、ここで数える points が並ぶ。
+  // 別々の集合から数えると両者が食い違い、配信物バリデーションで落ちる。
+  // 重複除去後の施設（stats.unique）を渡し忘れた場合はここで止める。
+  if (stats?.unique && stats.unique !== facilities) {
+    throw new Error('ベクトルタイルは結合CSV と同じ施設集合（stats.unique）から生成すること');
+  }
+
   const fc = buildFeatureCollection(facilities);
   if (fc.features.length === 0) {
     console.warn('  座標を持つ施設が無いため ベクトルタイルの生成をスキップ');

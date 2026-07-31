@@ -55,7 +55,12 @@ function write(stream, chunk) {
 
 /**
  * 結合CSV を書き出す（BOM なし UTF-8）。
- * 統計 `{ rowsIn, rowsOut, dupSkipped, prefectures, cities, bytes }` を返す。
+ * 統計 `{ rowsIn, rowsOut, dupSkipped, prefectures, cities, bytes }` と、
+ * 重複を除いたあとの施設 `unique` を返す。
+ *
+ * `unique` はベクトルタイルの生成にも使う。重複判定はここでしか行わないため、
+ * これを渡さずに元の配列からタイルを作ると、CSV には無い重複点がタイルに載り、
+ * metadata.json の records（CSV基準）と points（タイル基準）がズレる。
  */
 export async function buildMergedCsv(facilities, { outPath, log = console.log } = {}) {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
@@ -69,6 +74,7 @@ export async function buildMergedCsv(facilities, { outPath, log = console.log } 
   const seen = new Set(); // 出典を除く全列一致の重複判定
   const prefs = new Set();
   const cities = new Set();
+  const unique = []; // CSV に書いた施設（＝タイルに載せる施設）
 
   for (const f of facilities) {
     rowsIn++;
@@ -85,6 +91,7 @@ export async function buildMergedCsv(facilities, { outPath, log = console.log } 
     const backpressure = write(out, row.map(csvCell).join(',') + '\n');
     if (backpressure) await backpressure;
     rowsOut++;
+    unique.push(f);
     prefs.add(f.pref);
     cities.add(`${f.pref}/${f.city}`);
   }
@@ -111,5 +118,6 @@ export async function buildMergedCsv(facilities, { outPath, log = console.log } 
     prefectures: prefs.size,
     cities: cities.size,
     bytes,
+    unique,
   };
 }

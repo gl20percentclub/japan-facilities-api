@@ -141,7 +141,9 @@ async function main() {
 
   const updated = Math.floor(Date.now() / 1000);
   const csv = await buildMergedCsv(facilities, { outPath: CSV_PATH });
-  const tiles = generateTiles(facilities, { updated, stats: csv });
+  // タイルは CSV と同じ集合（重複除去後）から作る。元の facilities を渡すと
+  // CSV に載らない重複点がタイルに入り、配信物どうしで件数が食い違う。
+  const tiles = generateTiles(csv.unique, { updated, stats: csv });
   generateReadmeStats({ updated, csv, tiles });
 
   console.log(
