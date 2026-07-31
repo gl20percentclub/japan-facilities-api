@@ -24,9 +24,9 @@ const ROOT = path.resolve(__dirname, '..');
 const README_PATH = path.join(ROOT, 'README.md');
 
 // 配信 URL の基点。Pages はデータとページの配信先、RAW はリポジトリ内 Markdown の取得先。
-const PAGES = 'https://gl20percentclub.github.io/japan-facilities-api';
-const REPO = 'https://github.com/gl20percentclub/japan-facilities-api';
-const RAW = 'https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main';
+const PAGES = 'https://gl20percentclub.github.io/japan-food-facilities-api';
+const REPO = 'https://github.com/gl20percentclub/japan-food-facilities-api';
+const RAW = 'https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main';
 
 const STATS_START = '<!-- STATS:START -->';
 const STATS_END = '<!-- STATS:END -->';
