@@ -98,8 +98,6 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 | llms.txt（索引） | https://gl20percentclub.github.io/japan-facilities-api/llms.txt |
 | llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-facilities-api/llms-full.txt |
 
-キーワード検索・位置検索が必要な場合は、このCSVを検索API・MCPサーバーとして配信する [geosearch](https://github.com/naogify/geosearch) を利用できます。
-
 ## データ項目
 
 | 列 | 内容 |

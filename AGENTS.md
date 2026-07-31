@@ -16,7 +16,6 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`
 - 市区町村別 JSON や検索 API は**配信していない**。データ抽出は CSV（DuckDB 推奨）、
   地図表示はタイルを使う。ブラウザから非圧縮 CSV を直接 fetch しない
-- キーワード・位置検索が必要なら [geosearch](https://github.com/naogify/geosearch)（検索API/MCP）を使う
 - データは CC BY 4.0。出典表示: 「© Japan Facilities Data（各自治体オープンデータ）」
 
 ## 開発コマンド
