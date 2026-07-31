@@ -57,11 +57,11 @@ assert(extractStats('マーカー無し') === '', 'マーカーが無ければ�
 // --- absolutizeLinks ---
 const abs = absolutizeLinks(readme);
 assert(
-  abs.includes('](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/docs/COVERAGE.md)'),
+  abs.includes('](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main/docs/COVERAGE.md)'),
   '.md への相対リンクは GitHub raw に変換される',
 );
 assert(
-  abs.includes('](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)'),
+  abs.includes('](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)'),
   '.html への相対リンクは Pages に変換される',
 );
 assert(abs.includes('](https://example.com/page)'), '絶対 URL は変換されない');

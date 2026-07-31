@@ -7,7 +7,7 @@
 [公式サイト](https://gl20percentclub.github.io/japan-food-facilities-api/) ·
 [地図で見る](https://gl20percentclub.github.io/japan-food-facilities-api/map.html) ·
 [CSVをダウンロード](https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv) ·
-[収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/docs/COVERAGE.md) ·
+[収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main/docs/COVERAGE.md) ·
 [出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)
 
 ---
@@ -88,10 +88,8 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 
 | ファイル | URL |
 |---|---|
-| llms.txt（索引） | https://gl20percentclub.github.io/japan-facilities-api/llms.txt |
-| llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-facilities-api/llms-full.txt |
-
-キーワード検索・位置検索が必要な場合は、このCSVを検索API・MCPサーバーとして配信する [geosearch](https://github.com/naogify/geosearch) を利用できます。
+| llms.txt（索引） | https://gl20percentclub.github.io/japan-food-facilities-api/llms.txt |
+| llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-food-facilities-api/llms-full.txt |
 
 ## データ項目
 
@@ -122,7 +120,7 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 2. 都道府県など、管轄する保健所設置主体のオープンデータ
 3. 厚生労働省「食品衛生申請等システム（i2fas）」のオープンデータ
 
-自治体ごとの収録状況と取得元は、[`docs/COVERAGE.md`](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/docs/COVERAGE.md) で確認できます。
+自治体ごとの収録状況と取得元は、[`docs/COVERAGE.md`](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main/docs/COVERAGE.md) で確認できます。
 
 ## データの精度と注意事項
 
@@ -197,7 +195,7 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 バグ報告、データソース追加、ドキュメント改善、機能提案を歓迎します。
 
-開発環境のセットアップやプルリクエストの手順は、[`CONTRIBUTING.md`](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/CONTRIBUTING.md) を参照してください。
+開発環境のセットアップやプルリクエストの手順は、[`CONTRIBUTING.md`](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main/CONTRIBUTING.md) を参照してください。
 
 ---
 
@@ -213,7 +211,7 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 ```sql
 INSTALL httpfs; LOAD httpfs;
 SELECT name, address, lat, lng
-FROM read_csv_auto('https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz')
+FROM read_csv_auto('https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv.gz')
 WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲食店営業';
 ```
 
@@ -222,7 +220,7 @@ WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲�
 ```python
 import pandas as pd
 
-df = pd.read_csv('https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz')
+df = pd.read_csv('https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv.gz')
 naha = df[(df['prefecture'] == '沖縄県') & (df['city'] == '那覇市')]
 ```
 
@@ -233,7 +231,7 @@ naha = df[(df['prefecture'] == '沖縄県') & (df['city'] == '那覇市')]
 ```js
 map.addSource('facilities', {
   type: 'vector',
-  tiles: ['https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf'],
+  tiles: ['https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf'],
   minzoom: 6,
   maxzoom: 12,
 });
@@ -255,7 +253,7 @@ map.addLayer({
 - `geocoding_level` が小さいほど座標は大まか（1=都道府県、2=市区町村、3=町丁目、8=街区・地番）。
   建物単位の精度が必要なら level を確認する。
 - 同一施設が業種違いで複数レコード存在する。ユニーク施設が必要なら name + lat/lng で重複排除する。
-- キーワード検索・位置検索（「近くのラーメン屋」等）を提供したい場合は、静的 CSV では
-  実現できないため [geosearch](https://github.com/naogify/geosearch) の検索 API を利用する。
+- キーワード検索・位置検索（「近くのラーメン屋」等）を提供したい場合は、静的配信のみの
+  ため検索 API は無い。CSV を SQLite や PostgreSQL 等に取り込んで自前の検索を実装する。
 - データ利用時は出典表示が必要（CC BY 4.0）:
   「© Japan Facilities Data（各自治体オープンデータ）」
