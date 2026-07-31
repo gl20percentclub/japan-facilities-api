@@ -16,7 +16,7 @@
 - **市区町村数（下表の母数）の根拠**: 総務省／政府統計の総合窓口(e-Stat)が公表する全国市区町村総数**1,741**（市792・特別区23・町743・村183、2024年10月1日時点、北方地域の6村を除く。出典: https://www.e-stat.go.jp/municipalities/number-of-municipalities ）に一致する。内訳: 市792・特別区23・町743・村183。
 - i2fasライセンス: 公共データ利用規約(第1.0版/PDL1.0)＝CC BY 4.0互換。
 
-**データがある市区町村: 1727 / 1741（99%）**
+**データがある市区町村: 1719 / 1741（99%）**
 
 | 都道府県 | 市区町村 | 管轄（保健所設置主体） | データ | 収集経路 | ソース | ライセンス |
 |---|---|---|:---:|---|---|---|
@@ -369,7 +369,7 @@
 | 山形県 | 飽海郡遊佐町 | 山形県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 福島県 | 福島市 | 福島市（中核市） | ✅ | 自身 | [link](https://www.city.fukushima.fukushima.jp/material/files/group/7/R7nendo_syokuhin.csv) | CC BY 2.1 JP |
 | 福島県 | 会津若松市 | 福島県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.fukushima.lg.jp/uploaded/attachment/743308.xlsx) | CC BY 2.1 JP |
-| 福島県 | 郡山市 | 福島県（都道府県） | ✅ | 自身 | [link](https://www.city.koriyama.lg.jp/uploaded/attachment/120902.xls) | 要確認（2026-07-16調査: 掲載元ページ(生活衛生課)は著作権表示のみでライセンス明記なし。市のオープンデータカタログへの掲載も未確認） |
+| 福島県 | 郡山市 | 福島県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 福島県 | いわき市 | いわき市（中核市） | ✅ | 自身 | [link](https://www.city.iwaki.lg.jp/www/contents/1652661537484/simple/Shokuhin_itiran_R08.csv) | CC BY 4.0 |
 | 福島県 | 白河市 | 福島県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.fukushima.lg.jp/uploaded/attachment/743308.xlsx) | CC BY 2.1 JP |
 | 福島県 | 須賀川市 | 福島県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.fukushima.lg.jp/uploaded/attachment/743308.xlsx) | CC BY 2.1 JP |
@@ -593,7 +593,7 @@
 | 埼玉県 | 南埼玉郡宮代町 | 埼玉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 埼玉県 | 北葛飾郡杉戸町 | 埼玉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 埼玉県 | 北葛飾郡松伏町 | 埼玉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
-| 千葉県 | 千葉市 | 千葉市（指定都市） | ✅ | 自身 | [link](https://www.city.chiba.jp/somu/somu/seisakuhomu/shisei/documents/202605syokuhin.xlsx) | 要確認（2026-07-16調査: 掲載元ページにライセンス表記なし。ちばDataポータルへの掲載も未確認） |
+| 千葉県 | 千葉市 | 千葉市（指定都市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 千葉県 | 銚子市 | 千葉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 千葉県 | 市川市 | 千葉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 千葉県 | 船橋市 | 船橋市（中核市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
@@ -607,7 +607,7 @@
 | 千葉県 | 東金市 | 千葉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 千葉県 | 旭市 | 千葉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 千葉県 | 習志野市 | 千葉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
-| 千葉県 | 柏市 | 柏市（中核市） | ✅ | 自身 | [link](https://www.city.kashiwa.lg.jp/documents/24912/122173_food_business_all.csv) | 柏市オープンデータ利用規約 |
+| 千葉県 | 柏市 | 柏市（中核市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 千葉県 | 勝浦市 | 千葉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 千葉県 | 市原市 | 千葉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 千葉県 | 流山市 | 千葉県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
@@ -665,7 +665,7 @@
 | 東京都 | 豊島区 | 豊島区（特別区） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 東京都 | 北区 | 北区（特別区） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 東京都 | 荒川区 | 荒川区（特別区） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
-| 東京都 | 板橋区 | 板橋区（特別区） | ✅ | 自身 | [link](https://www.city.itabashi.tokyo.jp/_res/projects/default_project/_page_/001/051/220/r8.5_shokuhinkyokashisetsu.xlsx) | 要確認（2026-07-16調査: 保健所の通常業務ページに掲載され、区のオープンデータカタログとは別系統。ライセンス表記なし） |
+| 東京都 | 板橋区 | 板橋区（特別区） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 東京都 | 練馬区 | 練馬区（特別区） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 東京都 | 足立区 | 足立区（特別区） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 東京都 | 葛飾区 | 葛飾区（特別区） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
@@ -715,7 +715,7 @@
 | 神奈川県 | 横須賀市 | 横須賀市（中核市） | ✅ | 自身 | [link](https://data.bodik.jp/dataset/3a1aaf46-e6ca-41fa-8977-3388f3b7e3ba) | Creative Commons Attribution 4.0 International |
 | 神奈川県 | 平塚市 | 神奈川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 神奈川県 | 鎌倉市 | 神奈川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
-| 神奈川県 | 藤沢市 | 藤沢市（その他政令市） | ✅ | 自身 | [link](https://www.city.fujisawa.kanagawa.jp/documents/28905/zende-ta2020603houjin.csv) | CC BY 4.0 |
+| 神奈川県 | 藤沢市 | 藤沢市（その他政令市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 神奈川県 | 小田原市 | 神奈川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 神奈川県 | 茅ヶ崎市 | 茅ヶ崎市（その他政令市） | ✅ | 自身 | [link](https://www.city.chigasaki.kanagawa.jp/_res/projects/default_project/_page_/001/041/779/syokuhinall2025.csv) | CC BY 4.0 |
 | 神奈川県 | 逗子市 | 神奈川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
@@ -788,24 +788,24 @@
 | 富山県 | 下新川郡入善町 | 富山県（都道府県） | ✅ | 管轄主体 | [link](https://toyama-pref.box.com/shared/static/1t6074lluawpua1u5jhx1yeaynb48rle.csv) | CC BY |
 | 富山県 | 下新川郡朝日町 | 富山県（都道府県） | ✅ | 管轄主体 | [link](https://toyama-pref.box.com/shared/static/1t6074lluawpua1u5jhx1yeaynb48rle.csv) | CC BY |
 | 石川県 | 金沢市 | 金沢市（中核市） | ✅ | 自身 | [link](https://catalog-data.city.kanazawa.ishikawa.jp/datastore/dump/09a49521-cabf-40b4-978b-bd61ef02f650?bom=true) | CC BY |
-| 石川県 | 七尾市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 小松市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 輪島市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 珠洲市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 加賀市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 羽咋市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | かほく市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 白山市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 能美市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 野々市市 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 能美郡川北町 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 河北郡津幡町 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 河北郡内灘町 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 羽咋郡志賀町 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 羽咋郡宝達志水町 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 鹿島郡中能登町 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 鳳珠郡穴水町 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
-| 石川県 | 鳳珠郡能登町 | 石川県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx) | 石川県利用規約 |
+| 石川県 | 七尾市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 小松市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 輪島市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 珠洲市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 加賀市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 羽咋市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | かほく市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 白山市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 能美市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 野々市市 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 能美郡川北町 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 河北郡津幡町 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 河北郡内灘町 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 羽咋郡志賀町 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 羽咋郡宝達志水町 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 鹿島郡中能登町 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 鳳珠郡穴水町 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 石川県 | 鳳珠郡能登町 | 石川県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 福井県 | 福井市 | 福井市（中核市） | ✅ | 自身 | [link](https://www.city.fukui.lg.jp/fukusi/eisei/syokuhin/p070519_d/fil/11syokuhin_202605.xlsx) | 要確認（2026-07-16調査: 生活衛生課の通常業務ページに掲載され、市のオープンデータパークとは別系統。ライセンス表記なし） |
 | 福井県 | 敦賀市 | 福井県（都道府県） | ✅ | 管轄主体 | [link](https://data.odp.jig.jp/viewcsv/jp/fukui/776.csv) | CC BY |
 | 福井県 | 小浜市 | 福井県（都道府県） | ✅ | 管轄主体 | [link](https://data.odp.jig.jp/viewcsv/jp/fukui/776.csv) | CC BY |
@@ -852,81 +852,81 @@
 | 山梨県 | 北都留郡丹波山村 | 山梨県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.yamanashi.jp/documents/23776/190004_food_business_all.csv) | CC BY 2.1 JP |
 | 長野県 | 長野市 | 長野市（中核市） | ✅ | 自身 | [link](https://www.city.nagano.nagano.jp/documents/1948/202011_food_business_202605.csv) | CC BY 4.0 |
 | 長野県 | 松本市 | 松本市（中核市） | ✅ | 自身 | [link](http://linkdata.org/download/rdf1s8748i/link/shokuhin_kyoka_eigyo_matsumoto.txt) | CC BY 3.0 |
-| 長野県 | 上田市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 岡谷市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 飯田市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 諏訪市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 須坂市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 小諸市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 伊那市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 駒ヶ根市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 中野市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 大町市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 飯山市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 茅野市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 塩尻市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 佐久市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 千曲市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 東御市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 安曇野市 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 南佐久郡小海町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 南佐久郡川上村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 南佐久郡南牧村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 南佐久郡南相木村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 南佐久郡北相木村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 南佐久郡佐久穂町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 北佐久郡軽井沢町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 北佐久郡御代田町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 北佐久郡立科町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 小県郡青木村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 小県郡長和町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 諏訪郡下諏訪町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 諏訪郡富士見町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 諏訪郡原村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上伊那郡辰野町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上伊那郡箕輪町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上伊那郡飯島町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上伊那郡南箕輪村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上伊那郡中川村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上伊那郡宮田村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡松川町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡高森町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡阿南町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡阿智村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡平谷村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡根羽村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡下條村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡売木村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡天龍村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡泰阜村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡喬木村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡豊丘村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下伊那郡大鹿村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 木曽郡上松町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 木曽郡南木曽町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 木曽郡木祖村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 木曽郡王滝村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 木曽郡大桑村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 木曽郡木曽町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 東筑摩郡麻績村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 東筑摩郡生坂村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 東筑摩郡山形村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 東筑摩郡朝日村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 東筑摩郡筑北村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 北安曇郡池田町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 北安曇郡松川村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 北安曇郡白馬村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 北安曇郡小谷村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 埴科郡坂城町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上高井郡小布施町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上高井郡高山村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下高井郡山ノ内町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下高井郡木島平村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下高井郡野沢温泉村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上水内郡信濃町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上水内郡小川村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 上水内郡飯綱町 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
-| 長野県 | 下水内郡栄村 | 長野県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv) | CC BY 4.0 |
+| 長野県 | 上田市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 岡谷市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 飯田市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 諏訪市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 須坂市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 小諸市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 伊那市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 駒ヶ根市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 中野市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 大町市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 飯山市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 茅野市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 塩尻市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 佐久市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 千曲市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 東御市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 安曇野市 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 南佐久郡小海町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 南佐久郡川上村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 南佐久郡南牧村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 南佐久郡南相木村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 南佐久郡北相木村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 南佐久郡佐久穂町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 北佐久郡軽井沢町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 北佐久郡御代田町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 北佐久郡立科町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 小県郡青木村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 小県郡長和町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 諏訪郡下諏訪町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 諏訪郡富士見町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 諏訪郡原村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上伊那郡辰野町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上伊那郡箕輪町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上伊那郡飯島町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上伊那郡南箕輪村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上伊那郡中川村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上伊那郡宮田村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡松川町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡高森町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡阿南町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡阿智村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡平谷村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡根羽村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡下條村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡売木村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡天龍村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡泰阜村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡喬木村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡豊丘村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下伊那郡大鹿村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 木曽郡上松町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 木曽郡南木曽町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 木曽郡木祖村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 木曽郡王滝村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 木曽郡大桑村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 木曽郡木曽町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 東筑摩郡麻績村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 東筑摩郡生坂村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 東筑摩郡山形村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 東筑摩郡朝日村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 東筑摩郡筑北村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 北安曇郡池田町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 北安曇郡松川村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 北安曇郡白馬村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 北安曇郡小谷村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 埴科郡坂城町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上高井郡小布施町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上高井郡高山村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下高井郡山ノ内町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下高井郡木島平村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下高井郡野沢温泉村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上水内郡信濃町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上水内郡小川村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 上水内郡飯綱町 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 長野県 | 下水内郡栄村 | 長野県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 岐阜県 | 岐阜市 | 岐阜市（中核市） | ✅ | 自身 | [link](https://gifu-opendata.pref.gifu.lg.jp/dataset/2f9f1b1c-be25-4a27-96c6-47b597f1a0bd/resource/16ef7794-d2b6-4d7d-8353-f55193432530/download/gifushisyokuhinkyokar7.6.1.csv) | CC BY 2.0 |
 | 岐阜県 | 大垣市 | 岐阜県（都道府県） | ✅ | 管轄主体 | [link](https://gifu-opendata.pref.gifu.lg.jp/dataset/f6bbdb66-1d55-4e55-82cb-15fe1bb24223/resource/3c7d862d-a126-4441-a5b1-4839096b2591/download/20250331syokuhin.csv) | CC BY 2.0 |
 | 岐阜県 | 高山市 | 岐阜県（都道府県） | ✅ | 管轄主体 | [link](https://gifu-opendata.pref.gifu.lg.jp/dataset/f6bbdb66-1d55-4e55-82cb-15fe1bb24223/resource/3c7d862d-a126-4441-a5b1-4839096b2591/download/20250331syokuhin.csv) | CC BY 2.0 |
@@ -1005,7 +1005,7 @@
 | 静岡県 | 榛原郡川根本町 | 静岡県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 静岡県 | 周智郡森町 | 静岡県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 愛知県 | 名古屋市 | 名古屋市（指定都市） | ✅ | 自身 | [link](https://data.bodik.jp/dataset/979f325a-1b27-45d0-8eb5-dd4aeb85b1f5) | Creative Commons Attribution 4.0 International |
-| 愛知県 | 豊橋市 | 豊橋市（中核市） | ✅ | 自身 | [link](https://www.city.toyohashi.lg.jp/secure/18290/shokuhinshinki202605EXCEL.xlsx) | 要確認（2026-07-16調査: 掲載元ページに規約記載なし。東三河オープンデータ規約もこのデータセットの掲載を確認できず） |
+| 愛知県 | 豊橋市 | 豊橋市（中核市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 愛知県 | 岡崎市 | 岡崎市（中核市） | ✅ | 自身 | [link](https://data.bodik.jp/dataset/aabced9d-d86e-422d-8ad0-2781d0f30671) | Creative Commons Attribution 4.0 International |
 | 愛知県 | 一宮市 | 一宮市（中核市） | ✅ | 自身 | [link](https://www.city.ichinomiya.aichi.jp/_res/projects/default_project/_page_/001/040/636/232033_Food_Business_All_20260331.csv) | CC BY 4.0 |
 | 愛知県 | 瀬戸市 | 愛知県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.aichi.jp/uploaded/attachment/619853.csv) | 要確認（2026-07-16調査: 県公式オープンデータ一覧に本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
@@ -1088,24 +1088,24 @@
 | 三重県 | 南牟婁郡御浜町 | 三重県（都道府県） | ✅ | 管轄主体 | [link](https://data.bodik.jp/dataset/796b84b4-c197-44bd-b852-664a8a423676) | Creative Commons Attribution 4.0 International |
 | 三重県 | 南牟婁郡紀宝町 | 三重県（都道府県） | ✅ | 管轄主体 | [link](https://data.bodik.jp/dataset/796b84b4-c197-44bd-b852-664a8a423676) | Creative Commons Attribution 4.0 International |
 | 滋賀県 | 大津市 | 大津市（中核市） | ✅ | 自身 | [link](https://www.city.otsu.lg.jp/material/files/group/4/od_2605.csv) | CC BY 4.0 |
-| 滋賀県 | 彦根市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 長浜市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 近江八幡市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 草津市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 守山市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 栗東市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 甲賀市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 野洲市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 湖南市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 高島市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 東近江市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 米原市 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 蒲生郡日野町 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 蒲生郡竜王町 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 愛知郡愛荘町 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 犬上郡豊郷町 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 犬上郡甲良町 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
-| 滋賀県 | 犬上郡多賀町 | 滋賀県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.shiga.lg.jp/file/attachment/5615791.csv) | 滋賀県OD利用規約 |
+| 滋賀県 | 彦根市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 長浜市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 近江八幡市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 草津市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 守山市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 栗東市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 甲賀市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 野洲市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 湖南市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 高島市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 東近江市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 米原市 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 蒲生郡日野町 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 蒲生郡竜王町 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 愛知郡愛荘町 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 犬上郡豊郷町 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 犬上郡甲良町 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 滋賀県 | 犬上郡多賀町 | 滋賀県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 京都府 | 京都市 | 京都市（指定都市） | ✅ | 自身 | [link](https://data.city.kyoto.lg.jp/resource/?id=15447) | CC BY 4.0 |
 | 京都府 | 福知山市 | 京都府（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 京都府 | 舞鶴市 | 京都府（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
@@ -1180,81 +1180,81 @@
 | 兵庫県 | 尼崎市 | 尼崎市（中核市） | ✅ | 自身 | [link](https://www.city.amagasaki.hyogo.jp/_res/projects/default_project/_page_/001/001/025/kyoka202605.csv) | CC BY 4.0 |
 | 兵庫県 | 明石市 | 明石市（中核市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 兵庫県 | 西宮市 | 西宮市（中核市） | ✅ | 自身 | [link](http://opendata.nishi.or.jp/opendata/files/9/R8.5ichiran_syokuhin.xlsx) | CC BY相当 |
-| 兵庫県 | 洲本市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 芦屋市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 伊丹市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 相生市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 豊岡市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 加古川市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 赤穂市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 西脇市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 宝塚市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 三木市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 高砂市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 川西市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 小野市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 三田市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 加西市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 丹波篠山市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 養父市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 丹波市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 南あわじ市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 朝来市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 淡路市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 宍粟市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 加東市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | たつの市 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 川辺郡猪名川町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 多可郡多可町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 加古郡稲美町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 加古郡播磨町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 神崎郡市川町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 神崎郡福崎町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 神崎郡神河町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 揖保郡太子町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 赤穂郡上郡町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 佐用郡佐用町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 美方郡香美町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
-| 兵庫県 | 美方郡新温泉町 | 兵庫県（都道府県） | ✅ | 管轄主体 | [link](https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx) | 要確認（2026-07-16調査: 県公式オープンデータカタログに本データセットの掲載なし。県サイト標準方針は無断複製・転用禁止） |
+| 兵庫県 | 洲本市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 芦屋市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 伊丹市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 相生市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 豊岡市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 加古川市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 赤穂市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 西脇市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 宝塚市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 三木市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 高砂市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 川西市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 小野市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 三田市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 加西市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 丹波篠山市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 養父市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 丹波市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 南あわじ市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 朝来市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 淡路市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 宍粟市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 加東市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | たつの市 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 川辺郡猪名川町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 多可郡多可町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 加古郡稲美町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 加古郡播磨町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 神崎郡市川町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 神崎郡福崎町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 神崎郡神河町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 揖保郡太子町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 赤穂郡上郡町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 佐用郡佐用町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 美方郡香美町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 兵庫県 | 美方郡新温泉町 | 兵庫県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 奈良県 | 奈良市 | 奈良市（中核市） | ✅ | 自身 | [link](https://www.city.nara.lg.jp/uploaded/attachment/203480.csv) | CC BY 2.1 JP |
-| 奈良県 | 大和高田市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 大和郡山市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 天理市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 橿原市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 桜井市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 五條市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 御所市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 生駒市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 香芝市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 葛城市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 宇陀市 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 山辺郡山添村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 生駒郡平群町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 生駒郡三郷町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 生駒郡斑鳩町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 生駒郡安堵町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 磯城郡川西町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 磯城郡三宅町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 磯城郡田原本町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 宇陀郡曽爾村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 宇陀郡御杖村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 高市郡高取町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 高市郡明日香村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 北葛城郡上牧町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 北葛城郡王寺町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 北葛城郡広陵町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 北葛城郡河合町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡吉野町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡大淀町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡下市町 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡黒滝村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡天川村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡野迫川村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡十津川村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡下北山村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡上北山村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡川上村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
-| 奈良県 | 吉野郡東吉野村 | 奈良県（都道府県） | ✅ | 管轄主体 | [link](https://www.pref.nara.lg.jp/documents/4585/20260527103326.xlsx) | 奈良県（出典明示・利用規約に従う） |
+| 奈良県 | 大和高田市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 大和郡山市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 天理市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 橿原市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 桜井市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 五條市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 御所市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 生駒市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 香芝市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 葛城市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 宇陀市 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 山辺郡山添村 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 生駒郡平群町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 生駒郡三郷町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 生駒郡斑鳩町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 生駒郡安堵町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 磯城郡川西町 | 奈良県（都道府県） | ❌ |  | — | — |
+| 奈良県 | 磯城郡三宅町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 磯城郡田原本町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 宇陀郡曽爾村 | 奈良県（都道府県） | ❌ |  | — | — |
+| 奈良県 | 宇陀郡御杖村 | 奈良県（都道府県） | ❌ |  | — | — |
+| 奈良県 | 高市郡高取町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 高市郡明日香村 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 北葛城郡上牧町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 北葛城郡王寺町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 北葛城郡広陵町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 北葛城郡河合町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 吉野郡吉野町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 吉野郡大淀町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 吉野郡下市町 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 吉野郡黒滝村 | 奈良県（都道府県） | ❌ |  | — | — |
+| 奈良県 | 吉野郡天川村 | 奈良県（都道府県） | ❌ |  | — | — |
+| 奈良県 | 吉野郡野迫川村 | 奈良県（都道府県） | ❌ |  | — | — |
+| 奈良県 | 吉野郡十津川村 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 吉野郡下北山村 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
+| 奈良県 | 吉野郡上北山村 | 奈良県（都道府県） | ❌ |  | — | — |
+| 奈良県 | 吉野郡川上村 | 奈良県（都道府県） | ❌ |  | — | — |
+| 奈良県 | 吉野郡東吉野村 | 奈良県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 和歌山県 | 和歌山市 | 和歌山市（中核市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 和歌山県 | 海南市 | 和歌山県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 和歌山県 | 橋本市 | 和歌山県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
@@ -1304,7 +1304,7 @@
 | 鳥取県 | 日野郡日南町 | 鳥取県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 鳥取県 | 日野郡日野町 | 鳥取県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 鳥取県 | 日野郡江府町 | 鳥取県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
-| 島根県 | 松江市 | 松江市（中核市） | ✅ | 自身 | [link](https://www.city.matsue.lg.jp/material/files/group/50/202605_eigyoukyoka_zenken.xlsx) | 要確認（2026-07-16調査: 掲載元ページはCopyright表記のみ。市の統計オープンデータ規約(CC BY 2.1日本)とは別データセットのため適用不可） |
+| 島根県 | 松江市 | 松江市（中核市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 島根県 | 浜田市 | 島根県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 島根県 | 出雲市 | 島根県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 島根県 | 益田市 | 島根県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |

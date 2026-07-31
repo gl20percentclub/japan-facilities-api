@@ -6,21 +6,20 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
 
 ## このデータでアプリを作る場合
 
-**まず https://gl20percentclub.github.io/japan-facilities-api/llms-full.txt を読むこと。**
+**まず https://gl20percentclub.github.io/japan-food-facilities-api/llms-full.txt を読むこと。**
 データ仕様・コピペで動く利用例・注意事項がすべてまとまっている。要点だけ挙げる:
 
-- 全件CSV（gzip）: `https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz`
+- 全件CSV（gzip）: `https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv.gz`
   - UTF-8 **BOM付き**、約150万レコード、非圧縮で約540MB
   - 列: `prefecture, city, city_raw, name, name_kana, business_type, address, lat, lng, geocoding_level, phone, license_no, license_date, expire_date, sources, licenses`
-- ベクトルタイル（MVT）: `https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf`
+- ベクトルタイル（MVT）: `https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf`
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`
-- 検索用 Parquet（都道府県別・列は CSV と同一）: `https://gl20percentclub.github.io/japan-facilities-api/api/parquet/{JISコード}.parquet`
+- 検索用 Parquet（都道府県別・列は CSV と同一）: `https://gl20percentclub.github.io/japan-food-facilities-api/api/parquet/{JISコード}.parquet`
   - 例: `13.parquet` = 東京都、`99.parquet` = 都道府県不明。一覧は同ディレクトリの `manifest.json`
   - DuckDB（CLI / Python / Wasm）の `read_parquet()` でそのまま検索できる。
     ブラウザで試すには `playground.html`（検索プレイグラウンド）
 - サーバー型の検索 API や市区町村別 JSON は**配信していない**。キーワード検索は Parquet、
   一括抽出は CSV（DuckDB 推奨）、地図表示はタイルを使う。ブラウザから非圧縮 CSV を直接 fetch しない
-- キーワード・位置検索が必要なら [geosearch](https://github.com/naogify/geosearch)（検索API/MCP）を使う
 - データは CC BY 4.0。出典表示: 「© Japan Facilities Data（各自治体オープンデータ）」
 
 ## 開発コマンド

@@ -31,13 +31,16 @@
 - 毎週自動更新
 
 <!-- STATS:START -->
-> **最終更新: 2026-07-24**
+> **最終更新: 2026-07-31**
 >
 > | 項目 | 値 |
 > |---|---|
-> | 施設レコード数 | 1,495,048 件 |
-> | 都道府県 | 52 |
-> | 市区町村 | 1,958 |
+> | 施設レコード数 | 1,488,756 件 |
+> | 座標を持つ施設 | 1,359,323 件 |
+> | 都道府県 | 48 |
+> | 市区町村 | 1,796 |
+> | 結合CSV | 約 430.3 MB |
+> | ベクトルタイル | 8,866 枚 / 約 469.1 MB |
 <!-- STATS:END -->
 
 1レコードは、原則として1件の営業許可・届出を表します。同じ施設が複数の業種で許可を持つ場合は、複数レコードとして収録されます。
@@ -117,10 +120,8 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 
 | ファイル | URL |
 |---|---|
-| llms.txt（索引） | https://gl20percentclub.github.io/japan-facilities-api/llms.txt |
-| llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-facilities-api/llms-full.txt |
-
-キーワード検索・位置検索が必要な場合は、このCSVを検索API・MCPサーバーとして配信する [geosearch](https://github.com/naogify/geosearch) を利用できます。
+| llms.txt（索引） | https://gl20percentclub.github.io/japan-food-facilities-api/llms.txt |
+| llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-food-facilities-api/llms-full.txt |
 
 ## データ項目
 
