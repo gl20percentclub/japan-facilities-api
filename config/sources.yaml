@@ -223,16 +223,6 @@ sources:
     license: CC BY 4.0
     defaultPref: 東京都
     defaultCity: 港区
-  - key: nara-pref
-    acquire:
-      type: resolve
-      pageUrl: https://www.pref.nara.lg.jp/n086/52413.html
-      linkPattern: 全許可施設
-      format: xlsx
-    source: 奈良県食品営業許可施設一覧（奈良市を除く）
-    sourceUrl: https://www.pref.nara.lg.jp/n086/52413.html
-    license: 奈良県（出典明示・利用規約に従う）
-    defaultPref: 奈良県
   - key: kyoto-city
     acquire:
       type: post
@@ -518,16 +508,6 @@ sources:
     license: CC BY 2.1 JP
     defaultPref: 福島県
     defaultCity: 福島市
-  - key: koriyama
-    acquire:
-      type: get
-      url: https://www.city.koriyama.lg.jp/uploaded/attachment/120902.xls
-      format: xls
-    source: 郡山市食品営業許可施設一覧
-    sourceUrl: https://www.city.koriyama.lg.jp/soshiki/74/7244.html
-    license: 要確認
-    defaultPref: 福島県
-    defaultCity: 郡山市
   - key: iwaki
     acquire:
       type: get
@@ -570,27 +550,6 @@ sources:
     license: CC BY 2.1 JP
     defaultPref: 埼玉県
     defaultCity: 川口市
-  - key: chiba-city
-    acquire:
-      type: get
-      url: https://www.city.chiba.jp/somu/somu/seisakuhomu/shisei/documents/202605syokuhin.xlsx
-      format: xlsx
-    source: 千葉市食品営業許可施設一覧
-    sourceUrl: https://www.city.chiba.jp/somu/somu/seisakuhomu/shisei/hokenjokankei.html
-    license: 要確認
-    defaultPref: 千葉県
-    defaultCity: 千葉市
-  - key: kashiwa
-    acquire:
-      type: get
-      url: https://www.city.kashiwa.lg.jp/documents/24912/122173_food_business_all.csv
-      format: csv
-      encoding: auto
-    source: 柏市食品営業許可一覧
-    sourceUrl: https://www.city.kashiwa.lg.jp/databunseki/shiseijoho/jouhoukoukai/opendate/food.html
-    license: 柏市オープンデータ利用規約
-    defaultPref: 千葉県
-    defaultCity: 柏市
   - key: chuo-ku
     acquire:
       type: get
@@ -679,16 +638,6 @@ sources:
     license: CC BY 4.0
     defaultPref: 東京都
     defaultCity: 渋谷区
-  - key: itabashi-ku
-    acquire:
-      type: get
-      url: https://www.city.itabashi.tokyo.jp/_res/projects/default_project/_page_/001/051/220/r8.5_shokuhinkyokashisetsu.xlsx
-      format: xlsx
-    source: 東京都板橋区食品営業許可施設一覧
-    sourceUrl: https://www.city.itabashi.tokyo.jp/kenko/eisei/shokuhin/1051220.html
-    license: 要確認
-    defaultPref: 東京都
-    defaultCity: 板橋区
   - key: higashimurayama
     acquire:
       type: get
@@ -722,20 +671,6 @@ sources:
     license: CC BY 4.0
     defaultPref: 神奈川県
     defaultCity: 茅ヶ崎市
-  - key: fujisawa
-    acquire:
-      type: resolve
-      pageUrl: https://www.city.fujisawa.kanagawa.jp/seiei/shokuhineisei/opendatabase.html
-      hrefPattern: 'zende-ta\d+(houjin|kojin)\.csv'
-      multi: true
-      linkFormat: csv
-      format: tsv
-      encoding: utf-16
-    source: 藤沢市食品営業許可施設情報
-    sourceUrl: https://www.city.fujisawa.kanagawa.jp/seiei/shokuhineisei/opendatabase.html
-    license: 藤沢市オープンデータ利用規約
-    defaultPref: 神奈川県
-    defaultCity: 藤沢市
   - key: toyama-pref
     acquire:
       type: get
@@ -756,15 +691,6 @@ sources:
     license: CC BY
     defaultPref: 富山県
     defaultCity: 富山市
-  - key: ishikawa-pref
-    acquire:
-      type: get
-      url: https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/documents/nendor7.xlsx
-      format: xlsx
-    source: 石川県営業許可施設一覧
-    sourceUrl: https://www.pref.ishikawa.lg.jp/yakuji/syokuhin/opendate.html
-    license: 石川県利用規約
-    defaultPref: 石川県
   - key: kanazawa
     acquire:
       type: get
@@ -809,16 +735,6 @@ sources:
     sourceUrl: https://www.pref.yamanashi.jp/eisei-ykm/itiranhyou1.html
     license: CC BY 2.1 JP
     defaultPref: 山梨県
-  - key: nagano-pref
-    acquire:
-      type: get
-      url: https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/documents/food_20260531_csv.csv
-      format: csv
-      encoding: utf-8
-    source: 長野県食品営業許可施設
-    sourceUrl: https://www.pref.nagano.lg.jp/shokusei/kenko/shokuhin/seikatsu/opendata.html
-    license: 長野県オープンデータ利用規約
-    defaultPref: 長野県
   - key: nagano-city
     acquire:
       type: get
@@ -886,16 +802,6 @@ sources:
     sourceUrl: https://www.pref.aichi.jp/opendata/
     license: CC BY 2.1 JP
     defaultPref: 愛知県
-  - key: toyohashi
-    acquire:
-      type: get
-      url: https://www.city.toyohashi.lg.jp/secure/18290/shokuhinshinki202605EXCEL.xlsx
-      format: xlsx
-    source: 豊橋市食品営業許可施設情報（新規）
-    sourceUrl: https://www.city.toyohashi.lg.jp/13766.htm
-    license: 要確認
-    defaultPref: 愛知県
-    defaultCity: 豊橋市
   - key: ichinomiya
     acquire:
       type: get
@@ -907,18 +813,6 @@ sources:
     license: CC BY 4.0
     defaultPref: 愛知県
     defaultCity: 一宮市
-  - key: shiga-pref
-    acquire:
-      type: resolve
-      pageUrl: https://www.pref.shiga.lg.jp/ippan/kurashi/syokunoanzen/300273.html
-      linkPattern: 食品営業許可施設一覧
-      multi: true
-      format: csv
-      encoding: shift_jis
-    source: 滋賀県食品営業許可施設一覧
-    sourceUrl: https://www.pref.shiga.lg.jp/ippan/kurashi/syokunoanzen/300273.html
-    license: 滋賀県OD利用規約
-    defaultPref: 滋賀県
   - key: otsu
     acquire:
       type: get
@@ -951,15 +845,6 @@ sources:
     license: CC BY 4.0
     defaultPref: 大阪府
     defaultCity: 吹田市
-  - key: hyogo-pref
-    acquire:
-      type: get
-      url: https://web.pref.hyogo.lg.jp/kf14/documents/000028_food_business_lisence_all.xlsx
-      format: xlsx
-    source: 兵庫県食品関係営業施設リスト（許可）
-    sourceUrl: https://web.pref.hyogo.lg.jp/kf14/shokuhineigyoushisetsu_list.html
-    license: 要確認
-    defaultPref: 兵庫県
   - key: kobe
     acquire:
       type: get
@@ -1016,16 +901,6 @@ sources:
     license: CC BY
     defaultPref: 鳥取県
     defaultCity: 鳥取市
-  - key: matsue
-    acquire:
-      type: get
-      url: https://www.city.matsue.lg.jp/material/files/group/50/202605_eigyoukyoka_zenken.xlsx
-      format: xlsx
-    source: 松江市食品営業許可施設一覧
-    sourceUrl: https://www.city.matsue.lg.jp/soshikikarasagasu/kenkofukushibu_hokeneiseika/hokeneisei/4/2226.html
-    license: 要確認
-    defaultPref: 島根県
-    defaultCity: 松江市
   - key: fukuyama
     acquire:
       type: get
@@ -1116,17 +991,6 @@ sources:
     license: CC BY 2.1 JP
     defaultPref: 大分県
     defaultCity: 大分市
-  - key: sendai
-    acquire:
-      type: get
-      url: https://www.city.sendai.jp/sekatsuese-shokuhin/kyokalist/documents/r7shokuhinichiran.zip
-      format: zip
-    source: 仙台市営業許可施設一覧
-    sourceUrl: https://www.city.sendai.jp/sekatsuese-shokuhin/kyokalist/joho.html
-    license: 要確認
-    defaultPref: 宮城県
-    defaultCity: 仙台市
-    allSheets: true
   - key: sagamihara
     acquire:
       type: get
@@ -1138,40 +1002,6 @@ sources:
     license: CC BY 4.0
     defaultPref: 神奈川県
     defaultCity: 相模原市
-  - key: kofu
-    acquire:
-      type: get
-      url: https://www.city.kofu.yamanashi.jp/hokenjo/h31-shokuhin/documents/download_20260430143717.zip
-      format: zip
-    source: 甲府市食品営業許可施設一覧
-    sourceUrl: https://www.city.kofu.yamanashi.jp/hokenjo/h31-shokuhin/2019-shokuhinkyokaitiran.html
-    license: 要確認
-    defaultPref: 山梨県
-    defaultCity: 甲府市
-  - key: shimane-pref
-    acquire:
-      type: get
-      format: xlsx
-      urls:
-        - https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_02unnnann.xlsx
-        - https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_03izumo.xlsx
-        - https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_04kenou.xlsx
-        - https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_05hamada.xlsx
-        - https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_06masuda.xlsx
-        - https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.data/R8_05all_07oki.xlsx
-    source: 島根県食品営業許可一覧（松江市を除く）
-    sourceUrl: https://www.pref.shimane.lg.jp/life/syoku/anzen/eisei/eigyoukyokashisetu.html
-    license: 要確認
-    defaultPref: 島根県
-  - key: hiroshima-pref
-    acquire:
-      type: get
-      url: https://www.pref.hiroshima.lg.jp/uploaded/attachment/664836.xlsx
-      format: xlsx
-    source: 広島県食品営業許可施設一覧
-    sourceUrl: https://www.pref.hiroshima.lg.jp/soshiki/172/eigyoukyokaninnteisisetuitirann.html
-    license: 広島県利用規約
-    defaultPref: 広島県
   - key: tokyo-hokeniryo
     acquire:
       type: get
