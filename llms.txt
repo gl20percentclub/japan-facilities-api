@@ -1,0 +1,38 @@
+# Japan Facilities Data
+
+> 日本全国の食品営業許可・届出施設（飲食店・喫茶店・食品製造業など）を収集し、
+> 全国共通フォーマットの全件CSVとベクトルタイルで無料配信するオープンデータ。
+> 登録不要・APIキー不要・商用利用可（データは CC BY 4.0）。毎週自動更新。
+
+重要な事実:
+
+- 全件CSV（gzip 推奨）: https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz
+- 全件CSV（非圧縮・約540MB）: https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv
+- CSV は UTF-8（BOM付き）。列: prefecture, city, city_raw, name, name_kana,
+  business_type, address, lat, lng, geocoding_level, phone, license_no,
+  license_date, expire_date, sources, licenses
+- ベクトルタイル（MVT）: https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
+- 市区町村別 JSON や検索 API は配信していない。抽出は CSV から、地図表示はタイルで行う
+- 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
+- 毎週月曜 18:00 UTC（JST 火曜 3:00）に自動更新
+
+**最終更新: 2026-07-24**
+
+| 項目 | 値 |
+|---|---|
+| 施設レコード数 | 1,495,048 件 |
+| 都道府県 | 52 |
+| 市区町村 | 1,958 |
+
+## ドキュメント
+
+- [llms-full.txt](https://gl20percentclub.github.io/japan-facilities-api/llms-full.txt): データ仕様・利用例・注意事項の全文（まずこれを読む）
+- [README](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/README.md): プロジェクト概要
+- [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
+- [タイルメタデータ](https://gl20percentclub.github.io/japan-facilities-api/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
+- [出典・ライセンス表示](https://gl20percentclub.github.io/japan-facilities-api/attribution.html): 利用時に必要な出典表示の文例
+
+## 関連ツール
+
+- [geosearch](https://github.com/naogify/geosearch): この CSV をキーワード・位置情報で検索できる
+  API（SQLite in Lambda）とタイル配信に変換する IaC。全文検索が必要な場合はこちら

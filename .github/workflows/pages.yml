@@ -10,6 +10,8 @@ on:
       - 'index.html'
       - 'map.html'
       - 'attribution.html'
+      - 'llms.txt'
+      - 'llms-full.txt'
       - '_headers'
       - '.github/workflows/pages.yml'
   workflow_dispatch:

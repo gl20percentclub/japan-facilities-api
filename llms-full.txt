@@ -1,21 +1,14 @@
-<div align="center">
+<!-- このファイルは README.md から自動生成されています（scripts/gen-llms.js）。直接編集しないでください。 -->
 
-# 🍽️ Japan Food Facilities Data
+# 🍽️ Japan Facilities Data
 
 **全国の食品営業許可・届出データを、共通形式で無料配信するオープンデータプロジェクト**
 
-[![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/graphs/contributors)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/issues)
-[![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#更新頻度)
-
-[公式サイト](https://gl20percentclub.github.io/japan-food-facilities-api/) ·
-[地図で見る](https://gl20percentclub.github.io/japan-food-facilities-api/map.html) ·
-[CSVをダウンロード](https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv) ·
-[収録状況](docs/COVERAGE.md) ·
-[出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)
-
-</div>
+[公式サイト](https://gl20percentclub.github.io/japan-facilities-api/) ·
+[地図で見る](https://gl20percentclub.github.io/japan-facilities-api/map.html) ·
+[CSVをダウンロード](https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz) ·
+[収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/docs/COVERAGE.md) ·
+[出典・ライセンス](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)
 
 ---
 
@@ -49,20 +42,23 @@
 
 | ファイル | URL |
 |---|---|
-| 全件CSV | https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv |
+| gzip圧縮版（推奨） | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz |
+| 非圧縮版 | https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv |
 
-- 文字コード: UTF-8（BOMなし）
+- 文字コード: UTF-8 BOM付き
+- Excelで直接読み込み可能
 - 全列が一致する重複レコードは除去済み
 
 ```bash
-curl -O https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv
+curl -O https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz
+gunzip facilities-all.csv.gz
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv"
+    "https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz"
 )
 ```
 
@@ -76,7 +72,7 @@ df = pd.read_csv(
 map.addSource("facilities", {
   type: "vector",
   tiles: [
-    "https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf",
+    "https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf",
   ],
   minzoom: 6,
   maxzoom: 12,
@@ -85,9 +81,9 @@ map.addSource("facilities", {
 
 - レイヤー名: `facilities`
 - 主な属性: `name` / `business_type` / `pref` / `city`
-- 詳細: [`api/tiles/metadata.json`](https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/metadata.json)
+- 詳細: [`api/tiles/metadata.json`](https://gl20percentclub.github.io/japan-facilities-api/api/tiles/metadata.json)
 
-収録データは[プレビュー地図](https://gl20percentclub.github.io/japan-food-facilities-api/map.html)でも確認できます。
+収録データは[プレビュー地図](https://gl20percentclub.github.io/japan-facilities-api/map.html)でも確認できます。
 
 ### AIエージェントから使う
 
@@ -129,7 +125,7 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 2. 都道府県など、管轄する保健所設置主体のオープンデータ
 3. 厚生労働省「食品衛生申請等システム（i2fas）」のオープンデータ
 
-自治体ごとの収録状況と取得元は、[`docs/COVERAGE.md`](docs/COVERAGE.md) で確認できます。
+自治体ごとの収録状況と取得元は、[`docs/COVERAGE.md`](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/docs/COVERAGE.md) で確認できます。
 
 ## データの精度と注意事項
 
@@ -177,8 +173,8 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 ```html
 出典:
-<a href="https://github.com/gl20percentclub/japan-food-facilities-api">
-  Japan Food Facilities Data
+<a href="https://github.com/gl20percentclub/japan-facilities-api">
+  Japan Facilities Data
 </a>
 （各自治体の食品営業許可オープンデータを加工して作成）
 ```
@@ -186,12 +182,12 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 地図上では、次のように表示できます。
 
 ```text
-© Japan Food Facilities Data（各自治体オープンデータ）
+© Japan Facilities Data（各自治体オープンデータ）
 ```
 
 特定自治体のデータだけを利用する場合は、CSVの `sources` 列に記載された自治体名も併記してください。
 
-自治体ごとの出典表示文は、[出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)で確認できます。
+自治体ごとの出典表示文は、[出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-facilities-api/attribution.html)で確認できます。
 
 ## 免責事項
 
@@ -204,4 +200,65 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 バグ報告、データソース追加、ドキュメント改善、機能提案を歓迎します。
 
-開発環境のセットアップやプルリクエストの手順は、[`CONTRIBUTING.md`](CONTRIBUTING.md) を参照してください。
+開発環境のセットアップやプルリクエストの手順は、[`CONTRIBUTING.md`](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/CONTRIBUTING.md) を参照してください。
+
+---
+
+## 付録: AI エージェント向け利用レシピ
+
+このデータを使うアプリをコーディングエージェント（Claude Code / Codex 等）が書くための、
+コピペで動く最小コード例。
+
+### CSV から必要な範囲を抽出する（DuckDB・推奨）
+
+540MB の CSV 全体をメモリに載せずに、リモートの gzip CSV へ直接クエリできる。
+
+```sql
+INSTALL httpfs; LOAD httpfs;
+SELECT name, address, lat, lng
+FROM read_csv_auto('https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz')
+WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲食店営業';
+```
+
+### pandas で読む
+
+```python
+import pandas as pd
+
+df = pd.read_csv('https://gl20percentclub.github.io/japan-facilities-api/api/facilities-all.csv.gz')
+naha = df[(df['prefecture'] == '沖縄県') & (df['city'] == '那覇市')]
+```
+
+### 地図に表示する（MapLibre GL JS・タイル利用）
+
+ブラウザで施設を地図表示する場合は CSV ではなくベクトルタイルを使う（軽量・タイルサーバー不要）。
+
+```js
+map.addSource('facilities', {
+  type: 'vector',
+  tiles: ['https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf'],
+  minzoom: 6,
+  maxzoom: 12,
+});
+map.addLayer({
+  id: 'facilities-points',
+  type: 'circle',
+  source: 'facilities',
+  'source-layer': 'facilities', // レイヤ名は facilities 固定
+  paint: { 'circle-radius': 4, 'circle-color': '#e74c3c' },
+});
+```
+
+### 実装時の注意
+
+- **ブラウザから 540MB の CSV を fetch しない。** 地図表示はタイル、データ抽出はサーバー側
+  （または DuckDB-Wasm + HTTP range request）で行う。
+- CSV は UTF-8 **BOM付き**。Node.js 等でパースする際は先頭の BOM（\uFEFF）を除去する。
+- `lat` / `lng` は座標を補完できなかった施設では空になる。地図利用時は必ず除外する。
+- `geocoding_level` が小さいほど座標は大まか（1=都道府県、2=市区町村、3=町丁目、8=街区・地番）。
+  建物単位の精度が必要なら level を確認する。
+- 同一施設が業種違いで複数レコード存在する。ユニーク施設が必要なら name + lat/lng で重複排除する。
+- キーワード検索・位置検索（「近くのラーメン屋」等）を提供したい場合は、静的 CSV では
+  実現できないため [geosearch](https://github.com/naogify/geosearch) の検索 API を利用する。
+- データ利用時は出典表示が必要（CC BY 4.0）:
+  「© Japan Facilities Data（各自治体オープンデータ）」
