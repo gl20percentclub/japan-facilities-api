@@ -95,8 +95,8 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 
 | ファイル | URL |
 |---|---|
-| llms.txt（索引） | https://gl20percentclub.github.io/japan-facilities-api/llms.txt |
-| llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-facilities-api/llms-full.txt |
+| llms.txt（索引） | https://gl20percentclub.github.io/japan-food-facilities-api/llms.txt |
+| llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-food-facilities-api/llms-full.txt |
 
 ## データ項目
 
