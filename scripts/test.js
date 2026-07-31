@@ -1,16 +1,14 @@
 // 生成した配信物が正しいことを確認するバリデーションスクリプト。
 //
-// 検証対象は配信する3形式だけ:
+// 検証対象は配信する2形式だけ:
 //   api/facilities-all.csv[.gz]   全件の結合CSV
 //   api/tiles/{z}/{x}/{y}.pbf     ベクトルタイル + metadata.json（TileJSON）
-//   api/parquet/{コード}.parquet  検索用の都道府県別 Parquet + manifest.json
 //
 //   node scripts/test.js
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { asyncBufferFromFile, parquetMetadataAsync } from 'hyparquet';
 import { CSV_COLUMNS } from './build-merged-csv.js';
 import { readCsvRows } from './lib/csv-read.js';
 
@@ -19,7 +17,6 @@ const ROOT = path.resolve(__dirname, '..');
 const API_DIR = path.join(ROOT, 'api');
 const CSV_PATH = path.join(API_DIR, 'facilities-all.csv');
 const TILES_DIR = path.join(API_DIR, 'tiles');
-const PARQUET_DIR = path.join(API_DIR, 'parquet');
 
 let failures = 0;
 function assert(cond, msg) {
@@ -139,40 +136,6 @@ if (fs.existsSync(metaPath)) {
     : [];
   assert(pbfs.length > 0, `z${meta.minzoom} のタイルが存在する (${pbfs.length}枚)`);
   assert(pbfs.every((p) => fs.statSync(p).size > 0), 'タイルがすべて非空である');
-}
-
-// --- 3. 検索用 Parquet -------------------------------------------------------
-const manifestPath = path.join(PARQUET_DIR, 'manifest.json');
-assert(fs.existsSync(manifestPath), 'api/parquet/manifest.json が存在する');
-if (fs.existsSync(manifestPath)) {
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-  // 列名は結合CSV と同一（プレイグラウンド・利用者が同じスキーマとして扱えること）。
-  assert(
-    JSON.stringify(manifest.columns) === JSON.stringify(CSV_COLUMNS),
-    'manifest.columns が CSV_COLUMNS と一致',
-  );
-  // 3形式は同じ集合から生成するため、Parquet の合計件数も CSV 行数と一致すること。
-  assert(manifest.records === rowCount, `manifest.records(${manifest.records}) が CSV 行数と一致`);
-  const sum = (manifest.files ?? []).reduce((acc, f) => acc + f.records, 0);
-  assert(sum === rowCount, `Parquet 各ファイルの records 合計(${sum}) が CSV 行数と一致`);
-
-  // manifest に載っている全ファイルが実在し、Parquet として読めて件数も合うこと。
-  let filesOk = true;
-  for (const f of manifest.files ?? []) {
-    const p = path.join(PARQUET_DIR, f.path);
-    if (!fs.existsSync(p)) {
-      reportOnce('pq-missing', `parquet: ${f.path} が存在しない`);
-      filesOk = false;
-      continue;
-    }
-    // フッターのメタデータだけ読む（全データのデコードはしない）。
-    const meta = await parquetMetadataAsync(await asyncBufferFromFile(p));
-    if (Number(meta.num_rows) !== f.records) {
-      reportOnce('pq-rows', `parquet: ${f.path} の行数(${meta.num_rows})が manifest(${f.records})と不一致`);
-      filesOk = false;
-    }
-  }
-  assert(filesOk, `Parquet ${manifest.files?.length ?? 0}ファイルすべてが実在し行数が一致`);
 }
 
 console.log(
