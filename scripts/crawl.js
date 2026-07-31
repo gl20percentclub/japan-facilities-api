@@ -37,6 +37,7 @@ import { buildCityNormMap, applyPrefCity } from './lib/city-normmap.js';
 import { buildMergedCsv } from './build-merged-csv.js';
 import { generateTiles } from './gen-tiles.js';
 import { generateReadmeStats } from './gen-readme-stats.js';
+import { generateLlmsFiles } from './gen-llms.js';
 
 const CACHE_DIR = path.join(ROOT, '.cache');
 const API_DIR = path.join(ROOT, 'api');
@@ -145,6 +146,9 @@ async function main() {
   // CSV に載らない重複点がタイルに入り、配信物どうしで件数が食い違う。
   const tiles = generateTiles(csv.unique, { updated, stats: csv });
   generateReadmeStats({ updated, csv, tiles });
+  // README の統計更新後に、AI エージェント向けの llms.txt / llms-full.txt を
+  // README から再生成する（統計込みで最新化するため、必ず統計更新の後に呼ぶ）
+  generateLlmsFiles();
 
   console.log(
     `\n✅ 生成完了: ${csv.prefectures}都道府県 / ${csv.cities}市区町村 / ${csv.rowsOut}レコード`,
