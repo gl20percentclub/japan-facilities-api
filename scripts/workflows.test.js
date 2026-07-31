@@ -98,7 +98,7 @@ assert(
 // --- ページの変更が push で配信される ---
 const pushPaths = pages.on?.push?.paths ?? [];
 assert(pages.on?.push?.branches?.includes('main'), 'pages.yml: main への push で動く');
-for (const page of ['index.html', 'map.html', 'attribution.html']) {
+for (const page of ['index.html', 'map.html', 'playground.html', 'attribution.html']) {
   assert(pushPaths.includes(page), `pages.yml: ${page} の変更を配信対象にしている`);
 }
 // 配信されるページがリポジトリに実在することも確認する（リネーム時の追従漏れ防止）。

@@ -7,13 +7,14 @@
     "build:attribution": "node scripts/gen-attribution.js",
     "build:llms": "node scripts/gen-llms.js",
     "fetch:i2fas": "node scripts/fetch-i2fas.mjs",
-    "test:unit": "node scripts/crawl.test.js && node scripts/lib/config.test.js && node scripts/build-merged-csv.test.js && node scripts/gen-tiles.test.js && node scripts/preview-map.test.js && node scripts/gen-readme-stats.test.js && node scripts/gen-llms.test.js && node scripts/gen-attribution.test.js && node scripts/workflows.test.js",
+    "test:unit": "node scripts/crawl.test.js && node scripts/lib/config.test.js && node scripts/build-merged-csv.test.js && node scripts/gen-tiles.test.js && node scripts/gen-parquet.test.js && node scripts/preview-map.test.js && node scripts/playground.test.js && node scripts/gen-readme-stats.test.js && node scripts/gen-llms.test.js && node scripts/gen-attribution.test.js && node scripts/workflows.test.js",
     "test": "npm run test:unit && node scripts/test.js"
   },
   "dependencies": {
     "@geolonia/normalize-japanese-addresses": "^3.1.3",
     "fflate": "^0.8.3",
     "geojson-vt": "^4.0.3",
+    "hyparquet-writer": "^0.16.1",
     "iconv-lite": "^0.6.3",
     "js-yaml": "^5.2.1",
     "vt-pbf": "^3.1.3",
@@ -23,6 +24,7 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "hyparquet": "^1.27.1",
     "playwright": "^1.61.1"
   }
 }
