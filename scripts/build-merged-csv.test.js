@@ -8,7 +8,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import zlib from 'node:zlib';
 import { buildMergedCsv, CSV_COLUMNS, csvCell } from './build-merged-csv.js';
 import { generateTiles } from './gen-tiles.js';
 import { readCsvRows } from './lib/csv-read.js';
@@ -55,10 +54,12 @@ await test('csvCell: 特殊文字を含むときだけ引用符で囲む', () =>
 });
 
 // --- 書き出し → 読み戻し ---
-await test('CSV: ヘッダーと BOM を出し、値が往復で保たれる', async () => {
+await test('CSV: BOM なし UTF-8 でヘッダーを出し、値が往復で保たれる', async () => {
   const { dir, outPath, header, rows } = await writeCsv([fac()]);
   try {
-    assert.ok(fs.readFileSync(outPath, 'utf-8').startsWith('﻿'), 'BOM 付き');
+    const buf = fs.readFileSync(outPath);
+    assert.notDeepEqual([...buf.subarray(0, 3)], [0xef, 0xbb, 0xbf], 'UTF-8 BOM が付かない');
+    assert.ok(buf.toString('utf-8').startsWith('prefecture,'), '1バイト目から列名が始まる');
     assert.deepEqual(header, CSV_COLUMNS);
     assert.equal(rows.length, 1);
     assert.equal(rows[0][col.prefecture], '東京都');
@@ -169,14 +170,12 @@ await test('CSV: 都道府県・市区町村の異なり数を数える', async 
   }
 });
 
-await test('CSV: gzip 版が生成され、展開すると元の内容に一致する', async () => {
+await test('CSV: gzip 版は生成しない（配布は非圧縮CSVのみ）', async () => {
   const { dir, outPath, stats } = await writeCsv([fac()]);
   try {
-    const gz = `${outPath}.gz`;
-    assert.ok(fs.existsSync(gz), 'gz が生成される');
-    assert.equal(stats.gzipBytes, fs.statSync(gz).size);
-    const unzipped = zlib.gunzipSync(fs.readFileSync(gz)).toString('utf-8');
-    assert.equal(unzipped, fs.readFileSync(outPath, 'utf-8'), '展開結果が元CSVと一致');
+    assert.ok(!fs.existsSync(`${outPath}.gz`), '.csv.gz を作らない');
+    assert.ok(!('gzipBytes' in stats), '統計に gzipBytes を含めない');
+    assert.equal(stats.bytes, fs.statSync(outPath).size);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
