@@ -100,7 +100,10 @@ export function renderLlmsTxt(readme) {
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: ${PAGES}/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
-- 市区町村別 JSON や検索 API は配信していない。抽出は CSV から、地図表示はタイルで行う
+- 検索用 Parquet（都道府県別・列は CSV と同一）: ${PAGES}/api/parquet/{JISコード}.parquet
+  （例: 13.parquet = 東京都。一覧は ${PAGES}/api/parquet/manifest.json）
+- サーバー型の検索 API や市区町村別 JSON は配信していない。キーワード検索は
+  Parquet + DuckDB（CLI / Wasm）、一括抽出は CSV、地図表示はタイルで行う
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
 - 毎週月曜 18:00 UTC（JST 火曜 3:00）に自動更新
 
@@ -112,6 +115,7 @@ ${stats}
 - [README](${RAW}/README.md): プロジェクト概要
 - [収録状況](${RAW}/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
 - [タイルメタデータ](${PAGES}/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
+- [検索プレイグラウンド](${PAGES}/playground.html): ブラウザ内 DuckDB で Parquet を SQL 検索して試せる
 - [出典・ライセンス表示](${PAGES}/attribution.html): 利用時に必要な出典表示の文例
 
 ## 関連ツール
@@ -150,6 +154,21 @@ FROM read_csv_auto('${PAGES}/api/facilities-all.csv.gz')
 WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲食店営業';
 \`\`\`
 
+### キーワード検索する（都道府県別 Parquet・DuckDB）
+
+検索は全件 CSV より都道府県別 Parquet が軽い。列指向 + HTTP Range で必要な列だけ取得できる。
+ファイルは JIS X 0401 の都道府県コード別（01=北海道 〜 47=沖縄県、99=都道府県不明）。
+
+\`\`\`sql
+SELECT name, business_type, address, lat, lng
+FROM read_parquet('${PAGES}/api/parquet/13.parquet')  -- 13 = 東京都
+WHERE name LIKE '%ラーメン%'
+LIMIT 100;
+\`\`\`
+
+ブラウザからは DuckDB-Wasm で同じクエリを実行できる（実装例は
+[検索プレイグラウンド](${PAGES}/playground.html) のソースを参照）。
+
 ### pandas で読む
 
 \`\`\`python
@@ -181,8 +200,8 @@ map.addLayer({
 
 ### 実装時の注意
 
-- **ブラウザから 540MB の CSV を fetch しない。** 地図表示はタイル、データ抽出はサーバー側
-  （または DuckDB-Wasm + HTTP range request）で行う。
+- **ブラウザから 540MB の CSV を fetch しない。** 地図表示はタイル、ブラウザ内の検索は
+  都道府県別 Parquet（DuckDB-Wasm + HTTP range request）で行う。
 - CSV は UTF-8 **BOM付き**。Node.js 等でパースする際は先頭の BOM（\\uFEFF）を除去する。
 - \`lat\` / \`lng\` は座標を補完できなかった施設では空になる。地図利用時は必ず除外する。
 - \`geocoding_level\` が小さいほど座標は大まか（1=都道府県、2=市区町村、3=町丁目、8=街区・地番）。

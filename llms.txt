@@ -12,7 +12,10 @@
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: https://gl20percentclub.github.io/japan-facilities-api/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
-- 市区町村別 JSON や検索 API は配信していない。抽出は CSV から、地図表示はタイルで行う
+- 検索用 Parquet（都道府県別・列は CSV と同一）: https://gl20percentclub.github.io/japan-facilities-api/api/parquet/{JISコード}.parquet
+  （例: 13.parquet = 東京都。一覧は https://gl20percentclub.github.io/japan-facilities-api/api/parquet/manifest.json）
+- サーバー型の検索 API や市区町村別 JSON は配信していない。キーワード検索は
+  Parquet + DuckDB（CLI / Wasm）、一括抽出は CSV、地図表示はタイルで行う
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
 - 毎週月曜 18:00 UTC（JST 火曜 3:00）に自動更新
 
@@ -30,6 +33,7 @@
 - [README](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/README.md): プロジェクト概要
 - [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-facilities-api/main/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
 - [タイルメタデータ](https://gl20percentclub.github.io/japan-facilities-api/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
+- [検索プレイグラウンド](https://gl20percentclub.github.io/japan-facilities-api/playground.html): ブラウザ内 DuckDB で Parquet を SQL 検索して試せる
 - [出典・ライセンス表示](https://gl20percentclub.github.io/japan-facilities-api/attribution.html): 利用時に必要な出典表示の文例
 
 ## 関連ツール
