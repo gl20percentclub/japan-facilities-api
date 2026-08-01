@@ -1,4 +1,4 @@
-// 地図・検索ページ(map.html)の検索機能と、検索 API 仕様との整合性テスト。
+// 地図ページ(map.html)の検索窓と、検索 API 仕様との整合性テスト。
 //   node scripts/map-search.test.js
 //
 // map.html は geosearch（https://github.com/naogify/geosearch）の検索 API を
@@ -7,8 +7,9 @@
 // ここでは API 仕様のスナップショットをこのファイルに固定し、map.html の
 // 記述と突き合わせる。API 仕様が変わったらこのスナップショットも更新すること。
 //
-// 旧 playground.html は map.html へ統合したため、公開済み URL からの導線が
-// 切れないようリダイレクトが残っていることもここで固定する。
+// ページはキーワード検索だけの最小構成で、API のプレイグラウンド機能
+// （範囲指定・件数指定・リクエストURL表示・CSV出力）は持たない。
+// 旧 playground.html は map.html へのリダイレクトだけを残してある。
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -44,28 +45,11 @@ test('API エンドポイントを ?api= で上書きでき、既定値の定数
 test('ページが組み立てるクエリパラメータが API 仕様の範囲内である', () => {
   // params.set('xxx', ...) で使っているキーを抽出して仕様と突き合わせる。
   const used = [...HTML.matchAll(/params\.set\('([a-z_]+)'/g)].map((m) => m[1]);
-  assert.ok(used.length >= 3, `クエリパラメータを組み立てている (${used.join(',')})`);
   for (const key of used) {
     assert.ok(API_QUERY_PARAMS.includes(key), `パラメータ ${key} が API 仕様に存在する`);
   }
-  // 主要な検索パラメータは一通り使っていること（機能の退行防止）。
-  for (const key of API_QUERY_PARAMS) {
-    assert.ok(used.includes(key), `パラメータ ${key} をページが利用している`);
-  }
-});
-
-test('CSV ダウンロードの列が API レスポンス仕様と一致する', () => {
-  // RESULT_FIELDS 配列（CSV の列定義）を抽出して仕様と突き合わせる。
-  const m = HTML.match(/const RESULT_FIELDS = \[([^\]]+)\]/);
-  assert.ok(m, 'RESULT_FIELDS が定義されている');
-  const fields = [...m[1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1]);
-  for (const f of fields) {
-    assert.ok(API_RESULT_FIELDS.includes(f), `フィールド ${f} が API レスポンス仕様に存在する`);
-  }
-  // レスポンス仕様の全フィールドを CSV に出していること（情報の取りこぼし防止）。
-  for (const f of API_RESULT_FIELDS) {
-    assert.ok(fields.includes(f), `API のフィールド ${f} を CSV に出力する`);
-  }
+  // キーワード検索だけの最小構成なので q は必須。
+  assert.ok(used.includes('q'), 'キーワード q で検索している');
 });
 
 test('結果リスト・地図が参照するフィールドが API レスポンス仕様に存在する', () => {
@@ -93,6 +77,13 @@ test('検索結果を全件タイルとは別のソース・レイヤで重ね�
   assert.ok(/getSource\('results'\)\.setData/.test(HTML), '検索結果を setData で差し替える');
 });
 
+test('API プレイグラウンドの UI を持たない（最小構成を維持する）', () => {
+  // 統計表示と検索窓だけのページに保つ。復活させたい場合はこのテストも一緒に直す。
+  for (const gone of ['request-url', 'downloadCsv', 'RESULT_FIELDS', 'curl']) {
+    assert.ok(!HTML.includes(gone), `map.html が ${gone} を持たない`);
+  }
+});
+
 test('旧 playground.html が map.html へリダイレクトする', () => {
   assert.ok(
     /http-equiv="refresh"[^>]*url=\.\/map\.html/.test(PLAYGROUND),
@@ -111,4 +102,4 @@ test('廃止した配信形式・存在しないエンドポイントを参照�
   }
 });
 
-console.log(`\n✅ 地図・検索ページ 整合性テスト: ${passed}件すべて合格`);
+console.log(`\n✅ 地図ページ 整合性テスト: ${passed}件すべて合格`);

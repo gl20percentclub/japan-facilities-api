@@ -102,7 +102,7 @@ export function renderLlmsTxt(readme) {
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: ${DATA}/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
 - 市区町村別 JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
-  地図表示はタイルで行う（キーワード・近傍検索は ${PAGES}/map.html で試せる）
+  地図表示はタイルで行う
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
 - 毎週月曜 18:00 UTC（JST 火曜 3:00）に自動更新
 
@@ -114,7 +114,7 @@ ${stats}
 - [README](${RAW}/README.md): プロジェクト概要
 - [収録状況](${RAW}/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
 - [タイルメタデータ](${DATA}/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
-- [地図・検索ページ](${PAGES}/map.html): 全件をタイルで表示し、キーワード・近傍検索も試せる（geosearch の検索 API を利用）
+- [地図ページ](${PAGES}/map.html): 収録データをベクトルタイルで表示するプレビュー地図
 - [出典・ライセンス表示](${PAGES}/attribution.html): 利用時に必要な出典表示の文例
 `;
 }
