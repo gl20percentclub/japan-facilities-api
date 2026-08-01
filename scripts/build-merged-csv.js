@@ -17,7 +17,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { PREFECTURE_NAMES } from './lib/normalize.js';
+import { PREFECTURE_NAMES } from './lib/prefectures.js';
 
 // 「都道府県／市区町村の異なり数」に数えてよい値かを判定するための集合。
 // 元データには '不明'（解決できなかった）や '県外'（管轄外を表す独自の値）が混ざる。
