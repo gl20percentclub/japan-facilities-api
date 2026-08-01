@@ -66,6 +66,24 @@ test('TILE_MIN_ZOOM / TILE_MAX_ZOOM が gen-tiles の既定ズーム範囲と一
   });
 });
 
+test('初期ズームがタイルの最小ズーム以上で、開いた直後から点が出る', () => {
+  // fitBounds で全国を収めると z5 以下になり、タイルが無くて点が1つも出ない。
+  // 初期ズームはタイルの最小ズームに合わせる（定数を直接使っていることも確認する）。
+  assert.ok(/zoom: TILE_MIN_ZOOM/.test(HTML), '初期ズームに TILE_MIN_ZOOM を使う');
+  assert.ok(!/fitBoundsOptions/.test(HTML), '全国 fitBounds で初期表示していない');
+  withTiles({}, (meta) => {
+    const minZoom = Number(htmlValue(/TILE_MIN_ZOOM\s*=\s*(\d+)/, 'TILE_MIN_ZOOM'));
+    assert.ok(minZoom >= meta.minzoom, `初期ズーム(${minZoom}) がタイルの最小ズーム(${meta.minzoom})以上`);
+  });
+  // 初期中心が日本の範囲（タイルの bounds）に収まっていること。
+  const center = htmlValue(/INITIAL_CENTER = \[([^\]]+)\]/, 'INITIAL_CENTER')
+    .split(',').map((v) => Number(v.trim()));
+  const bounds = htmlValue(/JAPAN_BOUNDS = \[([^\]]+)\]/, 'JAPAN_BOUNDS')
+    .split(',').map((v) => Number(v.trim()));
+  assert.ok(center[0] > bounds[0] && center[0] < bounds[2], `初期中心の経度(${center[0]}) が日本の範囲内`);
+  assert.ok(center[1] > bounds[1] && center[1] < bounds[3], `初期中心の緯度(${center[1]}) が日本の範囲内`);
+});
+
 test('タイルURLテンプレートが「api/tiles/ + metadata.tiles[0]」の配置と一致する', () => {
   // データは CloudFront 配信のため、map.html は API_BASE（.../api）を基点に組み立てる。
   // API_BASE と組み立て後のパスを突き合わせ、配信物の配置と一致するか検証する。
