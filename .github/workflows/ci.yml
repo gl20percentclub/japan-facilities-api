@@ -1,0 +1,39 @@
+name: CI
+
+# PR と main への push でユニットテストを走らせる。
+# ここで走る scripts/*.test.js には「attribution.html が config/sources.yaml と
+# 同期しているか」「llms.txt が README と同期しているか」の検査も含まれるため、
+# 生成物のコミット漏れ・古い生成物の混入は PR の時点で落ちる。
+# （テスト自体は前からあったが、実行するワークフローが無く機能していなかった）
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # 配信物（api/）を伴う統合テストはデータが無いと動かないため unit のみ。
+      - name: Run unit tests
+        run: npm run test:unit
