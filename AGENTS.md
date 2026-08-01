@@ -77,3 +77,20 @@ attribution.html        # 出典表示ページ（sources.yaml から自動生�
   gh-pages へ反映する
 - `crawl.yml` は gh-pages へデータを配信していた旧構成の名残で、現在は使っていない
   （停止・削除は別途対応）。設定は `scripts/workflows.test.js` で固定されている
+- `publish_dir: .` のため `.gitignore` を配信対象から除外しないと gh-pages 上の `api/` が
+  全消えする事故が起きる（過去に発生済み。workflows.test.js が再発を防いでいる）
+
+## 生成物の所有権（このリポジトリが単一の情報源）
+
+`config/sources.yaml` と、そこから作られる `attribution.html` / `llms.txt` / `llms-full.txt`
+は**このリポジトリが唯一の情報源**。クロールを実行する外部の基盤（private リポジトリ
+`gl20percentclub/japan-facilities-crawler` + Fargate）は、これらを生成・push してはならない。
+外部が渡してよいのは README の STATS ブロック（クロール結果の統計）だけ。
+
+- `pages.yml` は配信前に必ず生成物を作り直すため、公開ページは常に main の生成元と一致する
+- `generated-docs.yml` は main 上の生成物がずれていたら再生成してコミットする（自己修復）
+- `ci.yml` は PR でユニットテストを走らせる。生成物の同期テスト（`gen-attribution.test.js` 等）が
+  含まれるため、生成元だけ直して生成物を再生成し忘れた PR はここで落ちる
+- 過去の事故: クローラーが自リポジトリに持っていた古い `config/sources.yaml` の
+  スナップショットから `attribution.html` を生成して main に push し、旧リポジトリ名と
+  ライセンス未確定で除外したソースが公開ページに巻き戻った

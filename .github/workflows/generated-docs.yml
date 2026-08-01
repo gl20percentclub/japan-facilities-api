@@ -1,0 +1,83 @@
+name: Generated docs
+
+# main 上の自動生成ファイル（attribution.html / llms.txt / llms-full.txt）が
+# 生成元（config/sources.yaml・README.md・生成スクリプト）とずれていたら、
+# 再生成してそのままコミットする（自己修復）。
+#
+# 自己修復する理由: 生成物はこのリポジトリの外（週次クローラーの自動コミット等）
+# からも push されるため、古いスナップショットが混入すると旧リポジトリ名や
+# 除外済みソースが復活する。実際に一度発生している。
+# 配信されるページは pages.yml が配信前に再生成するので公開ページは常に正しいが、
+# リポジトリ上の内容もここで生成元に合わせて揃えておく。
+#
+# PR でのドリフト検査は ci.yml（npm run test:unit に同期テストが含まれる）が担う。
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - 'config/sources.yaml'
+      - 'scripts/gen-attribution.js'
+      - 'scripts/gen-llms.js'
+      # 生成物そのものへの push も対象にする（外部の自動コミットで古い内容が
+      # 入ったときに、その push で即座に巻き戻せるようにするため）。
+      # 自己修復コミットは GITHUB_TOKEN による push でワークフローを再発火しないため
+      # 無限ループにはならない。
+      - 'attribution.html'
+      - 'llms.txt'
+      - 'llms-full.txt'
+      - '.github/workflows/generated-docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# 同じブランチへの多重実行を避ける（自己修復コミットの衝突防止）。
+concurrency:
+  group: generated-docs-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # 生成スクリプトは js-yaml だけで動くため devDependencies は入れない。
+      - name: Install dependencies
+        run: npm ci --omit=dev
+
+      - name: Regenerate
+        run: |
+          npm run build:attribution
+          npm run build:llms
+
+      # 外部からの古い自動コミットを巻き戻すため、差分があれば黙って直す。
+      - name: Commit regenerated files
+        run: |
+          if git diff --quiet -- attribution.html llms.txt llms-full.txt; then
+            echo "自動生成ファイルは生成元と一致しています"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add attribution.html llms.txt llms-full.txt
+          git commit -m "chore: 自動生成ファイルを生成元から再生成"
+          # 実行中に main が進んでいることがあるため rebase してリトライする。
+          for i in 1 2 3; do
+            if git pull --rebase --autostash origin "${GITHUB_REF_NAME}" \
+              && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              exit 0
+            fi
+            echo "push retry $i..."
+            sleep 5
+          done
+          echo "::error::再生成した自動生成ファイルの push に失敗しました"
+          exit 1

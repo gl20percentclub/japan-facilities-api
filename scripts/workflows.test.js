@@ -106,6 +106,59 @@ for (const page of pushPaths.filter((p) => p.endsWith('.html'))) {
   assert(fs.existsSync(path.join(ROOT, page)), `pages.yml: ${page} がリポジトリに存在する`);
 }
 
+// --- 自動生成ページは配信前に生成元から作り直す ---
+// コミット済みの attribution.html / llms*.txt が古くても（外部の自動コミット等）、
+// 公開ページは常に config/sources.yaml・README.md と一致させるための固定。
+const pagesRun = Object.values(pages.jobs ?? {})
+  .flatMap((job) => job.steps ?? [])
+  .map((step) => step.run ?? '')
+  .join('\n');
+assert(
+  pagesRun.includes('build:attribution') && pagesRun.includes('build:llms'),
+  'pages.yml: 配信前に attribution.html / llms*.txt を再生成する',
+);
+// 再生成が配信ステップより前にあること（順序が入れ替わると意味がない）。
+const pagesStepNames = Object.values(pages.jobs ?? {})
+  .flatMap((job) => job.steps ?? [])
+  .map((step) => (step.uses ?? '').startsWith('peaceiris/actions-gh-pages')
+    ? 'DEPLOY'
+    : (step.run ?? ''));
+assert(
+  pagesStepNames.findIndex((s) => s.includes('build:attribution'))
+    < pagesStepNames.indexOf('DEPLOY'),
+  'pages.yml: 再生成ステップが配信ステップより前にある',
+);
+// 生成元の変更だけでも配信が走る（生成物のコミット漏れで公開ページが古くならない）。
+for (const src of ['README.md', 'config/sources.yaml']) {
+  assert(pushPaths.includes(src), `pages.yml: ${src} の変更を配信対象にしている`);
+}
+
+// --- 生成物のドリフトを検知・自己修復するワークフロー ---
+const genDocs = loadWorkflow('generated-docs.yml');
+const genDocsPushPaths = genDocs.on?.push?.paths ?? [];
+assert(
+  genDocs.on?.push?.branches?.includes('main'),
+  'generated-docs.yml: main への push で動く',
+);
+// PR でのドリフト検査は ci.yml のユニットテスト（同期テストを含む）が担う。
+const ci = loadWorkflow('ci.yml');
+const ciRun = Object.values(ci.jobs ?? {})
+  .flatMap((job) => job.steps ?? [])
+  .map((step) => step.run ?? '')
+  .join('\n');
+assert(ci.on?.pull_request !== undefined, 'ci.yml: PR でテストが走る');
+assert(ciRun.includes('test:unit'), 'ci.yml: ユニットテスト（生成物の同期検査を含む）を実行する');
+for (const generated of ['attribution.html', 'llms.txt', 'llms-full.txt']) {
+  assert(
+    genDocsPushPaths.includes(generated),
+    `generated-docs.yml: ${generated} への push を検査対象にしている（外部の古い自動コミット対策）`,
+  );
+}
+assert(
+  genDocs.permissions?.contents === 'write',
+  'generated-docs.yml: 自己修復コミットのため contents: write を持つ',
+);
+
 console.log('');
 if (failures > 0) {
   console.error(`❌ ワークフロー設定テストに ${failures} 件の失敗`);
