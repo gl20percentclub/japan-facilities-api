@@ -233,12 +233,15 @@
     <div class="wrap">
       <h2>クイックスタート</h2>
       <p class="lead">
-        配信しているのは <strong>全件CSV</strong> と <strong>ベクトルタイル</strong> の2つだけです。
+        配信しているのは <strong>全件CSV</strong>・<strong>都道府県別CSV</strong>・<strong>ベクトルタイル</strong> の3つだけです。
         ベース URL は <code>https://d1nptpfogf2ynv.cloudfront.net/api/</code>。
       </p>
 
-      <p class="step">1. 全件CSV をダウンロードする（約 540MB）</p>
-<pre><code>curl -O https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv</code></pre>
+      <p class="step">1. CSV をダウンロードする（全件は約 540MB。1県だけなら都道府県別CSV が軽い）</p>
+<pre><code>curl -O https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv
+
+<span class="c"># 東京都だけ欲しい場合（ファイル名は {JISコード}-{ローマ字}.csv）</span>
+curl -O https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/13-tokyo.csv</code></pre>
 
       <p class="step">2. pandas で読み込む（URL 直指定でもいけます）</p>
 <pre><code>import pandas as pd
@@ -274,7 +277,7 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
   <section id="formats">
     <div class="wrap">
       <h2>配信している形式</h2>
-      <p class="lead">用途に合わせて2つから選べます。どちらも同じベース URL 配下の静的ファイルです。</p>
+      <p class="lead">用途に合わせて3つから選べます。いずれも同じベース URL 配下の静的ファイルです。</p>
       <div class="table-scroll">
         <table class="formats">
           <thead>
@@ -285,6 +288,14 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
               <td>全件 CSV</td>
               <td><code>api/facilities-all.csv</code>（約 540MB）</td>
               <td>pandas・BI ツール・DB 取り込みで分析する。全項目入り・BOM なし UTF-8 です。</td>
+            </tr>
+            <tr>
+              <td>都道府県別 CSV</td>
+              <td><code>api/prefectures/{JISコード}-{ローマ字}.csv</code>（例 <code>13-tokyo.csv</code>）</td>
+              <td>
+                1県だけ必要なときに。列・内容は全件CSV と同じで、47都道府県すべて存在します。
+                ファイル一覧と件数は <code>api/prefectures/index.json</code>。
+              </td>
             </tr>
             <tr>
               <td>ベクトルタイル</td>

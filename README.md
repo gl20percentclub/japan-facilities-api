@@ -25,7 +25,7 @@
 
 - 登録不要・APIキー不要
 - 商用利用可能
-- 全件CSVとベクトルタイルで配信
+- 全件CSV・都道府県別CSV・ベクトルタイルで配信
 - 住所の正規化と緯度経度の補完に対応
 - 毎週自動更新
 
@@ -69,7 +69,46 @@ df = pd.read_csv(
 )
 ```
 
-市区町村別JSONや検索APIは配信していません。必要な範囲をCSVから抽出してください。
+### 都道府県別CSV
+
+一部の地域だけが必要な場合は、全件CSV（数百MB）ではなく都道府県別CSVを使ってください。列と内容は全件CSVと同じで、都道府県ごとに分割してあります。
+
+| ファイル | URL |
+|---|---|
+| 都道府県別CSV | `https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/{JISコード}-{ローマ字}.csv` |
+| ファイル一覧（JSON） | https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/index.json |
+
+ファイル名は、JIS都道府県コード（2桁）とローマ字を組み合わせた `01-hokkaido.csv` 〜 `47-okinawa.csv` です。47都道府県すべてのURLが常に存在します。
+
+```bash
+# 東京都だけダウンロードする
+curl -O https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/13-tokyo.csv
+```
+
+```python
+import pandas as pd
+
+df = pd.read_csv(
+    "https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/13-tokyo.csv"
+)
+```
+
+各ファイルの件数とサイズは `index.json` で確認できます。
+
+```json
+{
+  "updated": 1785000000,
+  "columns": ["prefecture", "city", "..."],
+  "unassigned": 0,
+  "prefectures": [
+    { "code": "13", "name": "東京都", "romaji": "tokyo", "file": "13-tokyo.csv", "records": 123456, "bytes": 34567890 }
+  ]
+}
+```
+
+元データから都道府県を特定できなかったレコードは、都道府県別CSVには含まれません（件数は `index.json` の `unassigned` で確認できます）。これらを含む全レコードが必要な場合は全件CSVを使ってください。
+
+市区町村別CSVやJSON、検索APIは配信していません。必要な範囲をCSVから抽出してください。
 
 ### ベクトルタイル
 
@@ -167,7 +206,7 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 
 ## 更新頻度
 
-毎週月曜18:00 UTC（日本時間 火曜3:00）に自動でクロールし、CSVとベクトルタイルを再配信します。更新後もURLは変わりません。
+毎週月曜18:00 UTC（日本時間 火曜3:00）に自動でクロールし、全件CSV・都道府県別CSV・ベクトルタイルを再配信します。更新後もURLは変わりません。
 
 ## ライセンスと出典表示
 

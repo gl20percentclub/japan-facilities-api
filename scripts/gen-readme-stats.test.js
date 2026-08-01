@@ -25,6 +25,7 @@ const fixed = {
     cities: 1741,
     bytes: 540 * 1024 * 1024,
   },
+  prefCsv: { files: 47, records: 1495048, unassigned: 0, bytes: 538 * 1024 * 1024 },
   tiles: { tiles: 12345, points: 1106198, bytes: 250 * 1024 * 1024 },
 };
 const md = renderStats(fixed);
@@ -36,7 +37,12 @@ assert(md.includes('| 都道府県 | 47 |'), '都道府県数が出る');
 assert(md.includes('| 市区町村 | 1,741 |'), '市区町村数が出る');
 assert(md.includes('| 結合CSV | 約 540.0 MB |'), 'CSV サイズが出る');
 assert(!md.includes('gzip'), 'gzip 表記は出さない（非圧縮CSVのみ配布）');
+assert(md.includes('| 都道府県別CSV | 47 ファイル / 約 538.0 MB |'), '都道府県別CSV のファイル数とサイズが出る');
 assert(md.includes('| ベクトルタイル | 12,345 枚 / 約 250.0 MB |'), 'タイル枚数とサイズが出る');
+
+// prefCsv を渡さない場合は都道府県別CSV の行を出さない（旧形式の統計でも壊れないこと）。
+const noPref = renderStats({ ...fixed, prefCsv: undefined });
+assert(!noPref.includes('都道府県別CSV'), 'prefCsv が無ければ都道府県別CSV の行を出さない');
 
 // updated が無い場合はダッシュ表記。
 const noDate = renderStats({ ...fixed, updated: 0 });

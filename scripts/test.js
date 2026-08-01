@@ -1,7 +1,8 @@
 // 生成した配信物が正しいことを確認するバリデーションスクリプト。
 //
-// 検証対象は配信する2形式だけ:
+// 検証対象は配信する3形式だけ:
 //   api/facilities-all.csv[.gz]   全件の結合CSV
+//   api/prefectures/*.csv         都道府県別CSV + index.json
 //   api/tiles/{z}/{x}/{y}.pbf     ベクトルタイル + metadata.json（TileJSON）
 //
 //   node scripts/test.js
@@ -10,12 +11,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CSV_COLUMNS } from './build-merged-csv.js';
+import { INDEX_FILENAME, PREFECTURES } from './build-prefecture-csv.js';
 import { readCsvRows } from './lib/csv-read.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const API_DIR = path.join(ROOT, 'api');
 const CSV_PATH = path.join(API_DIR, 'facilities-all.csv');
+const PREF_CSV_DIR = path.join(API_DIR, 'prefectures');
 const TILES_DIR = path.join(API_DIR, 'tiles');
 
 let failures = 0;
@@ -42,6 +45,7 @@ let rowCount = 0;
 let withCoords = 0;
 let header = null;
 const prefs = new Set();
+const prefCounts = new Map(); // 都道府県名 -> 全件CSV 内の行数（都道府県別CSV との突き合わせに使う）
 const cities = new Set();
 // 同種のエラーで何万行も出力しないよう、種類ごとに最初の数件だけ報告する。
 const reported = new Map();
@@ -71,6 +75,7 @@ for (const row of readCsvRows(CSV_PATH)) {
   if (!pref) reportOnce('pref', `${rowCount}行目: prefecture が空`);
   if (!city) reportOnce('city', `${rowCount}行目: city が空`);
   prefs.add(pref);
+  prefCounts.set(pref, (prefCounts.get(pref) || 0) + 1);
   cities.add(`${pref}/${city}`);
 
   // 座標: 両方空か、両方が日本の範囲内の数値であること。
@@ -111,7 +116,68 @@ for (const [kind, n] of reported) {
 // 配布は非圧縮CSV のみ。gzip 版が残っていると配信物が二重になるため、無いことを確認する。
 assert(!fs.existsSync(`${CSV_PATH}.gz`), 'api/facilities-all.csv.gz を配信しない');
 
-// --- 2. ベクトルタイル ------------------------------------------------------
+// --- 2. 都道府県別CSV -------------------------------------------------------
+// 全件CSV の分割配信なので、「47ファイルある」「中身が全件CSV と一致する」の2点を見る。
+const prefIndexPath = path.join(PREF_CSV_DIR, INDEX_FILENAME);
+assert(fs.existsSync(prefIndexPath), `api/prefectures/${INDEX_FILENAME} が存在する`);
+if (fs.existsSync(prefIndexPath)) {
+  const index = JSON.parse(fs.readFileSync(prefIndexPath, 'utf-8'));
+  assert(
+    JSON.stringify(index.columns) === JSON.stringify(CSV_COLUMNS),
+    'index.json の columns が結合CSV と同じ定義',
+  );
+  assert(
+    Array.isArray(index.prefectures) && index.prefectures.length === 47,
+    `index.json に47都道府県ぶんの項目がある (${index.prefectures?.length})`,
+  );
+
+  let prefRowTotal = 0;
+  const missing = []; // 実ファイルが無い都道府県
+  const mismatched = []; // 行数・都道府県列が食い違う都道府県
+
+  for (const def of PREFECTURES) {
+    const entry = (index.prefectures || []).find((e) => e.code === def.code);
+    const file = path.join(PREF_CSV_DIR, `${def.code}-${def.romaji}.csv`);
+    if (!entry || !fs.existsSync(file)) {
+      missing.push(def.name);
+      continue;
+    }
+
+    // 1ファイルずつ読み、ヘッダー・行数・prefecture 列を検証する。
+    let rows = 0;
+    let head = null;
+    let foreign = 0; // その県のファイルに入っている他県のレコード
+    for (const row of readCsvRows(file)) {
+      if (head === null) {
+        head = row;
+        continue;
+      }
+      rows++;
+      if (row[col.prefecture] !== def.name) foreign++;
+    }
+
+    if (JSON.stringify(head) !== JSON.stringify(CSV_COLUMNS)) mismatched.push(`${def.name}(ヘッダー)`);
+    if (rows !== entry.records) mismatched.push(`${def.name}(index ${entry.records}≠実 ${rows})`);
+    if (rows !== (prefCounts.get(def.name) || 0)) {
+      mismatched.push(`${def.name}(全件CSV ${prefCounts.get(def.name) || 0}≠県別 ${rows})`);
+    }
+    if (foreign > 0) mismatched.push(`${def.name}(他県のレコード ${foreign}行)`);
+    prefRowTotal += rows;
+  }
+
+  assert(missing.length === 0, `47都道府県ぶんの CSV がそろっている${missing.length ? `（欠落: ${missing.join('・')}）` : ''}`);
+  assert(
+    mismatched.length === 0,
+    `各県のCSV が全件CSV と一致する${mismatched.length ? `（不一致: ${mismatched.slice(0, 5).join(' / ')}）` : ''}`,
+  );
+  // 47都道府県に振り分けられなかったレコード（都道府県が不明な行）を足すと全件と合う。
+  assert(
+    prefRowTotal + (index.unassigned || 0) === rowCount,
+    `県別の合計 + 未分類(${index.unassigned}) が全件CSV の行数と一致 (${prefRowTotal + (index.unassigned || 0)} / ${rowCount})`,
+  );
+}
+
+// --- 3. ベクトルタイル ------------------------------------------------------
 const metaPath = path.join(TILES_DIR, 'metadata.json');
 assert(fs.existsSync(metaPath), 'api/tiles/metadata.json が存在する');
 if (fs.existsSync(metaPath)) {
