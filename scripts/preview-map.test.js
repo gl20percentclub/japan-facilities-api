@@ -66,9 +66,19 @@ test('TILE_MIN_ZOOM / TILE_MAX_ZOOM が gen-tiles の既定ズーム範囲と一
 });
 
 test('タイルURLテンプレートが「api/tiles/ + metadata.tiles[0]」の配置と一致する', () => {
+  // データは CloudFront 配信のため、map.html は API_BASE（.../api）を基点に組み立てる。
+  // API_BASE と組み立て後のパスを突き合わせ、配信物の配置と一致するか検証する。
+  const apiBase = htmlValue(/API_BASE\s*=\s*'([^']+)'/, 'API_BASE');
+  assert.ok(apiBase.endsWith('/api'), `API_BASE(${apiBase}) が api/ を指す`);
   withTiles({ minZoom: 6, maxZoom: 12 }, (meta) => {
-    const expectedPath = `api/tiles/${meta.tiles[0]}`; // = api/tiles/{z}/{x}/{y}.pbf
+    const expectedPath = `\${API_BASE}/tiles/${meta.tiles[0]}`; // = ${API_BASE}/tiles/{z}/{x}/{y}.pbf
     assert.ok(HTML.includes(expectedPath), `map.html がタイルパス ${expectedPath} を参照する`);
+    // 組み立て結果が生成物の配置（api/tiles/{z}/{x}/{y}.pbf）と一致することを確認する。
+    const resolved = `${apiBase}/tiles/${meta.tiles[0]}`;
+    assert.ok(
+      resolved.endsWith(`api/tiles/${meta.tiles[0]}`),
+      `組み立て後のタイルURL(${resolved}) が api/tiles/ 配下を指す`,
+    );
   });
 });
 

@@ -235,16 +235,16 @@
       <h2>クイックスタート</h2>
       <p class="lead">
         配信しているのは <strong>全件CSV</strong> と <strong>ベクトルタイル</strong> の2つだけです。
-        ベース URL は <code>https://gl20percentclub.github.io/japan-food-facilities/api/</code>。
+        ベース URL は <code>https://d1nptpfogf2ynv.cloudfront.net/api/</code>。
       </p>
 
       <p class="step">1. 全件CSV をダウンロードする（約 540MB）</p>
-<pre><code>curl -O https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv</code></pre>
+<pre><code>curl -O https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv</code></pre>
 
       <p class="step">2. pandas で読み込む（URL 直指定でもいけます）</p>
 <pre><code>import pandas as pd
 
-df = pd.read_csv('https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv')
+df = pd.read_csv('https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv')
 <span class="c"># 那覇市の飲食店営業だけ抜き出す</span>
 naha = df[(df.city == '那覇市') &amp; (df.business_type == '飲食店営業')]
 print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
@@ -252,7 +252,7 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
       <p class="step">3. 地図に出す（MapLibre GL JS・タイルサーバー不要）</p>
 <pre><code>map.addSource('facilities', {
   type: 'vector',
-  tiles: ['https://gl20percentclub.github.io/japan-food-facilities/api/tiles/{z}/{x}/{y}.pbf'],
+  tiles: ['https://d1nptpfogf2ynv.cloudfront.net/api/tiles/{z}/{x}/{y}.pbf'],
   minzoom: 6, maxzoom: 12,
 });
 <span class="c">// レイヤ名は "facilities"、属性は name / business_type / pref / city</span></code></pre>
@@ -354,7 +354,9 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
   <script>
     // 配信中の api/ から件数を読み、ヒーローの統計を最新の値に差し替える。
     // 取得できない場合は HTML に書かれた既定値をそのまま残す（表示は壊さない）。
-    const API_BASE = './api';
+    // データは CloudFront 配信（このページ自身は GitHub Pages）なので、
+    // 相対パスではなく配信元の絶対 URL を指す。CORS は全オリジン許可済み。
+    const API_BASE = 'https://d1nptpfogf2ynv.cloudfront.net/api';
 
     /** 数値を「149万」「1,958」のような読みやすい表記にする。 */
     function formatCount(n) {

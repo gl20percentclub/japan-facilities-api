@@ -78,8 +78,17 @@ assert(!/\n{3,}/.test(stripped), '3連以上の空行が残らない');
 const llms = renderLlmsTxt(readme);
 assert(llms.startsWith('# Japan Food Facilities Data'), 'H1 で始まる（llms.txt 仕様）');
 assert(llms.split('\n')[2].startsWith('> '), 'H1 直後に blockquote の要約がある');
-assert(llms.includes('facilities-all.csv.gz'), 'CSV の URL が載る');
+// データ（api/）は CloudFront 配信。Pages のホストを指していたら張り替え漏れなので落とす。
+assert(
+  llms.includes('https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv'),
+  'CSV の URL は CloudFront を指す',
+);
+assert(!llms.includes('facilities-all.csv.gz'), '配信していない gzip 版を案内しない');
 assert(llms.includes('{z}/{x}/{y}.pbf'), 'タイルの URL テンプレートが載る');
+assert(
+  !llms.includes('gl20percentclub.github.io/japan-food-facilities/api/'),
+  'データの URL に Pages のホストが残っていない',
+);
 assert(llms.includes('| 施設レコード数 | 1,495,048 件 |'), 'README の統計が埋め込まれる');
 assert(llms.includes('llms-full.txt'), 'llms-full.txt へのリンクがある');
 

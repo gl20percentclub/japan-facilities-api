@@ -23,8 +23,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const README_PATH = path.join(ROOT, 'README.md');
 
-// 配信 URL の基点。Pages はデータとページの配信先、RAW はリポジトリ内 Markdown の取得先。
+// 配信 URL の基点。静的ページは GitHub Pages、データ（api/）は S3 + CloudFront と
+// 配信元が分かれている。RAW はリポジトリ内 Markdown の取得先。
 const PAGES = 'https://gl20percentclub.github.io/japan-food-facilities';
+const DATA = 'https://d1nptpfogf2ynv.cloudfront.net';
 const REPO = 'https://github.com/gl20percentclub/japan-food-facilities';
 const RAW = 'https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main';
 
@@ -94,12 +96,11 @@ export function renderLlmsTxt(readme) {
 
 重要な事実:
 
-- 全件CSV（gzip 推奨）: ${PAGES}/api/facilities-all.csv.gz
-- 全件CSV（非圧縮・約540MB）: ${PAGES}/api/facilities-all.csv
-- CSV は UTF-8（BOM付き）。列: prefecture, city, city_raw, name, name_kana,
+- 全件CSV（gzip 版は配信していない）: ${DATA}/api/facilities-all.csv
+- CSV は UTF-8（BOMなし）。列: prefecture, city, city_raw, name, name_kana,
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
-- ベクトルタイル（MVT）: ${PAGES}/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
+- ベクトルタイル（MVT）: ${DATA}/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
 - 市区町村別 JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
   地図表示はタイルで行う（キーワード・近傍検索は ${PAGES}/playground.html で試せる）
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
@@ -112,7 +113,7 @@ ${stats}
 - [llms-full.txt](${PAGES}/llms-full.txt): データ仕様・利用例・注意事項の全文（まずこれを読む）
 - [README](${RAW}/README.md): プロジェクト概要
 - [収録状況](${RAW}/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
-- [タイルメタデータ](${PAGES}/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
+- [タイルメタデータ](${DATA}/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
 - [検索プレイグラウンド](${PAGES}/playground.html): キーワード・近傍検索を試せる（geosearch の検索 API を利用）
 - [出典・ライセンス表示](${PAGES}/attribution.html): 利用時に必要な出典表示の文例
 `;
@@ -138,12 +139,12 @@ ${body}
 
 ### CSV から必要な範囲を抽出する（DuckDB・推奨）
 
-540MB の CSV 全体をメモリに載せずに、リモートの gzip CSV へ直接クエリできる。
+数百MB規模の CSV 全体をメモリに載せずに、リモートの CSV へ HTTP range request で直接クエリできる。
 
 \`\`\`sql
 INSTALL httpfs; LOAD httpfs;
 SELECT name, address, lat, lng
-FROM read_csv_auto('${PAGES}/api/facilities-all.csv.gz')
+FROM read_csv_auto('${DATA}/api/facilities-all.csv')
 WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲食店営業';
 \`\`\`
 
@@ -152,7 +153,7 @@ WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲�
 \`\`\`python
 import pandas as pd
 
-df = pd.read_csv('${PAGES}/api/facilities-all.csv.gz')
+df = pd.read_csv('${DATA}/api/facilities-all.csv')
 naha = df[(df['prefecture'] == '沖縄県') & (df['city'] == '那覇市')]
 \`\`\`
 
@@ -163,7 +164,7 @@ naha = df[(df['prefecture'] == '沖縄県') & (df['city'] == '那覇市')]
 \`\`\`js
 map.addSource('facilities', {
   type: 'vector',
-  tiles: ['${PAGES}/api/tiles/{z}/{x}/{y}.pbf'],
+  tiles: ['${DATA}/api/tiles/{z}/{x}/{y}.pbf'],
   minzoom: 6,
   maxzoom: 12,
 });
@@ -178,9 +179,9 @@ map.addLayer({
 
 ### 実装時の注意
 
-- **ブラウザから 540MB の CSV を fetch しない。** 地図表示はタイル、データ抽出はサーバー側
+- **ブラウザから数百MBの CSV を fetch しない。** 地図表示はタイル、データ抽出はサーバー側
   （または DuckDB-Wasm + HTTP range request）で行う。
-- CSV は UTF-8 **BOM付き**。Node.js 等でパースする際は先頭の BOM（\\uFEFF）を除去する。
+- CSV は UTF-8 **BOMなし**。gzip 圧縮版（.csv.gz）は配信していない。
 - \`lat\` / \`lng\` は座標を補完できなかった施設では空になる。地図利用時は必ず除外する。
 - \`geocoding_level\` が小さいほど座標は大まか（1=都道府県、2=市区町村、3=町丁目、8=街区・地番）。
   建物単位の精度が必要なら level を確認する。
