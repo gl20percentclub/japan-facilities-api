@@ -1,8 +1,9 @@
 name: Deploy Pages
 
 # 静的ページ（LP・プレビュー地図・出典表示）を main への push で gh-pages に反映する。
-# データ（api/）の生成は重いため crawl.yml 側で週次に行う。ここではページだけを
-# 上書きし、既存の api/ には触れない（keep_files: true）。
+# データ（api/）はこのリポジトリでは生成せず、外部の Fargate クローラーが S3 + CloudFront
+# へ配信する。ここではページだけを上書きし、gh-pages 上の既存ファイルには触れない
+# （keep_files: true）。gh-pages への配信ワークフローはこれ1本だけ。
 #
 # 自動生成ページ（attribution.html / llms.txt / llms-full.txt）は配信前に必ず
 # 生成元（config/sources.yaml・README.md）から作り直す。リポジトリにコミット済みの
@@ -30,7 +31,7 @@ on:
 permissions:
   contents: write
 
-# crawl.yml の配信ステップと同じグループ。gh-pages への同時 push を避ける。
+# 短時間に main へ複数 push があっても gh-pages への push が競合しないよう直列化する。
 concurrency:
   group: gh-pages-deploy
   cancel-in-progress: false
@@ -58,11 +59,11 @@ jobs:
           npm run build:attribution
           npm run build:llms
 
-      # keep_files: true なので gh-pages 上の api/ は残したまま、ページだけ上書きされる。
-      # 反面ファイル削除は反映されないため、リネームや削除の掃除は crawl.yml の
-      # 配信（keep_files: false）に任せる。
-      # .gitignore は api/ を無視するため、配信先に置くと次回以降の api/ 更新が
-      # コミットされなくなる。crawl.yml と同じく除外する。
+      # keep_files: true なので gh-pages 上の既存ファイルは残したまま、ページだけ上書きされる。
+      # 反面ファイル削除は反映されない。ページをリネーム・削除したときは gh-pages 側の
+      # 旧ファイルが残るため、必要なら手動で消す（掃除役だった crawl.yml は廃止済み）。
+      # .gitignore は api/ を無視するため、配信先に置くと gh-pages 上に api/ を置きたく
+      # なったときにコミットされなくなる。念のため除外し続ける。
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
