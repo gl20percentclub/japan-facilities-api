@@ -26,7 +26,7 @@
 
 - 登録不要・APIキー不要
 - 商用利用可能
-- 全件CSV・ベクトルタイル・検索用Parquetで配信
+- 全件CSVとベクトルタイルで配信
 - 住所の正規化と緯度経度の補完に対応
 - 毎週自動更新
 
@@ -70,7 +70,7 @@ df = pd.read_csv(
 )
 ```
 
-市区町村別JSONは配信していません。地域・業種・キーワードで絞り込む場合は、後述の検索用Parquetを利用するか、CSVから必要な範囲を抽出してください。
+市区町村別JSONや検索APIは配信していません。必要な範囲をCSVから抽出してください。
 
 ### ベクトルタイル
 
@@ -93,26 +93,13 @@ map.addSource("facilities", {
 
 収録データは[プレビュー地図](https://gl20percentclub.github.io/japan-food-facilities/map.html)でも確認できます。
 
-### 検索用Parquet
+### 検索プレイグラウンド
 
-キーワード・地域・業種での検索には、都道府県別のParquetファイルを利用してください。列指向フォーマットのため、DuckDBがHTTP Rangeリクエストで必要な列だけを取得します。サーバーを立てずに、静的ファイルのまま検索APIとして機能します。
+キーワード検索・近傍検索（「東京駅の近くのカフェ」等）は、[検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html)で試せます。検索バックエンドには [geosearch](https://github.com/naogify/geosearch)（本データを SQLite in Lambda の検索APIに変換するIaC）を利用しており、実行された GET リクエストの URL がそのまま画面に表示されるため、アプリへの組み込み方も確認できます。
 
-| ファイル | URL |
-|---|---|
-| 都道府県別Parquet | `https://gl20percentclub.github.io/japan-food-facilities/api/parquet/{都道府県コード}.parquet` |
-| ファイル一覧（manifest） | https://gl20percentclub.github.io/japan-food-facilities/api/parquet/manifest.json |
-
-- 都道府県コードは JIS X 0401（`01`=北海道 〜 `47`=沖縄県、`99`=都道府県不明）
-- 列は全件CSVと同一
-- ブラウザで試すには[検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html)を利用してください
-
-```sql
--- DuckDB（CLI / Python / Wasm）からそのまま検索できます
-SELECT name, business_type, address, lat, lng
-FROM read_parquet('https://gl20percentclub.github.io/japan-food-facilities/api/parquet/13.parquet')  -- 13 = 東京都
-WHERE name LIKE '%ラーメン%'
-LIMIT 100;
-```
+- キーワード: 名称・カナ・住所・市区町村を横断検索（`q`）
+- 範囲: 地図の表示範囲内（`bbox`）、中心から近い順（`center` + `radius`）
+- 結果はテーブル・地図表示・CSVダウンロードで確認可能
 
 ### AIエージェントから使う
 
@@ -191,7 +178,7 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 | 対象 | ライセンス |
 |---|---|
-| 生成データ（CSV・ベクトルタイル・Parquet） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ja) |
+| 生成データ（CSV・ベクトルタイル） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ja) |
 | リポジトリ内のコード | MIT |
 
 各レコードの出典とライセンスは、CSVの `sources` 列と `licenses` 列で確認できます。
