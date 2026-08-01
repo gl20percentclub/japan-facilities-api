@@ -254,6 +254,10 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
   type: 'vector',
   tiles: ['https://d1nptpfogf2ynv.cloudfront.net/api/tiles/{z}/{x}/{y}.pbf'],
   minzoom: 6, maxzoom: 12,
+  <span class="c">// 出典表示（source に入れると地図のアトリビューションに自動で表示される）</span>
+  attribution:
+    '出典：&lt;a href="https://gl20percentclub.github.io/japan-food-facilities/"&gt;Japan Food Facilities&lt;/a&gt;'
+    + '（&lt;a href="https://gl20percentclub.github.io/japan-food-facilities/attribution.html"&gt;各自治体・厚生労働省のオープンデータを加工して作成&lt;/a&gt;）',
 });
 <span class="c">// レイヤ名は "facilities"、属性は name / business_type / pref / city</span></code></pre>
 
@@ -308,6 +312,17 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
         本サービスは各自治体・厚生労働省が公開するオープンデータを加工・統合したものです。
         利用時の出典表示は、ライセンスごとに求められる形式が異なります。
       </p>
+      <div class="notice">
+        <strong>本データは、商用・非商用を問わず、アプリ、Webサービス、研究、分析、再配布などに利用できます。</strong><br>
+        利用・再配布する際は、次の出典を表示してください。
+      </div>
+<pre style="margin:12px 0 0"><code>出典：Japan Food Facilities（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）
+元データの出典・ライセンス一覧： https://gl20percentclub.github.io/japan-food-facilities/attribution.html</code></pre>
+      <div class="notice" style="margin-top:12px">
+        本データには複数の提供元によるデータが含まれており、各元データには、それぞれの提供元が定める
+        ライセンスおよび利用条件が適用されます。詳細は
+        <a href="./attribution.html">出典・ライセンス一覧</a>を確認してください。
+      </div>
       <div class="notice">
         <strong>📢 出典表示文は <a href="./attribution.html">出典・ライセンス表示ページ</a> にまとめています。</strong><br>
         全 <span data-source-count>82</span> ソースの出典 URL とライセンス、およびそのまま貼れる出典表示文を一覧化しています。
