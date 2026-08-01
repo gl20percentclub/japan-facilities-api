@@ -130,7 +130,7 @@
       <span id="updated"></span><br>
       <a href="./">トップ</a> ·
       <a href="https://github.com/gl20percentclub/japan-food-facilities">GitHub リポジトリ</a> ·
-      <a href="https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv">全件CSV</a> ·
+      <a href="https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv">全件CSV</a> ·
       <a href="./attribution.html">出典・ライセンス</a>
     </p>
   </div>
@@ -139,8 +139,10 @@
 
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script>
-    // データ配信ベース URL（このページと同じ gh-pages 上）。相対参照でローカルでも動く。
-    const API_BASE = './api';
+    // データ配信ベース URL。このページ自身は GitHub Pages だが、データ（api/）は
+    // S3 + CloudFront から配信されるため、相対参照ではなく絶対 URL を指す。
+    // CORS は全オリジン許可済みなので、ローカルで開いた場合もそのまま読める。
+    const API_BASE = 'https://d1nptpfogf2ynv.cloudfront.net/api';
     // ベクトルタイルのズーム範囲（scripts/gen-tiles.js の設定と一致させる）
     const TILE_MIN_ZOOM = 6;
     const TILE_MAX_ZOOM = 12;
@@ -165,7 +167,7 @@
           },
           facilities: {
             type: 'vector',
-            tiles: [`${location.href.replace(/[^/]*$/, '')}api/tiles/{z}/{x}/{y}.pbf`],
+            tiles: [`${API_BASE}/tiles/{z}/{x}/{y}.pbf`],
             minzoom: TILE_MIN_ZOOM,
             maxzoom: TILE_MAX_ZOOM,
             bounds: JAPAN_BOUNDS,
