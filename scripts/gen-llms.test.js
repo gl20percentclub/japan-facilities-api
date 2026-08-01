@@ -28,7 +28,7 @@ console.log('gen-llms テスト\n');
 // テスト用の README（統計ブロック・相対リンク・バッジを含む最小構成）
 const readme = `<div align="center">
 
-# 🍽️ Japan Facilities Data
+# 🍽️ Japan Food Facilities Data
 
 [![Contributors](https://img.shields.io/github/contributors/x)](https://github.com/x)
 
@@ -57,11 +57,11 @@ assert(extractStats('マーカー無し') === '', 'マーカーが無ければ�
 // --- absolutizeLinks ---
 const abs = absolutizeLinks(readme);
 assert(
-  abs.includes('](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main/docs/COVERAGE.md)'),
+  abs.includes('](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/COVERAGE.md)'),
   '.md への相対リンクは GitHub raw に変換される',
 );
 assert(
-  abs.includes('](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)'),
+  abs.includes('](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)'),
   '.html への相対リンクは Pages に変換される',
 );
 assert(abs.includes('](https://example.com/page)'), '絶対 URL は変換されない');
@@ -71,12 +71,12 @@ assert(abs.includes('](#概要)'), 'ページ内アンカーは変換されな�
 const stripped = stripHtmlNoise(readme);
 assert(!stripped.includes('img.shields.io'), 'バッジ行が除去される');
 assert(!stripped.includes('<div'), 'div タグ行が除去される');
-assert(stripped.includes('# 🍽️ Japan Facilities Data'), '見出しは残る');
+assert(stripped.includes('# 🍽️ Japan Food Facilities Data'), '見出しは残る');
 assert(!/\n{3,}/.test(stripped), '3連以上の空行が残らない');
 
 // --- renderLlmsTxt ---
 const llms = renderLlmsTxt(readme);
-assert(llms.startsWith('# Japan Facilities Data'), 'H1 で始まる（llms.txt 仕様）');
+assert(llms.startsWith('# Japan Food Facilities Data'), 'H1 で始まる（llms.txt 仕様）');
 assert(llms.split('\n')[2].startsWith('> '), 'H1 直後に blockquote の要約がある');
 assert(llms.includes('facilities-all.csv.gz'), 'CSV の URL が載る');
 assert(llms.includes('{z}/{x}/{y}.pbf'), 'タイルの URL テンプレートが載る');
