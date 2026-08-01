@@ -32,7 +32,8 @@ function num(n) {
 
 /**
  * 統計から README に埋め込む Markdown テーブルを組み立てる（純粋関数）。
- * `s` は `{ updated, csv: {...}, tiles: {...} }`。
+ * `s` は `{ updated, csv: {...}, prefCsv: {...}, tiles: {...} }`。
+ * `prefCsv`（都道府県別CSV の統計）は省略可で、無ければその行を出さない。
  */
 export function renderStats(s) {
   const date = s.updated ? new Date(s.updated * 1000).toISOString().slice(0, 10) : '—';
@@ -46,6 +47,8 @@ export function renderStats(s) {
     `> | 都道府県 | ${num(s.csv.prefectures)} |`,
     `> | 市区町村 | ${num(s.csv.cities)} |`,
     `> | 結合CSV | ${humanSize(s.csv.bytes)} |`,
+    // 都道府県別CSV は全件CSV と同じレコードの分割配信なので、件数ではなくファイル数と総量を出す。
+    ...(s.prefCsv ? [`> | 都道府県別CSV | ${num(s.prefCsv.files)} ファイル / ${humanSize(s.prefCsv.bytes)} |`] : []),
     `> | ベクトルタイル | ${num(s.tiles.tiles)} 枚 / ${humanSize(s.tiles.bytes)} |`,
   ].join('\n');
 }

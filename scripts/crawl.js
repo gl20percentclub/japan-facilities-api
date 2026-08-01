@@ -9,8 +9,9 @@
 //   lib/geocode.js       ジオコーディング（住所→座標の補完）
 //   lib/city-normmap.js  市区町村名の名寄せ（表記ゆれ→公式名）
 //
-// 配信物は2種類だけ（用途が無い階層JSONは配信しない）:
+// 配信物は3種類だけ（用途が無い階層JSONは配信しない）:
 //   api/facilities-all.csv[.gz]   全件の結合CSV（build-merged-csv.js）
+//   api/prefectures/*.csv         都道府県別CSV + index.json（build-prefecture-csv.js）
 //   api/tiles/{z}/{x}/{y}.pbf     地図用ベクトルタイル + metadata.json（gen-tiles.js）
 //
 // 使い方:
@@ -35,6 +36,7 @@ import {
 import { enrichWithGeocoding } from './lib/geocode.js';
 import { buildCityNormMap, applyPrefCity } from './lib/city-normmap.js';
 import { buildMergedCsv } from './build-merged-csv.js';
+import { buildPrefectureCsvs } from './build-prefecture-csv.js';
 import { generateTiles } from './gen-tiles.js';
 import { generateReadmeStats } from './gen-readme-stats.js';
 import { generateLlmsFiles } from './gen-llms.js';
@@ -42,6 +44,7 @@ import { generateLlmsFiles } from './gen-llms.js';
 const CACHE_DIR = path.join(ROOT, '.cache');
 const API_DIR = path.join(ROOT, 'api');
 const CSV_PATH = path.join(API_DIR, 'facilities-all.csv');
+const PREF_CSV_DIR = path.join(API_DIR, 'prefectures');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const NO_GEOCODE = process.argv.includes('--no-geocode');
@@ -142,10 +145,12 @@ async function main() {
 
   const updated = Math.floor(Date.now() / 1000);
   const csv = await buildMergedCsv(facilities, { outPath: CSV_PATH });
+  // 都道府県別CSV も全件CSV と同じ集合（重複除去後）から作る。
+  const prefCsv = await buildPrefectureCsvs(csv.unique, { outDir: PREF_CSV_DIR, updated });
   // タイルは CSV と同じ集合（重複除去後）から作る。元の facilities を渡すと
   // CSV に載らない重複点がタイルに入り、配信物どうしで件数が食い違う。
   const tiles = generateTiles(csv.unique, { updated, stats: csv });
-  generateReadmeStats({ updated, csv, tiles });
+  generateReadmeStats({ updated, csv, prefCsv, tiles });
   // README の統計更新後に、AI エージェント向けの llms.txt / llms-full.txt を
   // README から再生成する（統計込みで最新化するため、必ず統計更新の後に呼ぶ）
   generateLlmsFiles();
@@ -153,7 +158,7 @@ async function main() {
   console.log(
     `\n✅ 生成完了: ${csv.prefectures}都道府県 / ${csv.cities}市区町村 / ${csv.rowsOut}レコード`,
   );
-  console.log(`   出力先: api/facilities-all.csv[.gz] / api/tiles/`);
+  console.log(`   出力先: api/facilities-all.csv[.gz] / api/prefectures/ / api/tiles/`);
 }
 
 // 直接実行された場合のみクロールを開始する（テストから import しても main は走らない）。

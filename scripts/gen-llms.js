@@ -97,11 +97,15 @@ export function renderLlmsTxt(readme) {
 重要な事実:
 
 - 全件CSV（gzip 版は配信していない）: ${DATA}/api/facilities-all.csv
+- 都道府県別CSV（列・内容は全件CSV と同じ。1県だけ必要ならこちらを使う）:
+  ${DATA}/api/prefectures/{JISコード2桁}-{ローマ字}.csv
+  例 13-tokyo.csv / 01-hokkaido.csv / 47-okinawa.csv。47都道府県すべて存在する。
+  ファイル一覧と件数: ${DATA}/api/prefectures/index.json
 - CSV は UTF-8（BOMなし）。列: prefecture, city, city_raw, name, name_kana,
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: ${DATA}/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
-- 市区町村別 JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
+- 市区町村別 CSV/JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
   地図表示はタイルで行う
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
 - 毎週月曜 18:00 UTC（JST 火曜 3:00）に自動更新
@@ -148,7 +152,22 @@ FROM read_csv_auto('${DATA}/api/facilities-all.csv')
 WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲食店営業';
 \`\`\`
 
-### pandas で読む
+### 1都道府県だけ使う（都道府県別CSV）
+
+対象が1〜数県なら、全件CSV（数百MB）ではなく都道府県別CSV を落とす。列は全件CSV と同じ。
+
+\`\`\`python
+import pandas as pd
+
+# ファイル名は {JISコード2桁}-{ローマ字}.csv（13-tokyo.csv, 01-hokkaido.csv, 47-okinawa.csv …）
+df = pd.read_csv('${DATA}/api/prefectures/13-tokyo.csv')
+minato = df[df['city'] == '港区']
+\`\`\`
+
+ファイル名・件数の一覧は \`${DATA}/api/prefectures/index.json\` にある
+（\`prefectures[].file\` / \`records\` / \`bytes\`）。
+
+### pandas で読む（全件CSV）
 
 \`\`\`python
 import pandas as pd
