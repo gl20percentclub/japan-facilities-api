@@ -24,9 +24,9 @@ const ROOT = path.resolve(__dirname, '..');
 const README_PATH = path.join(ROOT, 'README.md');
 
 // 配信 URL の基点。Pages はデータとページの配信先、RAW はリポジトリ内 Markdown の取得先。
-const PAGES = 'https://gl20percentclub.github.io/japan-food-facilities-api';
-const REPO = 'https://github.com/gl20percentclub/japan-food-facilities-api';
-const RAW = 'https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main';
+const PAGES = 'https://gl20percentclub.github.io/japan-food-facilities';
+const REPO = 'https://github.com/gl20percentclub/japan-food-facilities';
+const RAW = 'https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main';
 
 const STATS_START = '<!-- STATS:START -->';
 const STATS_END = '<!-- STATS:END -->';
@@ -86,7 +86,7 @@ export function stripHtmlNoise(markdown) {
  */
 export function renderLlmsTxt(readme) {
   const stats = extractStats(readme);
-  return `# Japan Facilities Data
+  return `# Japan Food Facilities Data
 
 > 日本全国の食品営業許可・届出施設（飲食店・喫茶店・食品製造業など）を収集し、
 > 全国共通フォーマットの全件CSVとベクトルタイルで無料配信するオープンデータ。
@@ -188,7 +188,7 @@ map.addLayer({
 - キーワード検索・位置検索（「近くのラーメン屋」等）を提供したい場合は、静的配信のみの
   ため検索 API は無い。CSV を SQLite や PostgreSQL 等に取り込んで自前の検索を実装する。
 - データ利用時は出典表示が必要（CC BY 4.0）:
-  「© Japan Facilities Data（各自治体オープンデータ）」
+  「© Japan Food Facilities Data（各自治体オープンデータ）」
 `;
 }
 

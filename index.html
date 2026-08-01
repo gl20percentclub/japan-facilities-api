@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Japan Food Facilities API — 日本全国の飲食施設オープンデータを無料の静的 API で</title>
+  <title>Japan Food Facilities — 日本全国の飲食施設オープンデータを無料の静的 API で</title>
   <meta name="description" content="全国の自治体が公開する食品営業許可・届出のオープンデータを、正規化・ジオコーディングして無料で配信。登録不要・API キー不要で、全件 CSV とベクトルタイルをそのまま利用できます。">
 
   <!-- SNS シェア時のカード表示（画像は用意していないためテキストのみ） -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Japan Food Facilities API">
+  <meta property="og:title" content="Japan Food Facilities">
   <meta property="og:description" content="日本全国の飲食施設オープンデータ（食品営業許可・届出）を、登録不要・無料の静的 API として配信。">
-  <meta property="og:url" content="https://gl20percentclub.github.io/japan-food-facilities-api/">
+  <meta property="og:url" content="https://gl20percentclub.github.io/japan-food-facilities/">
   <meta name="twitter:card" content="summary">
 
   <style>
@@ -174,7 +174,7 @@
         <a class="btn primary" href="#quickstart">クイックスタート</a>
         <a class="btn ghost" href="./playground.html">検索プレイグラウンド</a>
         <a class="btn ghost" href="./map.html">地図で見てみる</a>
-        <a class="btn ghost" href="https://github.com/gl20percentclub/japan-food-facilities-api">GitHub</a>
+        <a class="btn ghost" href="https://github.com/gl20percentclub/japan-food-facilities">GitHub</a>
       </div>
 
       <!-- 統計は配信中の api/ から読み込んで更新する（取得できなければ下の既定値のまま） -->
@@ -235,16 +235,16 @@
       <h2>クイックスタート</h2>
       <p class="lead">
         配信しているのは <strong>全件CSV</strong> と <strong>ベクトルタイル</strong> の2つだけです。
-        ベース URL は <code>https://gl20percentclub.github.io/japan-food-facilities-api/api/</code>。
+        ベース URL は <code>https://gl20percentclub.github.io/japan-food-facilities/api/</code>。
       </p>
 
       <p class="step">1. 全件CSV をダウンロードする（約 540MB）</p>
-<pre><code>curl -O https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv</code></pre>
+<pre><code>curl -O https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv</code></pre>
 
       <p class="step">2. pandas で読み込む（URL 直指定でもいけます）</p>
 <pre><code>import pandas as pd
 
-df = pd.read_csv('https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv')
+df = pd.read_csv('https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv')
 <span class="c"># 那覇市の飲食店営業だけ抜き出す</span>
 naha = df[(df.city == '那覇市') &amp; (df.business_type == '飲食店営業')]
 print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
@@ -252,7 +252,7 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
       <p class="step">3. 地図に出す（MapLibre GL JS・タイルサーバー不要）</p>
 <pre><code>map.addSource('facilities', {
   type: 'vector',
-  tiles: ['https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf'],
+  tiles: ['https://gl20percentclub.github.io/japan-food-facilities/api/tiles/{z}/{x}/{y}.pbf'],
   minzoom: 6, maxzoom: 12,
 });
 <span class="c">// レイヤ名は "facilities"、属性は name / business_type / pref / city</span></code></pre>
@@ -294,8 +294,8 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
       <p class="lead" style="margin:20px 0 0">
         キーワード・近傍検索は<a href="./playground.html">検索プレイグラウンド</a>で試せます。
         地域や業種を絞りたい場合は、CSV をダウンロードしてフィルタしてください。
-        各列の詳細は <a href="https://github.com/gl20percentclub/japan-food-facilities-api#どんなデータか">README</a>、
-        自治体ごとの収録状況は <a href="https://github.com/gl20percentclub/japan-food-facilities-api/blob/main/docs/COVERAGE.md">収録状況一覧</a> を参照してください。
+        各列の詳細は <a href="https://github.com/gl20percentclub/japan-food-facilities#どんなデータか">README</a>、
+        自治体ごとの収録状況は <a href="https://github.com/gl20percentclub/japan-food-facilities/blob/main/docs/COVERAGE.md">収録状況一覧</a> を参照してください。
       </p>
     </div>
   </section>
@@ -332,8 +332,8 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
         バグ報告・データ品質の問題報告・ドキュメント改善も歓迎です。
       </p>
       <div class="cta" style="justify-content:flex-start">
-        <a class="btn primary" href="https://github.com/gl20percentclub/japan-food-facilities-api#-コントリビューション">コントリビュート方法</a>
-        <a class="btn ghost" href="https://github.com/gl20percentclub/japan-food-facilities-api/issues/new">Issue を立てる</a>
+        <a class="btn primary" href="https://github.com/gl20percentclub/japan-food-facilities#-コントリビューション">コントリビュート方法</a>
+        <a class="btn ghost" href="https://github.com/gl20percentclub/japan-food-facilities/issues/new">Issue を立てる</a>
       </div>
     </div>
   </section>
@@ -344,10 +344,10 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
         <a href="./map.html">プレビュー地図</a> ·
         <a href="./playground.html">検索プレイグラウンド</a> ·
         <a href="./attribution.html">出典・ライセンス</a> ·
-        <a href="https://github.com/gl20percentclub/japan-food-facilities-api">GitHub</a> ·
-        <a href="https://github.com/gl20percentclub/japan-food-facilities-api/issues">Issues</a>
+        <a href="https://github.com/gl20percentclub/japan-food-facilities">GitHub</a> ·
+        <a href="https://github.com/gl20percentclub/japan-food-facilities/issues">Issues</a>
       </p>
-      <p>各自治体が公開するオープンデータを加工して作成 — Japan Food Facilities API</p>
+      <p>各自治体が公開するオープンデータを加工して作成 — Japan Food Facilities</p>
     </div>
   </footer>
 
