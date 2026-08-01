@@ -11,7 +11,13 @@ import path from 'node:path';
 import { buildMergedCsv, CSV_COLUMNS, csvCell } from './build-merged-csv.js';
 import { generateTiles } from './gen-tiles.js';
 import { readCsvRows } from './lib/csv-read.js';
-import { resolvePrefCity, applyPrefCity, collectCityPairs } from './lib/city-normmap.js';
+import {
+  resolvePrefCity,
+  applyPrefCity,
+  collectCityPairs,
+  stripWardSuffix,
+  buildCountyAliasMap,
+} from './lib/city-normmap.js';
 
 let passed = 0;
 async function test(name, fn) {
@@ -183,15 +189,65 @@ await test('CSV: gzip 版は生成しない（配布は非圧縮CSVのみ）', a
 
 // --- 市区町村の名寄せ（純粋関数） ---
 await test('resolvePrefCity: 名寄せ表があれば公式名を採用する', () => {
-  const f = { _pref: '大分県', _city: '玖珠郡九重町', address: '大分県玖珠郡九重町大字後野上8-1' };
-  const r = resolvePrefCity(f, { '大分県\t玖珠郡九重町': { pref: '大分県', city: '九重町' } });
-  assert.deepEqual(r, { pref: '大分県', city: '九重町', cityRaw: '玖珠郡九重町', colFixed: false });
+  const f = { _pref: '大分県', _city: '九重町', address: '大分県九重町大字後野上8-1' };
+  // normalize() は郡付きの公式名を返す。
+  const r = resolvePrefCity(f, { '大分県\t九重町': { pref: '大分県', city: '玖珠郡九重町' } });
+  assert.deepEqual(r, { pref: '大分県', city: '玖珠郡九重町', cityRaw: '九重町', colFixed: false });
 });
 
-await test('resolvePrefCity: 名寄せ表に無ければ郡名を剥がす', () => {
+await test('resolvePrefCity: 名寄せ表にも対応表にも無ければ元の表記を保つ', () => {
   const f = { _pref: '大分県', _city: '玖珠郡九重町', address: '大分県玖珠郡九重町…' };
-  assert.equal(resolvePrefCity(f, {}).city, '九重町');
+  assert.equal(resolvePrefCity(f, {}).city, '玖珠郡九重町', '郡名は勝手に剥がさない');
   assert.equal(resolvePrefCity(f, {}).cityRaw, '玖珠郡九重町');
+});
+
+// --- 粒度の統一: 政令指定都市の行政区は市に集約する ---
+await test('stripWardSuffix: 政令市の行政区を市に集約し、特別区はそのまま返す', () => {
+  assert.equal(stripWardSuffix('横浜市戸塚区'), '横浜市');
+  assert.equal(stripWardSuffix('京都市北区'), '京都市');
+  assert.equal(stripWardSuffix('北九州市八幡西区'), '北九州市');
+  assert.equal(stripWardSuffix('千代田区'), '千代田区', '特別区は市区町村そのもの');
+  assert.equal(stripWardSuffix('四日市市'), '四日市市', '「市」で終わる市名は無傷');
+  assert.equal(stripWardSuffix('河北郡津幡町'), '河北郡津幡町');
+});
+
+await test('resolvePrefCity: 名寄せ結果の行政区を市へ集約する', () => {
+  const f = { _pref: '神奈川県', _city: '横浜市', address: '神奈川県横浜市戸塚区戸塚町16-1' };
+  const normMap = { '神奈川県\t横浜市': { pref: '神奈川県', city: '横浜市戸塚区' } };
+  const r = resolvePrefCity(f, normMap);
+  assert.equal(r.city, '横浜市');
+  assert.equal(r.cityRaw, '横浜市', '元データの表記は city_raw に残す');
+});
+
+// --- 粒度の統一: 町村は郡付きの公式表記へ寄せる ---
+await test('buildCountyAliasMap: 名寄せ結果から「郡なし→郡付き」の対応表を作る', () => {
+  const alias = buildCountyAliasMap({
+    '石川県\t河北郡津幡町': { pref: '石川県', city: '河北郡津幡町' },
+    '東京都\t港区': { pref: '東京都', city: '港区' },
+    '不明\t不明': null,
+  });
+  assert.deepEqual(alias, { '石川県\t津幡町': '河北郡津幡町' }, '郡付きの値だけが対応表になる');
+});
+
+await test('resolvePrefCity: 郡なしの町村名を郡付きの公式表記へ寄せる', () => {
+  const f = { _pref: '石川県', _city: '津幡町', address: '石川県津幡町字加賀爪ニ3' };
+  const alias = { '石川県\t津幡町': '河北郡津幡町' };
+  const r = resolvePrefCity(f, {}, alias);
+  assert.equal(r.city, '河北郡津幡町');
+  assert.equal(r.cityRaw, '津幡町');
+});
+
+await test('applyPrefCity: 郡あり・郡なしの表記ゆれが同じ市区町村に揃う', () => {
+  const facilities = [
+    { _pref: '石川県', _city: '河北郡津幡町', address: '石川県河北郡津幡町字加賀爪ニ3' },
+    { _pref: '石川県', _city: '津幡町', address: '石川県津幡町字加賀爪ニ3' },
+  ];
+  // 郡付き側だけ名寄せに成功したケース（郡なし側は対応表で救う）。
+  applyPrefCity(facilities, {
+    '石川県\t河北郡津幡町': { pref: '石川県', city: '河北郡津幡町' },
+  });
+  assert.equal(facilities[0].city, '河北郡津幡町');
+  assert.equal(facilities[1].city, '河北郡津幡町', '郡なし表記も同じ値に寄る');
 });
 
 await test('resolvePrefCity: 列ズレ（pref に郵便番号・city に都道府県名）を住所から復元する', () => {
@@ -207,12 +263,14 @@ await test('applyPrefCity: 施設に pref / city / city_raw を書き込み件�
     { _pref: '大分県', _city: '玖珠郡九重町', address: '大分県玖珠郡九重町…' },
     { _pref: '東京都', _city: '港区', address: '東京都港区赤坂1-1' },
   ];
-  const { colFixedCount, mergedCount } = applyPrefCity(facilities, {});
-  assert.equal(facilities[0].city, '九重町');
+  const { colFixedCount, mergedCount } = applyPrefCity(facilities, {
+    '大分県\t玖珠郡九重町': { pref: '大分県', city: '玖珠郡九重町' },
+  });
+  assert.equal(facilities[0].city, '玖珠郡九重町');
   assert.equal(facilities[0].city_raw, '玖珠郡九重町');
   assert.equal(facilities[1].city, '港区');
   assert.equal(colFixedCount, 0);
-  assert.equal(mergedCount, 1);
+  assert.equal(mergedCount, 0, '表記が変わらなければ名寄せ件数に数えない');
 });
 
 await test('collectCityPairs: ユニークな (都道府県, 市区町村) を代表住所つきで集める', () => {
