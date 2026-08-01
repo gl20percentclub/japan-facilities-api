@@ -12,7 +12,7 @@
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: https://d1nptpfogf2ynv.cloudfront.net/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
 - 市区町村別 JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
-  地図表示はタイルで行う（キーワード・近傍検索は https://gl20percentclub.github.io/japan-food-facilities/playground.html で試せる）
+  地図表示はタイルで行う（キーワード・近傍検索は https://gl20percentclub.github.io/japan-food-facilities/map.html で試せる）
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
 - 毎週月曜 18:00 UTC（JST 火曜 3:00）に自動更新
 
@@ -33,5 +33,5 @@
 - [README](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/README.md): プロジェクト概要
 - [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
 - [タイルメタデータ](https://d1nptpfogf2ynv.cloudfront.net/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
-- [検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html): キーワード・近傍検索を試せる（geosearch の検索 API を利用）
+- [地図・検索ページ](https://gl20percentclub.github.io/japan-food-facilities/map.html): 全件をタイルで表示し、キーワード・近傍検索も試せる（geosearch の検索 API を利用）
 - [出典・ライセンス表示](https://gl20percentclub.github.io/japan-food-facilities/attribution.html): 利用時に必要な出典表示の文例
