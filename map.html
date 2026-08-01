@@ -209,6 +209,9 @@
     const TILE_MAX_ZOOM = 12;
     // 日本のおおよその範囲 [west, south, east, north]
     const JAPAN_BOUNDS = [122, 20, 154, 46];
+    // 初期表示の中心（本州中央部あたり）。ズームはタイルの最小ズームに合わせるため、
+    // 全国を収める fitBounds ではなく中心＋ズーム指定で開く。
+    const INITIAL_CENTER = [138.2, 36.4];
 
     // 業種（business_type）の大分類。元データの表記は自治体ごとにゆれが大きく
     // （「飲食店営業」「① 飲食店営業」「飲食店営業(1)一般食堂・レストラン等」など）、
@@ -290,8 +293,10 @@
           },
         ],
       },
-      bounds: JAPAN_BOUNDS,
-      fitBoundsOptions: { padding: 20 },
+      // 開いた直後から施設の点が見えるよう、初期ズームをタイルの最小ズームに合わせる
+      // （全国を収める fitBounds だと z5 以下になり、タイルが無くて点が出ない）。
+      center: INITIAL_CENTER,
+      zoom: TILE_MIN_ZOOM,
       minZoom: 3,
       maxZoom: 18,
       attributionControl: false,
