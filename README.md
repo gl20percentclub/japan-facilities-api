@@ -84,6 +84,10 @@ map.addSource("facilities", {
   ],
   minzoom: 6,
   maxzoom: 12,
+  // 出典表示（地図上のアトリビューションに表示される）
+  attribution:
+    '出典：<a href="https://gl20percentclub.github.io/japan-food-facilities/" target="_blank" rel="noopener">Japan Food Facilities</a>'
+    + '（<a href="https://gl20percentclub.github.io/japan-food-facilities/attribution.html" target="_blank" rel="noopener">各自治体・厚生労働省のオープンデータを加工して作成</a>）',
 });
 ```
 
@@ -176,27 +180,40 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 ## ライセンスと出典表示
 
-| 対象 | ライセンス |
+| 対象 | 条件 |
 |---|---|
-| 生成データ（CSV・ベクトルタイル） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ja) |
+| 生成データ（CSV・ベクトルタイル） | 各元データの提供元が定めるライセンス・利用条件に従う（いずれも出典表示が必要） |
 | リポジトリ内のコード | MIT |
 
 各レコードの出典とライセンスは、CSVの `sources` 列と `licenses` 列で確認できます。
 
+### データの利用について
+
+本データは、商用・非商用を問わず、アプリ、Webサービス、研究、分析、再配布などに利用できます。
+
+利用・再配布する際は、次の出典を表示してください。
+
+```text
+出典：Japan Food Facilities（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）
+元データの出典・ライセンス一覧： https://gl20percentclub.github.io/japan-food-facilities/attribution.html
+```
+
+本データには複数の提供元によるデータが含まれており、各元データには、それぞれの提供元が定めるライセンスおよび利用条件が適用されます。詳細は上記の出典・ライセンス一覧を確認してください。
+
 ### 表示例
 
 ```html
-出典:
-<a href="https://github.com/gl20percentclub/japan-food-facilities">
-  Japan Food Facilities Data
-</a>
-（各自治体の食品営業許可オープンデータを加工して作成）
+出典：
+<a href="https://gl20percentclub.github.io/japan-food-facilities/">Japan Food Facilities</a>
+（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）<br>
+元データの出典・ライセンス一覧：
+<a href="https://gl20percentclub.github.io/japan-food-facilities/attribution.html">出典・ライセンス</a>
 ```
 
-地図上では、次のように表示できます。
+地図上では、次のように表示できます（ベクトルタイルの `attribution` に指定すれば自動で表示されます）。
 
 ```text
-© Japan Food Facilities Data（各自治体オープンデータ）
+出典：Japan Food Facilities（各自治体・厚生労働省のオープンデータを加工して作成）
 ```
 
 特定自治体のデータだけを利用する場合は、CSVの `sources` 列に記載された自治体名も併記してください。

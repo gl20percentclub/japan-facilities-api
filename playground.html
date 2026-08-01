@@ -293,7 +293,8 @@ curl -sG "&lt;検索APIのURL&gt;" \
 
   <footer>
     <div class="wrap">
-      © Japan Food Facilities Data（<a href="./attribution.html">各自治体オープンデータ</a>）· CC BY 4.0
+      出典：Japan Food Facilities（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）·
+      <a href="./attribution.html">出典・ライセンス一覧</a>
     </div>
   </footer>
 
@@ -332,7 +333,14 @@ curl -sG "&lt;検索APIのURL&gt;" \
             maxzoom: 18,
             attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル</a>',
           },
-          results: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+          // 検索結果の描画元。施設データの出典表示は地図の attribution に出す
+          results: {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: [] },
+            attribution:
+              '出典：<a href="./" target="_blank" rel="noopener">Japan Food Facilities</a>'
+              + '（<a href="./attribution.html" target="_blank" rel="noopener">各自治体・厚生労働省のオープンデータを加工して作成</a>）',
+          },
         },
         layers: [
           { id: 'gsi', type: 'raster', source: 'gsi' },
