@@ -240,8 +240,8 @@
       <p class="step">1. CSV をダウンロードする（全件は約 540MB。1県だけなら都道府県別CSV が軽い）</p>
 <pre><code>curl -O https://food.japan-facilities.com/api/facilities-all.csv
 
-<span class="c"># 東京都だけ欲しい場合（ファイル名は {JISコード}-{ローマ字}.csv）</span>
-curl -O https://food.japan-facilities.com/api/prefectures/13-tokyo.csv</code></pre>
+<span class="c"># 東京都だけ欲しい場合（ファイル名は {都道府県コード}.csv）</span>
+curl -O https://food.japan-facilities.com/api/prefectures/13.csv</code></pre>
 
       <p class="step">2. pandas で読み込む（URL 直指定でもいけます）</p>
 <pre><code>import pandas as pd
@@ -291,7 +291,7 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
             </tr>
             <tr>
               <td>都道府県別 CSV</td>
-              <td><code>api/prefectures/{JISコード}-{ローマ字}.csv</code>（例 <code>13-tokyo.csv</code>）</td>
+              <td><code>api/prefectures/{都道府県コード}.csv</code>（例 <code>13.csv</code>＝東京都）</td>
               <td>
                 1県だけ必要なときに。列・内容は全件CSV と同じで、47都道府県すべて存在します。
                 ファイル一覧と件数は <code>api/prefectures/index.json</code>。

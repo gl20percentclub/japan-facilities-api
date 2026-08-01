@@ -137,7 +137,7 @@ if (fs.existsSync(prefIndexPath)) {
 
   for (const def of PREFECTURES) {
     const entry = (index.prefectures || []).find((e) => e.code === def.code);
-    const file = path.join(PREF_CSV_DIR, `${def.code}-${def.romaji}.csv`);
+    const file = path.join(PREF_CSV_DIR, `${def.code}.csv`);
     if (!entry || !fs.existsSync(file)) {
       missing.push(def.name);
       continue;

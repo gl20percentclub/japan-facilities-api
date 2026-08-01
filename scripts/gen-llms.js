@@ -99,8 +99,8 @@ export function renderLlmsTxt(readme) {
 
 - 全件CSV（gzip 版は配信していない）: ${DATA}/api/facilities-all.csv
 - 都道府県別CSV（列・内容は全件CSV と同じ。1県だけ必要ならこちらを使う）:
-  ${DATA}/api/prefectures/{JISコード2桁}-{ローマ字}.csv
-  例 13-tokyo.csv / 01-hokkaido.csv / 47-okinawa.csv。47都道府県すべて存在する。
+  ${DATA}/api/prefectures/{都道府県コード2桁}.csv
+  例 13.csv（東京都）/ 01.csv（北海道）/ 47.csv（沖縄県）。47都道府県すべて存在する。
   ファイル一覧と件数: ${DATA}/api/prefectures/index.json
 - CSV は UTF-8（BOMなし）。列: prefecture, city, city_raw, name, name_kana,
   business_type, address, lat, lng, geocoding_level, phone, license_no,
@@ -160,8 +160,8 @@ WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲�
 \`\`\`python
 import pandas as pd
 
-# ファイル名は {JISコード2桁}-{ローマ字}.csv（13-tokyo.csv, 01-hokkaido.csv, 47-okinawa.csv …）
-df = pd.read_csv('${DATA}/api/prefectures/13-tokyo.csv')
+# ファイル名は {都道府県コード2桁}.csv（01.csv 〜 47.csv。13.csv は東京都）
+df = pd.read_csv('${DATA}/api/prefectures/13.csv')
 minato = df[df['city'] == '港区']
 \`\`\`
 
