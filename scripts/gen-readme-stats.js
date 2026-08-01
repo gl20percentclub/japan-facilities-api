@@ -46,6 +46,9 @@ export function renderStats(s) {
     `> | 座標を持つ施設 | ${num(s.tiles.points)} 件 |`,
     `> | 都道府県 | ${num(s.csv.prefectures)} |`,
     `> | 市区町村 | ${num(s.csv.cities)} |`,
+    // 「不明」等で自治体に紐づけられなかったレコードは異なり数に数えていないので、
+    // 数え落としに見えないよう件数を別行で出す（0件なら行ごと省く）。
+    ...(s.csv.cityUnknown ? [`> | うち市区町村を特定できない施設 | ${num(s.csv.cityUnknown)} 件 |`] : []),
     `> | 結合CSV | ${humanSize(s.csv.bytes)} |`,
     // 都道府県別CSV は全件CSV と同じレコードの分割配信なので、件数ではなくファイル数と総量を出す。
     ...(s.prefCsv ? [`> | 都道府県別CSV | ${num(s.prefCsv.files)} ファイル / ${humanSize(s.prefCsv.bytes)} |`] : []),

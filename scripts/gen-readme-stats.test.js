@@ -40,6 +40,19 @@ assert(!md.includes('gzip'), 'gzip 表記は出さない（非圧縮CSVのみ配
 assert(md.includes('| 都道府県別CSV | 47 ファイル / 約 538.0 MB |'), '都道府県別CSV のファイル数とサイズが出る');
 assert(md.includes('| ベクトルタイル | 12,345 枚 / 約 250.0 MB |'), 'タイル枚数とサイズが出る');
 
+assert(
+  !md.includes('市区町村を特定できない施設'),
+  '特定できない施設が0件ならその行を出さない',
+);
+
+// 市区町村を特定できないレコードがある場合は、異なり数と別に件数を出す。
+const withUnknown = renderStats({ ...fixed, csv: { ...fixed.csv, cityUnknown: 61234 } });
+assert(
+  withUnknown.includes('| うち市区町村を特定できない施設 | 61,234 件 |'),
+  '特定できない施設の件数を別行で出す',
+);
+assert(withUnknown.includes('| 市区町村 | 1,741 |'), '異なり数には数えない');
+
 // prefCsv を渡さない場合は都道府県別CSV の行を出さない（旧形式の統計でも壊れないこと）。
 const noPref = renderStats({ ...fixed, prefCsv: undefined });
 assert(!noPref.includes('都道府県別CSV'), 'prefCsv が無ければ都道府県別CSV の行を出さない');

@@ -17,6 +17,11 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { PREFECTURE_NAMES } from './lib/normalize.js';
+
+// 「都道府県／市区町村の異なり数」に数えてよい値かを判定するための集合。
+// 元データには '不明'（解決できなかった）や '県外'（管轄外を表す独自の値）が混ざる。
+const REAL_PREFECTURES = new Set(PREFECTURE_NAMES);
 
 /** 結合CSV の列（この順で出力する）。 */
 export const CSV_COLUMNS = [
@@ -54,9 +59,23 @@ function write(stream, chunk) {
 }
 
 /**
+ * 施設の都道府県・市区町村が実在の自治体として数えられるかを判定する（純粋関数）。
+ * `prefOk` が false なら都道府県すら特定できていないので、市区町村も数えない。
+ */
+export function countableArea(facility) {
+  const prefOk = REAL_PREFECTURES.has(facility.pref);
+  const city = facility.city;
+  return { prefOk, cityOk: prefOk && !!city && city !== '不明' };
+}
+
+/**
  * 結合CSV を書き出す（BOM なし UTF-8）。
- * 統計 `{ rowsIn, rowsOut, dupSkipped, prefectures, cities, bytes }` と、
- * 重複を除いたあとの施設 `unique` を返す。
+ * 統計 `{ rowsIn, rowsOut, dupSkipped, prefectures, cities, prefUnknown, cityUnknown, bytes }`
+ * と、重複を除いたあとの施設 `unique` を返す。
+ *
+ * `prefectures` / `cities` は実在の自治体だけを数える。'不明' や '県外' を混ぜると、
+ * 47都道府県・1,741市区町村という上限を超えた値が統計に出てしまうため、
+ * これらはレコードとしては残したうえで `prefUnknown` / `cityUnknown` に集計する。
  *
  * `unique` はベクトルタイルの生成にも使う。重複判定はここでしか行わないため、
  * これを渡さずに元の配列からタイルを作ると、CSV には無い重複点がタイルに載り、
@@ -74,6 +93,8 @@ export async function buildMergedCsv(facilities, { outPath, log = console.log } 
   const seen = new Set(); // 出典を除く全列一致の重複判定
   const prefs = new Set();
   const cities = new Set();
+  let prefUnknown = 0; // 都道府県を特定できなかったレコード数
+  let cityUnknown = 0; // 市区町村を特定できなかったレコード数
   const unique = []; // CSV に書いた施設（＝タイルに載せる施設）
 
   for (const f of facilities) {
@@ -92,8 +113,13 @@ export async function buildMergedCsv(facilities, { outPath, log = console.log } 
     if (backpressure) await backpressure;
     rowsOut++;
     unique.push(f);
-    prefs.add(f.pref);
-    cities.add(`${f.pref}/${f.city}`);
+
+    // 異なり数は実在の自治体だけを数え、特定できなかったものは件数として別に持つ。
+    const { prefOk, cityOk } = countableArea(f);
+    if (prefOk) prefs.add(f.pref);
+    else prefUnknown++;
+    if (cityOk) cities.add(`${f.pref}/${f.city}`);
+    else cityUnknown++;
   }
 
   // end() のコールバックは flush 完了時に呼ばれる。
@@ -110,6 +136,12 @@ export async function buildMergedCsv(facilities, { outPath, log = console.log } 
       ` / ${prefs.size}都道府県 / ${cities.size}市区町村` +
       ` / ${(bytes / 1024 / 1024).toFixed(1)} MB`,
   );
+  if (cityUnknown) {
+    log(
+      `  自治体を特定できないレコード: 都道府県 ${prefUnknown.toLocaleString('en-US')}件` +
+        ` / 市区町村 ${cityUnknown.toLocaleString('en-US')}件（CSV には残す）`,
+    );
+  }
 
   return {
     rowsIn,
@@ -117,6 +149,8 @@ export async function buildMergedCsv(facilities, { outPath, log = console.log } 
     dupSkipped,
     prefectures: prefs.size,
     cities: cities.size,
+    prefUnknown,
+    cityUnknown,
     bytes,
     unique,
   };
