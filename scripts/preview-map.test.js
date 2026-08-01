@@ -83,13 +83,18 @@ test('タイルURLテンプレートが「api/tiles/ + metadata.tiles[0]」の�
   });
 });
 
-test('ポップアップで参照する施設属性がすべて生成featureに存在する', () => {
-  const props = buildFeatureCollection(FACILITIES).features[0].properties;
-  // map.html が p.<prop> として参照している属性を抽出する。
-  const referenced = new Set([...HTML.matchAll(/\bp\.([a-z_]+)\b/g)].map((m) => m[1]));
-  assert.ok(referenced.size >= 3, `map.html が施設属性を参照している (${[...referenced].join(',')})`);
-  for (const key of referenced) {
-    assert.ok(key in props, `属性 ${key} が生成feature.properties に存在する`);
+test('ポップアップのラベル定義が生成featureの属性と過不足なく一致する', () => {
+  // ポップアップは feature が実際に持つ属性を出すため、ラベル定義(TILE_PROP_LABELS)が
+  // 生成物とズレるとキー名がそのまま画面に出る／表示されない属性が生まれる。
+  const props = Object.keys(buildFeatureCollection(FACILITIES).features[0].properties);
+  const m = HTML.match(/const TILE_PROP_LABELS = \{([^}]+)\}/);
+  assert.ok(m, 'map.html に TILE_PROP_LABELS が定義されている');
+  const labeled = [...m[1].matchAll(/^\s*([a-z_]+):/gm)].map((x) => x[1]);
+  for (const key of props) {
+    assert.ok(labeled.includes(key), `生成属性 ${key} のラベルが定義されている`);
+  }
+  for (const key of labeled) {
+    assert.ok(props.includes(key), `ラベル定義の ${key} が生成feature.properties に存在する`);
   }
 });
 

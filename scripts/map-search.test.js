@@ -65,6 +65,20 @@ test('結果リスト・地図が参照するフィールドが API レスポン
   }
 });
 
+test('ポップアップのラベル定義が API レスポンス仕様と過不足なく一致する', () => {
+  // ポップアップは検索結果が実際に持つ属性を出すため、ラベル定義(SEARCH_PROP_LABELS)が
+  // API 仕様とズレるとキー名がそのまま画面に出てしまう。
+  const m = HTML.match(/const SEARCH_PROP_LABELS = \{([^}]+)\}/);
+  assert.ok(m, 'map.html に SEARCH_PROP_LABELS が定義されている');
+  const labeled = [...m[1].matchAll(/^\s*([a-z_]+):/gm)].map((x) => x[1]);
+  for (const key of API_RESULT_FIELDS) {
+    assert.ok(labeled.includes(key), `API のフィールド ${key} のラベルが定義されている`);
+  }
+  for (const key of labeled) {
+    assert.ok(API_RESULT_FIELDS.includes(key), `ラベル定義の ${key} が API レスポンス仕様に存在する`);
+  }
+});
+
 test('レスポンスの count / results / error を仕様どおり参照している', () => {
   assert.ok(/body\.results/.test(HTML), 'results 配列を読んでいる');
   assert.ok(/body\.count/.test(HTML), 'count を読んでいる');
