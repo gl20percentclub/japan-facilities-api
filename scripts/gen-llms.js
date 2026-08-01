@@ -23,10 +23,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const README_PATH = path.join(ROOT, 'README.md');
 
-// 配信 URL の基点。静的ページは GitHub Pages、データ（api/）は S3 + CloudFront と
-// 配信元が分かれている。RAW はリポジトリ内 Markdown の取得先。
+// 配信 URL の基点。静的ページは GitHub Pages、データ（api/）は S3 + CloudFront
+// （独自ドメイン food.japan-facilities.com）と配信元が分かれている。
+// RAW はリポジトリ内 Markdown の取得先。
 const PAGES = 'https://gl20percentclub.github.io/japan-food-facilities';
-const DATA = 'https://d1nptpfogf2ynv.cloudfront.net';
+const DATA = 'https://food.japan-facilities.com';
 const REPO = 'https://github.com/gl20percentclub/japan-food-facilities';
 const RAW = 'https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main';
 

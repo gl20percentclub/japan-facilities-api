@@ -11,7 +11,7 @@
 
 [公式サイト](https://gl20percentclub.github.io/japan-food-facilities/) ·
 [地図で見る](https://gl20percentclub.github.io/japan-food-facilities/map.html) ·
-[CSVをダウンロード](https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv) ·
+[CSVをダウンロード](https://food.japan-facilities.com/api/facilities-all.csv) ·
 [収録状況](docs/COVERAGE.md) ·
 [出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)
 
@@ -52,20 +52,20 @@
 
 | ファイル | URL |
 |---|---|
-| 全件CSV | https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv |
+| 全件CSV | https://food.japan-facilities.com/api/facilities-all.csv |
 
 - 文字コード: UTF-8（BOMなし）
 - 全列が一致する重複レコードは除去済み
 
 ```bash
-curl -O https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv
+curl -O https://food.japan-facilities.com/api/facilities-all.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv"
+    "https://food.japan-facilities.com/api/facilities-all.csv"
 )
 ```
 
@@ -75,21 +75,21 @@ df = pd.read_csv(
 
 | ファイル | URL |
 |---|---|
-| 都道府県別CSV | `https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/{JISコード}-{ローマ字}.csv` |
-| ファイル一覧（JSON） | https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/index.json |
+| 都道府県別CSV | `https://food.japan-facilities.com/api/prefectures/{JISコード}-{ローマ字}.csv` |
+| ファイル一覧（JSON） | https://food.japan-facilities.com/api/prefectures/index.json |
 
 ファイル名は、JIS都道府県コード（2桁）とローマ字を組み合わせた `01-hokkaido.csv` 〜 `47-okinawa.csv` です。47都道府県すべてのURLが常に存在します。
 
 ```bash
 # 東京都だけダウンロードする
-curl -O https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/13-tokyo.csv
+curl -O https://food.japan-facilities.com/api/prefectures/13-tokyo.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://d1nptpfogf2ynv.cloudfront.net/api/prefectures/13-tokyo.csv"
+    "https://food.japan-facilities.com/api/prefectures/13-tokyo.csv"
 )
 ```
 
@@ -118,7 +118,7 @@ df = pd.read_csv(
 map.addSource("facilities", {
   type: "vector",
   tiles: [
-    "https://d1nptpfogf2ynv.cloudfront.net/api/tiles/{z}/{x}/{y}.pbf",
+    "https://food.japan-facilities.com/api/tiles/{z}/{x}/{y}.pbf",
   ],
   minzoom: 6,
   maxzoom: 12,
@@ -131,7 +131,7 @@ map.addSource("facilities", {
 
 - レイヤー名: `facilities`
 - 主な属性: `name` / `business_type` / `pref` / `city`
-- 詳細: [`api/tiles/metadata.json`](https://d1nptpfogf2ynv.cloudfront.net/api/tiles/metadata.json)
+- 詳細: [`api/tiles/metadata.json`](https://food.japan-facilities.com/api/tiles/metadata.json)
 
 収録データは[地図ページ](https://gl20percentclub.github.io/japan-food-facilities/map.html)でも確認できます。
 

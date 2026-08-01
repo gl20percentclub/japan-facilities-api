@@ -78,10 +78,10 @@ assert(!/\n{3,}/.test(stripped), '3連以上の空行が残らない');
 const llms = renderLlmsTxt(readme);
 assert(llms.startsWith('# Japan Food Facilities Data'), 'H1 で始まる（llms.txt 仕様）');
 assert(llms.split('\n')[2].startsWith('> '), 'H1 直後に blockquote の要約がある');
-// データ（api/）は CloudFront 配信。Pages のホストを指していたら張り替え漏れなので落とす。
+// データ（api/）は独自ドメインで配信。Pages のホストを指していたら張り替え漏れなので落とす。
 assert(
-  llms.includes('https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv'),
-  'CSV の URL は CloudFront を指す',
+  llms.includes('https://food.japan-facilities.com/api/facilities-all.csv'),
+  'CSV の URL は配信用の独自ドメインを指す',
 );
 assert(!llms.includes('facilities-all.csv.gz'), '配信していない gzip 版を案内しない');
 assert(llms.includes('{z}/{x}/{y}.pbf'), 'タイルの URL テンプレートが載る');
