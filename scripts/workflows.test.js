@@ -6,6 +6,10 @@
 // された結果 api/ が一切コミットされず（.gitignore が api/ を無視するため）、
 // gh-pages 上のデータが全削除される事故があった。同じ壊れ方を繰り返さないよう、
 // 配信ステップの設定をテストで固定する。
+//
+// データ（api/）の配信は外部の Fargate クローラー（S3 + CloudFront）へ移したため、
+// gh-pages へ配信するのは静的ページだけ。旧 crawl.yml は廃止済みで、復活しないことも
+// ここで固定する。
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -40,8 +44,17 @@ function deploySteps(workflow) {
 
 console.log('ワークフロー設定テスト\n');
 
-const crawl = loadWorkflow('crawl.yml');
 const pages = loadWorkflow('pages.yml');
+
+// --- 旧 crawl.yml が復活していない ---
+// gh-pages へデータを配信していた旧ワークフロー。クロールと配信は外部の Fargate
+// クローラー（S3 + CloudFront）に移ったため廃止した。復活すると (1) 100MB を超える
+// 結合CSV で push 全体が失敗し、(2) 生成物（attribution.html / llms*.txt）を main へ
+// push して古い内容に巻き戻す事故が再発する。
+assert(
+  !fs.existsSync(path.join(ROOT, '.github/workflows/crawl.yml')),
+  '廃止した crawl.yml が復活していない（クロールと配信は外部の Fargate クローラーが担う）',
+);
 
 // --- .gitignore が api/ を無視している前提を確認する ---
 // この前提が崩れたら以降の除外チェックの意味も変わるため、最初に固定する。
@@ -50,11 +63,8 @@ const ignoresApi = gitignore.split('\n').some((line) => line.trim() === 'api/');
 assert(ignoresApi, '.gitignore が api/ を無視している（配信物は Git 管理しない）');
 
 // --- 配信ステップは .gitignore を配信対象から除外する ---
-const allDeploySteps = [
-  ...deploySteps(crawl).map((step) => ['crawl.yml', step]),
-  ...deploySteps(pages).map((step) => ['pages.yml', step]),
-];
-assert(allDeploySteps.length === 2, '配信ステップが crawl.yml と pages.yml に1つずつある');
+const allDeploySteps = deploySteps(pages).map((step) => ['pages.yml', step]);
+assert(allDeploySteps.length === 1, '配信ステップは pages.yml の1つだけ');
 
 for (const [file, step] of allDeploySteps) {
   const withInputs = step.with ?? {};
@@ -75,24 +85,19 @@ for (const [file, step] of allDeploySteps) {
   );
 }
 
-// --- それぞれの役割 ---
-// crawl.yml は生成し直した api/ をまるごと入れ替える（削除も反映する掃除役）。
-// pages.yml はページだけを上書きし、既存の api/ を消さない。
-const crawlDeploy = deploySteps(crawl)[0]?.with ?? {};
+// --- 役割 ---
+// pages.yml はページだけを上書きし、gh-pages 上の既存ファイルを消さない。
 const pagesDeploy = deploySteps(pages)[0]?.with ?? {};
 assert(
-  crawlDeploy.keep_files !== true,
-  'crawl.yml: keep_files を有効にしない（旧生成物を掃除する）',
-);
-assert(
   pagesDeploy.keep_files === true,
-  'pages.yml: keep_files が true（既存の api/ を消さない）',
+  'pages.yml: keep_files が true（gh-pages 上の既存ファイルを消さない）',
 );
 
 // --- gh-pages への同時 push を避ける ---
+// main への連続 push で配信が重なると push が競合するため直列化する。
 assert(
-  crawl.concurrency?.group != null && crawl.concurrency?.group === pages.concurrency?.group,
-  '2つのワークフローが同じ concurrency グループで直列化される',
+  pages.concurrency?.group != null && pages.concurrency?.['cancel-in-progress'] !== true,
+  'pages.yml: concurrency グループで配信を直列化する（実行中をキャンセルしない）',
 );
 
 // --- ページの変更が push で配信される ---
