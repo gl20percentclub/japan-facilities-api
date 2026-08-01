@@ -64,7 +64,7 @@ attribution.html        # 出典表示ページ（sources.yaml から自動生�
 - `llms.txt` / `llms-full.txt` / `attribution.html` / README の STATS ブロックは自動生成。
   内容を変えたいときは生成元（README 本文・テンプレート・`config/sources.yaml`）を変更する
 - 配信ワークフローの設定は `scripts/workflows.test.js` で固定されている。
-  `crawl.yml` / `pages.yml` を変更したらこのテストも必ず確認する
+  `pages.yml` / `generated-docs.yml` / `ci.yml` を変更したらこのテストも必ず確認する
 
 ## 配信の仕組み
 
@@ -76,10 +76,14 @@ attribution.html        # 出典表示ページ（sources.yaml から自動生�
   管理もしない（結合CSV は 430MB あり、GitHub の 100MB 制限で Git 配信できないため）
 - `pages.yml`: 静的ページ（LP・地図・出典・llms.txt）の変更を main への push で
   gh-pages へ反映する
-- `crawl.yml` は gh-pages へデータを配信していた旧構成の名残で、現在は使っていない
-  （停止・削除は別途対応）。設定は `scripts/workflows.test.js` で固定されている
-- `publish_dir: .` のため `.gitignore` を配信対象から除外しないと gh-pages 上の `api/` が
-  全消えする事故が起きる（過去に発生済み。workflows.test.js が再発を防いでいる）
+- gh-pages へ配信するワークフローは `pages.yml` **1本だけ**。gh-pages へデータを配信して
+  いた旧 `crawl.yml` は廃止した（週次クロールは Fargate 側に一本化。復活していないことを
+  `scripts/workflows.test.js` で固定している）
+- `publish_dir: .` のため `.gitignore` を配信対象から除外しないと、配信先で `git add --all`
+  したときに `api/` が一切コミットされない（過去に gh-pages のデータが全消えした。
+  workflows.test.js が再発を防いでいる）
+- `pages.yml` は `keep_files: true` のためファイル削除が反映されない。ページを削除・リネーム
+  したときは gh-pages 上の旧ファイルを手動で消す
 
 ## 生成物の所有権（このリポジトリが単一の情報源）
 
