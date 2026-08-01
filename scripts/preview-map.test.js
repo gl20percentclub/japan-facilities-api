@@ -1,4 +1,5 @@
-// プレビュー地図(map.html)と gen-tiles.js の生成物との整合性テスト。
+// 地図・検索ページ(map.html)と gen-tiles.js の生成物との整合性テスト。
+// 検索機能そのものの整合性は scripts/map-search.test.js が見る。
 //   node scripts/preview-map.test.js
 //
 // map.html はベクトルタイル(api/tiles)を直接読むため、レイヤ名・ズーム範囲・
