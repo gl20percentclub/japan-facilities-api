@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>🍽️ Japan Food Facilities — 地図と検索</title>
-  <meta name="description" content="日本全国の飲食施設オープンデータ（食品営業許可・届出）を、地図で眺めながらキーワード・近傍検索できるページです。登録不要。">
+  <title>🍽️ Japan Food Facilities — 地図</title>
+  <meta name="description" content="日本全国の飲食施設オープンデータ（食品営業許可・届出）を地図で見て、名称や住所で検索できます。">
 
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
   <style>
@@ -18,9 +18,6 @@
       --field-bg: #ffffff;
       --soft: #f7f8fa;
       --border: rgba(31, 41, 51, 0.12);
-      --code-bg: #1f2933;
-      --code-ink: #e4e7eb;
-      --ok: #1a7f37;
       --err: #c0392b;
     }
     * { box-sizing: border-box; }
@@ -37,8 +34,8 @@
       top: 12px;
       left: 12px;
       z-index: 2;
-      width: min(360px, calc(100vw - 24px));
-      /* 画面からはみ出さないよう、パネル全体の高さに上限を設ける */
+      width: min(340px, calc(100vw - 24px));
+      /* 画面からはみ出さないよう上限を設け、超えた分はパネル内でスクロールさせる */
       max-height: calc(100% - 24px);
       display: flex;
       flex-direction: column;
@@ -47,7 +44,6 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-      /* 上限を超えたときにフッターのリンクが切れないよう、パネル自体もスクロールさせる */
       overflow-x: hidden;
       overflow-y: auto;
     }
@@ -87,7 +83,7 @@
     }
     .stat .lbl { font-size: 10px; color: #616e7c; }
 
-    /* --- 検索フォーム --- */
+    /* --- 検索窓 --- */
     .search-row { display: flex; gap: 8px; }
     .search-row input {
       flex: 1;
@@ -99,22 +95,6 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 8px 10px;
-    }
-    .opts {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .opts select {
-      width: 100%;
-      font-size: 12.5px;
-      font-family: inherit;
-      color: var(--sub);
-      background: var(--field-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 8px;
     }
     .btn {
       font-size: 14px;
@@ -130,36 +110,12 @@
     }
     .btn:hover { opacity: 0.85; }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn.ghost { background: transparent; color: var(--accent); }
-    .btn.small { font-size: 11.5px; padding: 4px 10px; }
 
-    /* --- 検索APIが未設定のときの案内 --- */
-    .notice {
-      display: none;
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      background: var(--soft);
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 11.5px;
-      line-height: 1.6;
-      color: var(--sub);
-      margin-top: 10px;
-    }
-    .notice.visible { display: block; }
-
-    /* --- 結果 --- */
-    .result-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    #status { font-size: 12px; color: var(--sub); margin: 0; }
-    #status.ok { color: var(--ok); }
+    /* --- 検索結果 --- */
+    #status { font-size: 12px; color: var(--sub); margin: 8px 0 0; }
     #status.err { color: var(--err); }
-    /* 結果リストだけをスクロールさせ、検索フォームは常に見えるようにする */
+    #status:empty { display: none; }
+    /* 結果リストだけをスクロールさせ、検索窓は常に見えるようにする */
     #results {
       overflow-y: auto;
       margin: 8px 0 0;
@@ -177,24 +133,6 @@
     #results .r-name { font-weight: 600; display: block; }
     #results .r-meta { color: var(--muted); font-size: 11.5px; }
 
-    /* --- API リクエスト表示（折りたたみ） --- */
-    details.api { font-size: 11.5px; margin-top: 4px; }
-    details.api summary { cursor: pointer; color: var(--sub); }
-    details.api code#request-url {
-      display: block;
-      margin-top: 6px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 11px;
-      line-height: 1.6;
-      color: var(--code-ink);
-      background: var(--code-bg);
-      border-radius: 8px;
-      padding: 8px 10px;
-      word-break: break-all;
-      white-space: pre-wrap;
-    }
-    details.api p { margin: 6px 0 0; color: var(--muted); line-height: 1.6; }
-
     /* --- フッターのリンク --- */
     .meta-line {
       font-size: 11px;
@@ -208,13 +146,12 @@
       display: inline-block;
       width: 9px; height: 9px;
       border-radius: 50%;
+      background: var(--accent);
       border: 1.5px solid #fff;
       box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
       vertical-align: middle;
       margin-right: 4px;
     }
-    .legend-dot.all { background: var(--accent); }
-    .legend-dot.hit { background: var(--hit); margin-left: 8px; }
 
     /* --- ズームヒント（下中央） --- */
     .hint {
@@ -246,7 +183,7 @@
     .fac-row { font-size: 12px; color: #52606d; margin: 2px 0; }
     .fac-row .k { color: #9aa5b1; margin-right: 6px; }
 
-    /* 画面が低いときは統計を隠し、検索フォームと結果を優先する */
+    /* 画面が低いときは統計を隠し、検索窓と結果を優先する */
     @media (max-height: 640px) {
       .stats { display: none; }
     }
@@ -260,11 +197,11 @@
 <body>
   <div id="map"></div>
 
-  <!-- ================= 操作パネル（地図・検索を1画面に統合） ================= -->
+  <!-- ================= 操作パネル（統計と検索窓だけの最小構成） ================= -->
   <div class="panel">
     <div class="body">
       <h1>🍽️ Japan Food Facilities</h1>
-      <p class="sub">全国の飲食施設オープンデータ（食品営業許可・届出）を地図で見て、その場で検索できます。</p>
+      <p class="sub">全国の飲食施設オープンデータ（食品営業許可・届出）のプレビュー地図です。</p>
 
       <div class="stats">
         <div class="stat"><span class="num" id="stat-pref">–</span><span class="lbl">都道府県</span></div>
@@ -273,58 +210,18 @@
       </div>
 
       <div class="search-row">
-        <input id="keyword" type="text" placeholder="例: 渋谷 ラーメン" aria-label="キーワード（名称・カナ・住所・市区町村）">
+        <input id="keyword" type="text" placeholder="名称・住所で検索" aria-label="名称・住所で検索">
         <button class="btn" id="search" disabled>検索</button>
       </div>
-      <div class="opts">
-        <select id="scope" aria-label="検索範囲">
-          <option value="all">全国から検索</option>
-          <option value="bbox">地図の表示範囲内</option>
-          <option value="center">地図の中心から近い順</option>
-        </select>
-        <select id="limit" aria-label="上限件数">
-          <option value="50">上限 50件</option>
-          <option value="100">上限 100件</option>
-          <option value="200">上限 200件</option>
-        </select>
-        <select id="radius" aria-label="半径" hidden>
-          <option value="1000">半径 1km</option>
-          <option value="5000">半径 5km</option>
-          <option value="10000" selected>半径 10km</option>
-          <option value="50000">半径 50km</option>
-        </select>
-      </div>
-
-      <!-- 検索APIのエンドポイントが未設定のときだけ出す案内 -->
-      <div class="notice" id="notice-no-api">
-        <strong>検索APIのエンドポイントが未設定です。</strong>
-        URL に <code>?api=&lt;検索APIのURL&gt;</code> を付けるか、<code>map.html</code> の
-        <code>DEFAULT_API_URL</code> を設定すると検索できます。地図の閲覧はそのまま使えます。
-      </div>
-
-      <div class="result-head">
-        <p id="status">キーワードを入れて検索できます。</p>
-        <button class="btn ghost small" id="download" disabled>CSV</button>
-      </div>
+      <p id="status"></p>
     </div>
 
     <!-- 検索結果（クリックでその施設へ移動する） -->
     <ul id="results"></ul>
 
     <div class="body" style="padding-top:8px">
-      <details class="api">
-        <summary>API リクエストを見る</summary>
-        <code id="request-url">—</code>
-        <p>
-          この GET リクエストがそのまま検索 API の使い方です。レスポンスは
-          <code>{ count, results: [{ name, name_kana, prefecture, city, address, business_type,
-          lat, lng, level }] }</code> の JSON です。
-        </p>
-      </details>
-
       <p class="meta-line">
-        <span class="legend-dot all"></span>全施設
-        <span class="legend-dot hit"></span>検索結果
+        <span class="legend-dot"></span>各点＝1施設
         <span id="updated"></span><br>
         <a href="./">トップ</a> ·
         <a href="https://github.com/gl20percentclub/japan-food-facilities">GitHub</a> ·
@@ -350,19 +247,15 @@
     const JAPAN_BOUNDS = [122, 20, 154, 46];
 
     // 検索 API（geosearch: SQLite FTS5 + R*Tree in Lambda）のエンドポイント。
-    // デプロイの CDK 出力 SearchApiUrl を設定する。URL の ?api= で上書きもできる
-    // （例: map.html?api=https://xxxx.execute-api.ap-northeast-1.amazonaws.com/）。
+    // 未設定のあいだ検索窓は無効で、地図の閲覧だけができる。デプロイの CDK 出力
+    // SearchApiUrl を設定すると有効になる（URL の ?api= でも上書きできる）。
     const DEFAULT_API_URL = '';
     const API_URL = new URLSearchParams(location.search).get('api') || DEFAULT_API_URL;
-
-    // CSV ダウンロードに出す列（検索 API のレスポンス results[] のフィールド）。
-    const RESULT_FIELDS = [
-      'name', 'business_type', 'prefecture', 'city', 'address',
-      'name_kana', 'lat', 'lng', 'level',
-    ];
+    // 検索結果の取得件数の上限（一覧が長くなりすぎない程度に抑える）。
+    const SEARCH_LIMIT = 50;
 
     // ================= 状態 =================
-    let lastRows = []; // 直近の検索結果（結果リスト・地図・CSV で共有する）
+    let lastRows = []; // 直近の検索結果（結果リストと地図で共有する）
 
     const $ = (id) => document.getElementById(id);
     /** HTML 埋め込み用のエスケープ。 */
@@ -466,9 +359,6 @@
     map.on('zoom', updateHint);
     map.on('load', updateHint);
 
-    // 地図が動いたら、範囲を使う検索モードのリクエスト URL 表示を追随させる。
-    map.on('moveend', updateRequestUrl);
-
     // ================= ポップアップ =================
     /**
      * 施設のポップアップを表示する。`info` は { name, business_type, place, address } で、
@@ -511,56 +401,25 @@
       map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
     }
 
-    // ================= リクエスト組み立て =================
-    /** ステータス行を更新する。kind は '' | 'ok' | 'err'。 */
+    // ================= 検索 =================
+    /** ステータス行を更新する。kind は '' | 'err'。 */
     function setStatus(msg, kind = '') {
       const el = $('status');
       el.textContent = msg;
       el.className = kind;
     }
 
-    /** 小数を URL 用に丸める（座標は5桁 ≒ 1m 精度で十分）。 */
-    const r5 = (n) => Math.round(n * 1e5) / 1e5;
-
-    /**
-     * フォームと地図の状態から検索 API のクエリパラメータを組み立てる。
-     * scope=bbox は地図の表示範囲、scope=center は地図中心 + 半径を使う。
-     */
-    function buildParams() {
-      const params = new URLSearchParams();
-      const q = $('keyword').value.trim();
-      if (q) params.set('q', q);
-
-      const scope = $('scope').value;
-      if (scope === 'bbox') {
-        const b = map.getBounds();
-        params.set('bbox', [r5(b.getWest()), r5(b.getSouth()), r5(b.getEast()), r5(b.getNorth())].join(','));
-      } else if (scope === 'center') {
-        const c = map.getCenter();
-        params.set('center', `${r5(c.lng)},${r5(c.lat)}`);
-        params.set('radius', $('radius').value);
-      }
-
-      params.set('limit', $('limit').value);
-      return params;
-    }
-
-    /** 現在のフォーム内容で実行される GET リクエストの URL 表示を更新する。 */
-    function updateRequestUrl() {
-      const base = API_URL || '<検索APIのURL>';
-      $('request-url').textContent = `GET ${base}?${buildParams().toString()}`;
-    }
-
-    // ================= 検索実行 =================
-    /** 検索 API を呼び、結果リスト・地図・CSV ボタンを更新する。 */
+    /** 検索 API をキーワードで呼び、結果リストと地図を更新する。 */
     async function run() {
-      if (!API_URL) return;
+      const q = $('keyword').value.trim();
+      if (!API_URL || !q) return;
       $('search').disabled = true;
       try {
         setStatus('検索中…');
-        const t0 = performance.now();
-        const res = await fetch(`${API_URL}?${buildParams().toString()}`);
-        const ms = Math.round(performance.now() - t0);
+        const params = new URLSearchParams();
+        params.set('q', q);
+        params.set('limit', String(SEARCH_LIMIT));
+        const res = await fetch(`${API_URL}?${params.toString()}`);
         const body = await res.json();
         // 400 はクエリ起因のエラー。API が返す error メッセージをそのまま見せる。
         if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
@@ -568,8 +427,9 @@
         lastRows = body.results || [];
         renderResults();
         renderMap();
-        $('download').disabled = lastRows.length === 0;
-        setStatus(`${(body.count ?? lastRows.length).toLocaleString('ja-JP')}件ヒット（${ms.toLocaleString('ja-JP')}ms）`, 'ok');
+        setStatus(lastRows.length
+          ? `${(body.count ?? lastRows.length).toLocaleString('ja-JP')}件`
+          : '該当する施設が見つかりませんでした。');
       } catch (err) {
         setStatus(`エラー: ${err.message}`, 'err');
       } finally {
@@ -618,7 +478,7 @@
       map.setPaintProperty('facilities-circle', 'circle-stroke-opacity', dimmed ? 0.12 : 1);
     }
 
-    /** 座標を持つ結果を地図に重ね、範囲検索でなければ結果の範囲へズームする。 */
+    /** 座標を持つ結果を地図に重ね、その範囲へズームする。 */
     function renderMap() {
       const features = [];
       let bbox = null; // [west, south, east, north]
@@ -645,32 +505,7 @@
       }
       map.getSource('results').setData({ type: 'FeatureCollection', features });
       dimAllFacilities(features.length > 0);
-      // 地図の表示範囲を使った検索では視点を動かさない（範囲がずれると混乱するため）。
-      if (bbox && $('scope').value === 'all') {
-        map.fitBounds(bbox, { padding: 60, maxZoom: 15, duration: 600 });
-      }
-    }
-
-    // ================= CSV ダウンロード =================
-    /** CSV セルのエスケープ（区切り・引用符・改行を含む場合のみ引用符で囲む）。 */
-    function csvCell(v) {
-      if (v === null || v === undefined) return '';
-      const s = String(v);
-      return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-    }
-
-    /** 直近の検索結果を CSV（UTF-8 BOM 付き・Excel 対応）としてダウンロードする。 */
-    function downloadCsv() {
-      const lines = [RESULT_FIELDS.join(',')];
-      for (const row of lastRows) {
-        lines.push(RESULT_FIELDS.map((c) => csvCell(row[c])).join(','));
-      }
-      const blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'facilities-search-results.csv';
-      a.click();
-      URL.revokeObjectURL(a.href);
+      if (bbox) map.fitBounds(bbox, { padding: 60, maxZoom: 15, duration: 600 });
     }
 
     // ================= 統計（タイルの metadata.json から） =================
@@ -694,32 +529,20 @@
       })
       .catch(() => { /* 統計が取れなくても地図・検索は動く */ });
 
-    // ================= イベント =================
-    // フォームの変更はリクエスト URL 表示へ即時反映する。
-    for (const id of ['keyword', 'scope', 'limit', 'radius']) {
-      $(id).addEventListener('input', updateRequestUrl);
-    }
-    // 「近い順」のときだけ半径セレクトを見せる。
-    $('scope').addEventListener('input', () => {
-      $('radius').hidden = $('scope').value !== 'center';
-    });
+    // ================= イベント・初期化 =================
     $('search').addEventListener('click', run);
     // キーワード欄で Enter でも検索できるようにする。
     $('keyword').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') run();
     });
-    $('download').addEventListener('click', downloadCsv);
 
-    // ================= 初期化 =================
     if (API_URL) {
       $('search').disabled = false;
     } else {
-      // エンドポイント未設定なら案内を出し、検索は無効のままにする（地図は使える）。
-      $('notice-no-api').classList.add('visible');
+      // 検索 API 未設定のあいだは検索窓を無効にし、地図の閲覧だけを提供する。
       $('keyword').disabled = true;
-      setStatus('検索は準備中です。地図はそのまま操作できます。');
+      $('keyword').placeholder = '検索は準備中です';
     }
-    updateRequestUrl();
   </script>
 </body>
 </html>

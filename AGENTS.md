@@ -18,10 +18,10 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`
 - 市区町村別 JSON や検索 API は**このリポジトリからは配信していない**。データ抽出は
   CSV（DuckDB 推奨）、地図表示はタイルを使う。ブラウザから非圧縮 CSV を直接 fetch しない
-- キーワード・近傍検索は [geosearch](https://github.com/naogify/geosearch) の検索 API を
-  使った `map.html`（地図・検索ページ）で試せる。API のエンドポイントは
-  `map.html` の `DEFAULT_API_URL`（または `?api=` パラメータ）で設定する。
-  旧 `playground.html` は `map.html` へのリダイレクトだけを残した薄いページ
+- `map.html` は統計表示と検索窓だけの最小構成のプレビュー地図。検索窓は
+  [geosearch](https://github.com/naogify/geosearch) の検索 API を呼ぶが、
+  エンドポイント（`DEFAULT_API_URL`）は未設定で現状は無効。旧 `playground.html` は
+  `map.html` へのリダイレクトだけを残した薄いページ
 - 商用・非商用を問わず利用可だが出典表示が必要。ライセンスは元データの提供元ごとに異なる
   （単一ライセンスではないので「CC BY 4.0」と一括で書かない）。出典表示:
   「出典：Japan Food Facilities（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）」
