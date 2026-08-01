@@ -8,8 +8,9 @@
 // 出力する city の粒度は「市区町村」に揃える。具体的には次の2点を保証する:
 //   - 政令指定都市の行政区は市に集約する（「横浜市戸塚区」→「横浜市」）。
 //     splitPrefCity（normalize.js）と同じ粒度に合わせるため。
-//   - 町村は郡付きの公式表記に揃える（「津幡町」→「河北郡津幡町」）。
-//     名寄せに成功した表記が郡付きなので、解決できなかった側をそちらへ寄せる。
+//   - 町村は郡名を外した表記に揃える（「河北郡津幡町」→「津幡町」）。
+//     全国1,741市区町村を都道府県ごとに見ると、郡名を外しても名前が衝突する自治体は
+//     無い（docs/COVERAGE.md の一覧で確認済み）。
 // 揃えないと、同じ自治体が「横浜市戸塚区」「河北郡津幡町」「津幡町」のように
 // 複数の値へ分裂し、市区町村の異なり数が実際の自治体数（1,741）を超えてしまう。
 //
@@ -22,10 +23,11 @@ import { PREFECTURE_NAMES, splitPrefCity } from './normalize.js';
 const PREFS = new Set(PREFECTURE_NAMES);
 
 /**
- * 郡名プレフィックスを剥がす。例: 「玖珠郡九重町」→「九重町」
- * 郡付き・郡なしの表記ゆれを突き合わせるためのキー作りに使う（出力値には使わない）。
+ * 郡名プレフィックスを剥がす（純粋関数）。
+ * 例: 「玖珠郡九重町」→「九重町」、「国頭郡今帰仁村」→「今帰仁村」
+ * 「郡上市」「大和郡山市」のように郡名でない「郡」を含む市名は対象外。
  */
-function stripCountyPrefix(city) {
+export function stripCountyPrefix(city) {
   const m = String(city).match(/郡(.+?[町村])$/);
   return m ? m[1] : city;
 }
@@ -41,21 +43,12 @@ export function stripWardSuffix(city) {
 }
 
 /**
- * 名寄せ表の値から「郡なし町村名 → 郡付き公式名」の対応表を作る（純粋関数）。
- * キーは `"都道府県\t郡なし町村名"`。
- *
- * 名寄せに失敗したペア（normMap の値が null）は郡付きの公式名が分からないため、
- * 同じ実行内で名寄せに成功した他ソースの結果を辞書として流用する。
+ * 市区町村名を出力用の表記に揃える（純粋関数）。
+ * 郡名を外し、政令指定都市の行政区を市に集約する。
+ * 名寄せの成否にかかわらず、city 列に出す値はすべてここを通す。
  */
-export function buildCountyAliasMap(normMap = {}) {
-  const alias = {};
-  for (const v of Object.values(normMap)) {
-    if (!v?.pref || !v?.city) continue;
-    const short = stripCountyPrefix(v.city);
-    // 郡付きの値だけが対応表になる（「九重町」→「玖珠郡九重町」）。
-    if (short !== v.city) alias[`${v.pref}\t${short}`] = v.city;
-  }
-  return alias;
+export function toMunicipality(city) {
+  return stripWardSuffix(stripCountyPrefix(city));
 }
 
 /**
@@ -128,11 +121,10 @@ export async function buildCityNormMap(facilities, { concurrency = 8, log = cons
  *
  * 1. 列ズレ補正: pref が都道府県名でない（郵便番号等）／city に都道府県名が入っている
  *    ソース（富山県の数件）は、住所先頭から都道府県・市区町村を復元する。
- * 2. 名寄せ: 名寄せ表にあれば公式の都道府県・市区町村名を採用。無ければ郡付き対応表
- *    （countyAlias）で公式表記を補う。
- * 3. 粒度統一: どちらの経路でも政令指定都市の行政区は市に集約する。
+ * 2. 名寄せ: 名寄せ表にあれば公式の都道府県・市区町村名を採用。無ければ元の表記を使う。
+ * 3. 粒度統一: どちらの経路でも toMunicipality() を通し、郡名剥がしと行政区の集約を行う。
  */
-export function resolvePrefCity(facility, normMap = {}, countyAlias = {}) {
+export function resolvePrefCity(facility, normMap = {}) {
   const rawPref = facility._pref || '不明';
   const rawCity = facility._city || '不明';
 
@@ -150,24 +142,22 @@ export function resolvePrefCity(facility, normMap = {}, countyAlias = {}) {
 
   const nm = normMap[`${rawPref}\t${rawCity}`];
   if (nm?.pref && nm?.city) {
-    return { pref: nm.pref, city: stripWardSuffix(nm.city), cityRaw, colFixed };
+    return { pref: nm.pref, city: toMunicipality(nm.city), cityRaw, colFixed };
   }
-  // 名寄せできなかった分は、郡付き対応表があれば公式表記へ寄せる（無ければ元の表記のまま）。
-  const official = countyAlias[`${pref}\t${stripCountyPrefix(cityRaw)}`];
-  return { pref, city: stripWardSuffix(official || cityRaw), cityRaw, colFixed };
+  // 名寄せできなかった分も同じ整形を通す。表記ゆれは残るが粒度だけは揃う。
+  return { pref, city: toMunicipality(cityRaw), cityRaw, colFixed };
 }
 
 /**
  * 施設配列に確定した pref / city / city_raw を書き込む（破壊的）。
  * 以降の出力（結合CSV・ベクトルタイル）は共通してこの値を使う。
- * 郡付き対応表は名寄せ表から自動で作る（テスト等から明示的に渡すこともできる）。
  * 補正・名寄せの件数を返す。
  */
-export function applyPrefCity(facilities, normMap, countyAlias = buildCountyAliasMap(normMap)) {
+export function applyPrefCity(facilities, normMap) {
   let colFixedCount = 0;
   let mergedCount = 0;
   for (const f of facilities) {
-    const { pref, city, cityRaw, colFixed } = resolvePrefCity(f, normMap, countyAlias);
+    const { pref, city, cityRaw, colFixed } = resolvePrefCity(f, normMap);
     f.pref = pref;
     f.city = city;
     f.city_raw = cityRaw;
