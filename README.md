@@ -10,7 +10,7 @@
 [![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#更新頻度)
 
 [公式サイト](https://gl20percentclub.github.io/japan-food-facilities/) ·
-[地図で見る・検索する](https://gl20percentclub.github.io/japan-food-facilities/map.html) ·
+[地図で見る](https://gl20percentclub.github.io/japan-food-facilities/map.html) ·
 [CSVをダウンロード](https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv) ·
 [収録状況](docs/COVERAGE.md) ·
 [出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)
@@ -95,14 +95,6 @@ map.addSource("facilities", {
 - 詳細: [`api/tiles/metadata.json`](https://d1nptpfogf2ynv.cloudfront.net/api/tiles/metadata.json)
 
 収録データは[地図ページ](https://gl20percentclub.github.io/japan-food-facilities/map.html)でも確認できます。
-
-### 地図から検索する
-
-キーワード検索・近傍検索（「東京駅の近くのカフェ」等）も、同じ[地図ページ](https://gl20percentclub.github.io/japan-food-facilities/map.html)から試せます。検索バックエンドには [geosearch](https://github.com/naogify/geosearch)（本データを SQLite in Lambda の検索APIに変換するIaC）を利用しており、実行された GET リクエストの URL がそのまま画面に表示されるため、アプリへの組み込み方も確認できます。
-
-- キーワード: 名称・カナ・住所・市区町村を横断検索（`q`）
-- 範囲: 地図の表示範囲内（`bbox`）、中心から近い順（`center` + `radius`）
-- 結果は一覧・地図表示・CSVダウンロードで確認可能
 
 ### AIエージェントから使う
 
