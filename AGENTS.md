@@ -9,8 +9,8 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
 **まず https://gl20percentclub.github.io/japan-food-facilities/llms-full.txt を読むこと。**
 データ仕様・コピペで動く利用例・注意事項がすべてまとまっている。要点だけ挙げる:
 
-- 全件CSV（gzip）: `https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv.gz`
-  - UTF-8 **BOM付き**、約150万レコード、非圧縮で約540MB
+- 全件CSV: `https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv`
+  - **BOM なし** UTF-8、約150万レコード、約400MB（GitHub Release アセットとして配信）
   - 列: `prefecture, city, city_raw, name, name_kana, business_type, address, lat, lng, geocoding_level, phone, license_no, license_date, expire_date, sources, licenses`
 - ベクトルタイル（MVT）: `https://gl20percentclub.github.io/japan-food-facilities/api/tiles/{z}/{x}/{y}.pbf`
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`

@@ -6,23 +6,23 @@
 
 重要な事実:
 
-- 全件CSV（gzip 推奨）: https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv.gz
-- 全件CSV（非圧縮・約540MB）: https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv
-- CSV は UTF-8（BOM付き）。列: prefecture, city, city_raw, name, name_kana,
+- 全件CSV（約400MB）: https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv
+  （Release アセットとして配信。Pages の 1ファイル 100MB 上限を超えるため）
+- CSV は BOM なし UTF-8。列: prefecture, city, city_raw, name, name_kana,
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: https://gl20percentclub.github.io/japan-food-facilities/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
 - 市区町村別 JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
   地図表示はタイルで行う（キーワード・近傍検索は https://gl20percentclub.github.io/japan-food-facilities/playground.html で試せる）
-- 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
+- タイルは CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
 - 毎週月曜 18:00 UTC（JST 火曜 3:00）に自動更新
 
-**最終更新: 2026-07-31**
+**最終更新: 2026-08-01**
 
 | 項目 | 値 |
 |---|---|
 | 施設レコード数 | 1,488,756 件 |
-| 座標を持つ施設 | 1,359,323 件 |
+| 座標を持つ施設 | 1,359,322 件 |
 | 都道府県 | 48 |
 | 市区町村 | 1,796 |
 | 結合CSV | 約 430.3 MB |

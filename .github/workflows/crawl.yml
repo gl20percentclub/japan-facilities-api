@@ -72,6 +72,35 @@ jobs:
       - name: Validate
         run: npm test
 
+      # 全件CSV（約400MB）を Release アセットとして配信する。
+      # gh-pages では配信できない: GitHub は 1ファイル 100MB を上限とし、
+      # これを超えるファイルを含む push は拒否される（GH001）。Release アセットは
+      # 上限 2GB のため全件CSV をそのまま置ける。
+      #
+      # タグ data-latest を固定で使い回し、ダウンロード URL を不変に保つ
+      # （--clobber で同名アセットを毎週上書きする）。
+      - name: Publish merged CSV to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # 初回のみリリースを作成する（2回目以降は既存のものを使う）。
+          if ! gh release view data-latest >/dev/null 2>&1; then
+            gh release create data-latest \
+              --title '全件CSV（最新）' \
+              --notes '毎週のクロールで更新される全件CSV。詳細は README を参照。'
+          fi
+          # アセットを上書きアップロード（URL は常に同じ）。
+          gh release upload data-latest api/facilities-all.csv --clobber
+          # 更新日と件数を本文に反映して、いつ時点のデータか分かるようにする。
+          gh release edit data-latest --notes "$(printf '%s\n' \
+            "毎週のクロールで更新される全件CSV（BOM なし UTF-8）。" \
+            "" \
+            "- 更新: $(date -u '+%Y-%m-%d %H:%M UTC')" \
+            "- ダウンロード: https://github.com/${GITHUB_REPOSITORY}/releases/download/data-latest/facilities-all.csv" \
+            "" \
+            "列の定義・ライセンス・利用例は README / llms-full.txt を参照。")"
+
       # README の統計（件数・サイズ）・出典表示ページ・llms.txt だけを main に反映する。
       # 生成物 api/ は Git 管理せず（.gitignore）、配信は gh-pages のみで行う（履歴肥大を避けるため）。
       # クロール中に他の push で main が進むことがあるため、rebase してリトライする。
@@ -92,14 +121,17 @@ jobs:
           done
           echo "::warning::README stats の push に失敗（gh-pages への配信は別ステップで実施）"
 
-      # 生成した api/ を gh-pages へ配信する（データの唯一の配信先）。
+      # 生成した api/ のうち、ベクトルタイルを gh-pages へ配信する。
       # publish_dir が . なので .gitignore も配信対象に含まれてしまう。gh-pages 側では
       # actions-gh-pages が git add --all するため、api/ を無視する .gitignore が
       # 配信先に置かれると生成物が一切コミットされない。必ず除外する。
+      #
+      # 全件CSV は 100MB 上限を超えるため必ず除外する（含めると push 全体が
+      # GH001 で失敗し、タイルもろとも配信されない）。配信は Release アセットで行う。
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .
           publish_branch: gh-pages
-          exclude_assets: 'node_modules,.cache,scripts,.github,.gitignore'
+          exclude_assets: 'node_modules,.cache,scripts,.github,.gitignore,api/facilities-all.csv'

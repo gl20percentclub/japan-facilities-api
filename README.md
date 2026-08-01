@@ -12,7 +12,7 @@
 [公式サイト](https://gl20percentclub.github.io/japan-food-facilities/) ·
 [地図で見る](https://gl20percentclub.github.io/japan-food-facilities/map.html) ·
 [検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html) ·
-[CSVをダウンロード](https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv) ·
+[CSVをダウンロード](https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv) ·
 [収録状況](docs/COVERAGE.md) ·
 [出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)
 
@@ -53,20 +53,23 @@
 
 | ファイル | URL |
 |---|---|
-| 全件CSV | https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv |
+| 全件CSV | https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv |
 
 - 文字コード: UTF-8（BOMなし）
 - 全列が一致する重複レコードは除去済み
+- 配信は GitHub Release アセット（タグ `data-latest`）。約400MBあり、GitHub Pages の
+  1ファイル100MB制限を超えるためこの形式で配信しています。URLは更新後も変わりません
+- リダイレクトを経由するため、`curl` には `-L` を付けてください
 
 ```bash
-curl -O https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv
+curl -LO https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv"
+    "https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv"
 )
 ```
 

@@ -7,7 +7,7 @@
 [公式サイト](https://gl20percentclub.github.io/japan-food-facilities/) ·
 [地図で見る](https://gl20percentclub.github.io/japan-food-facilities/map.html) ·
 [検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html) ·
-[CSVをダウンロード](https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv) ·
+[CSVをダウンロード](https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv) ·
 [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/COVERAGE.md) ·
 [出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)
 
@@ -24,12 +24,12 @@
 - 毎週自動更新
 
 <!-- STATS:START -->
-> **最終更新: 2026-07-31**
+> **最終更新: 2026-08-01**
 >
 > | 項目 | 値 |
 > |---|---|
 > | 施設レコード数 | 1,488,756 件 |
-> | 座標を持つ施設 | 1,359,323 件 |
+> | 座標を持つ施設 | 1,359,322 件 |
 > | 都道府県 | 48 |
 > | 市区町村 | 1,796 |
 > | 結合CSV | 約 430.3 MB |
@@ -46,20 +46,23 @@
 
 | ファイル | URL |
 |---|---|
-| 全件CSV | https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv |
+| 全件CSV | https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv |
 
 - 文字コード: UTF-8（BOMなし）
 - 全列が一致する重複レコードは除去済み
+- 配信は GitHub Release アセット（タグ `data-latest`）。約400MBあり、GitHub Pages の
+  1ファイル100MB制限を超えるためこの形式で配信しています。URLは更新後も変わりません
+- リダイレクトを経由するため、`curl` には `-L` を付けてください
 
 ```bash
-curl -O https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv
+curl -LO https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv"
+    "https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv"
 )
 ```
 
@@ -218,12 +221,12 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 ### CSV から必要な範囲を抽出する（DuckDB・推奨）
 
-540MB の CSV 全体をメモリに載せずに、リモートの gzip CSV へ直接クエリできる。
+400MB の CSV 全体をメモリに載せずに、リモートの CSV へ直接クエリできる。
 
 ```sql
 INSTALL httpfs; LOAD httpfs;
 SELECT name, address, lat, lng
-FROM read_csv_auto('https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv.gz')
+FROM read_csv_auto('https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv')
 WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲食店営業';
 ```
 
@@ -232,7 +235,7 @@ WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲�
 ```python
 import pandas as pd
 
-df = pd.read_csv('https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv.gz')
+df = pd.read_csv('https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv')
 naha = df[(df['prefecture'] == '沖縄県') & (df['city'] == '那覇市')]
 ```
 

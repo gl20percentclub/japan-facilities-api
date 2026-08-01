@@ -27,6 +27,9 @@ const README_PATH = path.join(ROOT, 'README.md');
 const PAGES = 'https://gl20percentclub.github.io/japan-food-facilities';
 const REPO = 'https://github.com/gl20percentclub/japan-food-facilities';
 const RAW = 'https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main';
+// 全件CSV は Pages ではなく Release アセットで配信する（Pages は 1ファイル 100MB 上限、
+// CSV は約400MB）。タグ data-latest は毎週上書きされ、URL は不変。
+const CSV_URL = `${REPO}/releases/download/data-latest/facilities-all.csv`;
 
 const STATS_START = '<!-- STATS:START -->';
 const STATS_END = '<!-- STATS:END -->';
@@ -94,15 +97,15 @@ export function renderLlmsTxt(readme) {
 
 重要な事実:
 
-- 全件CSV（gzip 推奨）: ${PAGES}/api/facilities-all.csv.gz
-- 全件CSV（非圧縮・約540MB）: ${PAGES}/api/facilities-all.csv
-- CSV は UTF-8（BOM付き）。列: prefecture, city, city_raw, name, name_kana,
+- 全件CSV（約400MB）: ${CSV_URL}
+  （Release アセットとして配信。Pages の 1ファイル 100MB 上限を超えるため）
+- CSV は BOM なし UTF-8。列: prefecture, city, city_raw, name, name_kana,
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: ${PAGES}/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
 - 市区町村別 JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
   地図表示はタイルで行う（キーワード・近傍検索は ${PAGES}/playground.html で試せる）
-- 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
+- タイルは CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
 - 毎週月曜 18:00 UTC（JST 火曜 3:00）に自動更新
 
 ${stats}
@@ -138,12 +141,12 @@ ${body}
 
 ### CSV から必要な範囲を抽出する（DuckDB・推奨）
 
-540MB の CSV 全体をメモリに載せずに、リモートの gzip CSV へ直接クエリできる。
+400MB の CSV 全体をメモリに載せずに、リモートの CSV へ直接クエリできる。
 
 \`\`\`sql
 INSTALL httpfs; LOAD httpfs;
 SELECT name, address, lat, lng
-FROM read_csv_auto('${PAGES}/api/facilities-all.csv.gz')
+FROM read_csv_auto('${CSV_URL}')
 WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲食店営業';
 \`\`\`
 
@@ -152,7 +155,7 @@ WHERE prefecture = '沖縄県' AND city = '那覇市' AND business_type = '飲�
 \`\`\`python
 import pandas as pd
 
-df = pd.read_csv('${PAGES}/api/facilities-all.csv.gz')
+df = pd.read_csv('${CSV_URL}')
 naha = df[(df['prefecture'] == '沖縄県') & (df['city'] == '那覇市')]
 \`\`\`
 

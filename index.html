@@ -235,16 +235,17 @@
       <h2>クイックスタート</h2>
       <p class="lead">
         配信しているのは <strong>全件CSV</strong> と <strong>ベクトルタイル</strong> の2つだけです。
-        ベース URL は <code>https://gl20percentclub.github.io/japan-food-facilities/api/</code>。
+        CSV は GitHub Release アセット、タイルは
+        <code>https://gl20percentclub.github.io/japan-food-facilities/api/</code> 配下で配信しています。
       </p>
 
-      <p class="step">1. 全件CSV をダウンロードする（約 540MB）</p>
-<pre><code>curl -O https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv</code></pre>
+      <p class="step">1. 全件CSV をダウンロードする（約 400MB・リダイレクトを辿るので <code>-L</code> が必要）</p>
+<pre><code>curl -LO https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv</code></pre>
 
       <p class="step">2. pandas で読み込む（URL 直指定でもいけます）</p>
 <pre><code>import pandas as pd
 
-df = pd.read_csv('https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv')
+df = pd.read_csv('https://github.com/gl20percentclub/japan-food-facilities/releases/download/data-latest/facilities-all.csv')
 <span class="c"># 那覇市の飲食店営業だけ抜き出す</span>
 naha = df[(df.city == '那覇市') &amp; (df.business_type == '飲食店営業')]
 print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
@@ -271,7 +272,7 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
   <section id="formats">
     <div class="wrap">
       <h2>配信している形式</h2>
-      <p class="lead">用途に合わせて2つから選べます。どちらも同じベース URL 配下の静的ファイルです。</p>
+      <p class="lead">用途に合わせて2つから選べます。どちらも登録不要で直接取得できる静的ファイルです。</p>
       <div class="table-scroll">
         <table class="formats">
           <thead>
@@ -280,7 +281,7 @@ print(naha[['name', 'address', 'lat', 'lng']].head())</code></pre>
           <tbody>
             <tr>
               <td>全件 CSV</td>
-              <td><code>api/facilities-all.csv</code>（約 540MB）</td>
+              <td><code>releases/download/data-latest/facilities-all.csv</code>（約 400MB）</td>
               <td>pandas・BI ツール・DB 取り込みで分析する。全項目入り・BOM なし UTF-8 です。</td>
             </tr>
             <tr>

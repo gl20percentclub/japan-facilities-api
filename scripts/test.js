@@ -1,7 +1,8 @@
 // 生成した配信物が正しいことを確認するバリデーションスクリプト。
 //
 // 検証対象は配信する2形式だけ:
-//   api/facilities-all.csv[.gz]   全件の結合CSV
+//   api/facilities-all.csv        全件の結合CSV（配信は Release アセット。
+//                                 gh-pages には載せない = 100MB 上限を超えるため）
 //   api/tiles/{z}/{x}/{y}.pbf     ベクトルタイル + metadata.json（TileJSON）
 //
 //   node scripts/test.js

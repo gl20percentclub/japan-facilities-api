@@ -89,6 +89,33 @@ assert(
   'pages.yml: keep_files が true（既存の api/ を消さない）',
 );
 
+// --- 全件CSV は gh-pages に載せず Release で配信する ---
+// GitHub は 1ファイル 100MB を上限とし、超えるファイルを含む push は GH001 で
+// 拒否される。約400MB の全件CSV を配信対象に含めると push 全体が失敗し、
+// タイルもろとも配信されなくなる（実際に発生した）。除外を固定する。
+const crawlExcluded = String(crawlDeploy.exclude_assets ?? '')
+  .split(',')
+  .map((s) => s.trim());
+assert(
+  crawlExcluded.includes('api/facilities-all.csv'),
+  'crawl.yml: 全件CSV を gh-pages 配信から除外している（100MB 上限による push 失敗の防止）',
+);
+
+// 除外しただけでは配信されないため、Release へのアップロードが必要。
+// タグは固定（data-latest）で、ダウンロード URL を不変に保つ。
+const crawlRun = Object.values(crawl.jobs ?? {})
+  .flatMap((job) => job.steps ?? [])
+  .map((step) => step.run ?? '')
+  .join('\n');
+assert(
+  /gh release upload\s+data-latest[^\n]*api\/facilities-all\.csv/.test(crawlRun),
+  'crawl.yml: 全件CSV を Release（タグ data-latest）へアップロードしている',
+);
+assert(
+  crawlRun.includes('--clobber'),
+  'crawl.yml: Release アセットを上書きする（--clobber で URL を不変に保つ）',
+);
+
 // --- gh-pages への同時 push を避ける ---
 assert(
   crawl.concurrency?.group != null && crawl.concurrency?.group === pages.concurrency?.group,
