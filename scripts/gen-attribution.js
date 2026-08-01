@@ -521,7 +521,7 @@ ${sections.map(renderSection).join('\n')}
         誤りを見つけた場合は <a href="${REPO_URL}/issues">Issue</a> でお知らせください。
       </p>
       <p>
-        <a href="./">← トップへ戻る</a> · <a href="./map.html">プレビュー地図</a> ·
+        <a href="./">← トップへ戻る</a> · <a href="./map.html">地図・検索</a> ·
         <a href="${REPO_URL}">GitHub リポジトリ</a>
       </p>
     </footer>
