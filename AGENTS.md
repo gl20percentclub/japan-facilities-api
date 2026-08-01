@@ -21,9 +21,10 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`
 - 市区町村別 CSV/JSON や検索 API は**このリポジトリからは配信していない**。データ抽出は
   CSV（DuckDB 推奨）、地図表示はタイルを使う。ブラウザから非圧縮 CSV を直接 fetch しない
-- `map.html` は統計表示と検索窓だけの最小構成のプレビュー地図。検索窓は
-  [geosearch](https://github.com/naogify/geosearch) の検索 API を呼ぶが、
-  エンドポイント（`DEFAULT_API_URL`）は未設定で現状は無効。旧 `playground.html` は
+- `map.html` は統計表示と業種フィルターだけの最小構成のプレビュー地図。フィルターは
+  タイルの `business_type` にキーワード部分一致をかける（`CATEGORIES` が定義。業種表記は
+  自治体ごとにゆれが大きく、業種欄が無い自治体もあるため「業種の記載なし」を別枠にしている）。
+  検索機能は持たない（検索 API は未公開）。旧 `playground.html` は
   `map.html` へのリダイレクトだけを残した薄いページ
 - 商用・非商用を問わず利用可だが出典表示が必要。ライセンスは元データの提供元ごとに異なる
   （単一ライセンスではないので「CC BY 4.0」と一括で書かない）。出典表示:

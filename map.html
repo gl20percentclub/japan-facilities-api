@@ -4,13 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>🍽️ Japan Food Facilities — 地図</title>
-  <meta name="description" content="日本全国の飲食施設オープンデータ（食品営業許可・届出）を地図で見て、名称や住所で検索できます。">
+  <meta name="description" content="日本全国の飲食施設オープンデータ（食品営業許可・届出）を地図で見て、業種カテゴリで絞り込めます。">
 
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
   <style>
     :root {
       --accent: #e8563f;
-      --hit: #1f6feb;
       --ink: #1f2933;
       --sub: #52606d;
       --muted: #9aa5b1;
@@ -18,7 +17,6 @@
       --field-bg: #ffffff;
       --soft: #f7f8fa;
       --border: rgba(31, 41, 51, 0.12);
-      --err: #c0392b;
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; }
@@ -37,8 +35,6 @@
       width: min(340px, calc(100vw - 24px));
       /* 画面からはみ出さないよう上限を設け、超えた分はパネル内でスクロールさせる */
       max-height: calc(100% - 24px);
-      display: flex;
-      flex-direction: column;
       background: var(--panel-bg);
       backdrop-filter: blur(8px);
       border: 1px solid var(--border);
@@ -46,8 +42,8 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
       overflow-x: hidden;
       overflow-y: auto;
+      padding: 14px 16px 12px;
     }
-    .panel .body { padding: 14px 16px 12px; }
     .panel h1 {
       margin: 0 0 4px;
       font-size: 16px;
@@ -83,11 +79,15 @@
     }
     .stat .lbl { font-size: 10px; color: #616e7c; }
 
-    /* --- 検索窓 --- */
-    .search-row { display: flex; gap: 8px; }
-    .search-row input {
-      flex: 1;
-      min-width: 0;
+    /* --- 業種フィルター --- */
+    .filter label {
+      display: block;
+      font-size: 11.5px;
+      color: var(--sub);
+      margin-bottom: 4px;
+    }
+    .filter select {
+      width: 100%;
       font-size: 14px;
       font-family: inherit;
       color: var(--ink);
@@ -96,42 +96,12 @@
       border-radius: 8px;
       padding: 8px 10px;
     }
-    .btn {
-      font-size: 14px;
-      font-weight: 600;
-      font-family: inherit;
-      border-radius: 8px;
-      padding: 8px 16px;
-      border: 1px solid var(--accent);
-      background: var(--accent);
-      color: #fff;
-      cursor: pointer;
-      transition: opacity 0.15s;
+    .filter .note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 6px 0 0;
     }
-    .btn:hover { opacity: 0.85; }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* --- 検索結果 --- */
-    #status { font-size: 12px; color: var(--sub); margin: 8px 0 0; }
-    #status.err { color: var(--err); }
-    #status:empty { display: none; }
-    /* 結果リストだけをスクロールさせ、検索窓は常に見えるようにする */
-    #results {
-      overflow-y: auto;
-      margin: 8px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-    #results li {
-      padding: 8px 16px;
-      border-top: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 12.5px;
-      line-height: 1.5;
-    }
-    #results li:hover, #results li:focus-visible { background: rgba(31, 111, 235, 0.08); outline: none; }
-    #results .r-name { font-weight: 600; display: block; }
-    #results .r-meta { color: var(--muted); font-size: 11.5px; }
 
     /* --- フッターのリンク --- */
     .meta-line {
@@ -183,13 +153,13 @@
     .fac-row { font-size: 12px; color: #52606d; margin: 2px 0; }
     .fac-row .k { color: #9aa5b1; margin-right: 6px; }
 
-    /* 画面が低いときは統計を隠し、検索窓と結果を優先する */
-    @media (max-height: 640px) {
+    /* 画面が低いときは統計を隠し、フィルターを優先する */
+    @media (max-height: 560px) {
       .stats { display: none; }
     }
     /* スマートフォンでは説明文を省き、パネルが地図を覆いすぎないようにする */
     @media (max-width: 520px) {
-      .panel { max-height: 60%; }
+      .panel { max-height: 55%; }
       .panel .sub { display: none; }
     }
   </style>
@@ -197,38 +167,32 @@
 <body>
   <div id="map"></div>
 
-  <!-- ================= 操作パネル（統計と検索窓だけの最小構成） ================= -->
+  <!-- ================= 操作パネル（統計と業種フィルターだけの最小構成） ================= -->
   <div class="panel">
-    <div class="body">
-      <h1>🍽️ Japan Food Facilities</h1>
-      <p class="sub">全国の飲食施設オープンデータ（食品営業許可・届出）のプレビュー地図です。</p>
+    <h1>🍽️ Japan Food Facilities</h1>
+    <p class="sub">全国の飲食施設オープンデータ（食品営業許可・届出）のプレビュー地図です。</p>
 
-      <div class="stats">
-        <div class="stat"><span class="num" id="stat-pref">–</span><span class="lbl">都道府県</span></div>
-        <div class="stat"><span class="num" id="stat-city">–</span><span class="lbl">市区町村</span></div>
-        <div class="stat"><span class="num" id="stat-fac">–</span><span class="lbl">施設</span></div>
-      </div>
-
-      <div class="search-row">
-        <input id="keyword" type="text" placeholder="名称・住所で検索" aria-label="名称・住所で検索">
-        <button class="btn" id="search" disabled>検索</button>
-      </div>
-      <p id="status"></p>
+    <div class="stats">
+      <div class="stat"><span class="num" id="stat-pref">–</span><span class="lbl">都道府県</span></div>
+      <div class="stat"><span class="num" id="stat-city">–</span><span class="lbl">市区町村</span></div>
+      <div class="stat"><span class="num" id="stat-fac">–</span><span class="lbl">施設</span></div>
     </div>
 
-    <!-- 検索結果（クリックでその施設へ移動する） -->
-    <ul id="results"></ul>
-
-    <div class="body" style="padding-top:8px">
-      <p class="meta-line">
-        <span class="legend-dot"></span>各点＝1施設
-        <span id="updated"></span><br>
-        <a href="./">トップ</a> ·
-        <a href="https://github.com/gl20percentclub/japan-food-facilities">GitHub</a> ·
-        <a href="https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv">全件CSV</a> ·
-        <a href="./attribution.html">出典・ライセンス</a>
-      </p>
+    <div class="filter">
+      <label for="category">業種カテゴリで絞り込む</label>
+      <!-- 選択肢は CATEGORIES から組み立てる（表示とフィルター条件の定義を1か所に保つ） -->
+      <select id="category"></select>
+      <p class="note" id="filter-note"></p>
     </div>
+
+    <p class="meta-line">
+      <span class="legend-dot"></span>各点＝1施設
+      <span id="updated"></span><br>
+      <a href="./">トップ</a> ·
+      <a href="https://github.com/gl20percentclub/japan-food-facilities">GitHub</a> ·
+      <a href="https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv">全件CSV</a> ·
+      <a href="./attribution.html">出典・ライセンス</a>
+    </p>
   </div>
 
   <div class="hint" id="hint">🔍 ズームインすると施設ピンが表示されます</div>
@@ -246,25 +210,36 @@
     // 日本のおおよその範囲 [west, south, east, north]
     const JAPAN_BOUNDS = [122, 20, 154, 46];
 
-    // 検索 API（geosearch: SQLite FTS5 + R*Tree in Lambda）のエンドポイント。
-    // 未設定のあいだ検索窓は無効で、地図の閲覧だけができる。デプロイの CDK 出力
-    // SearchApiUrl を設定すると有効になる（URL の ?api= でも上書きできる）。
-    const DEFAULT_API_URL = '';
-    const API_URL = new URLSearchParams(location.search).get('api') || DEFAULT_API_URL;
-    // 検索結果の取得件数の上限（一覧が長くなりすぎない程度に抑える）。
-    const SEARCH_LIMIT = 50;
+    // 業種（business_type）の大分類。元データの表記は自治体ごとにゆれが大きく
+    // （「飲食店営業」「① 飲食店営業」「飲食店営業(1)一般食堂・レストラン等」など）、
+    // 統一コードも無いため、部分一致するキーワードで束ねて絞り込む。
+    // keywords のいずれかを business_type に含めばそのカテゴリに入る（重複はあり得る）。
+    const CATEGORIES = [
+      { id: 'all', label: 'すべての業種', keywords: null },
+      { id: 'restaurant', label: '飲食店', keywords: ['飲食店'] },
+      { id: 'cafe', label: '喫茶店・コーヒー', keywords: ['喫茶', 'コーヒー'] },
+      { id: 'deli', label: 'そうざい・弁当・仕出し', keywords: ['そうざい', '惣菜', '弁当', '仕出'] },
+      { id: 'sweets', label: '菓子・アイスクリーム', keywords: ['菓子', 'アイスクリーム'] },
+      { id: 'meat_fish', label: '食肉・魚介', keywords: ['食肉', '魚介', '水産'] },
+      { id: 'canteen', label: '給食施設', keywords: ['給食'] },
+      { id: 'sale', label: '販売業（小売・自販機など）', keywords: ['販売', 'スーパー', 'コンビニ', '百貨店'] },
+      { id: 'manufacture', label: '製造・加工業', keywords: ['製造', '加工', '処理'] },
+      // 上のどのキーワードにも当たらない業種（表記ゆれの取りこぼしもここに入る）
+      { id: 'other', label: 'その他の業種', keywords: [] },
+      // 元データに業種の記載がない施設。自治体によっては業種欄が無く、
+      // 都心部ではこれが多数派になるため「その他」とは分けて扱う。
+      { id: 'unknown', label: '業種の記載なし', keywords: [] },
+    ];
 
     // ================= 状態 =================
-    let lastRows = []; // 直近の検索結果（結果リストと地図で共有する）
-
     const $ = (id) => document.getElementById(id);
     /** HTML 埋め込み用のエスケープ。 */
     const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
     // ================= 地図 =================
-    // 国土地理院 淡色地図をベースに、全件のベクトルタイル（facilities）と
-    // 検索結果の GeoJSON（results）を重ねる最小構成スタイル（API キー不要）。
+    // 国土地理院 淡色地図をベースに、全件のベクトルタイル（facilities）を
+    // 重ねる最小構成スタイル（API キー不要）。
     const map = new maplibregl.Map({
       container: 'map',
       style: {
@@ -290,11 +265,6 @@
               '出典：<a href="./" target="_blank" rel="noopener">Japan Food Facilities</a>'
               + '（<a href="./attribution.html">各自治体・厚生労働省のオープンデータを加工して作成</a>）',
           },
-          // 検索結果の描画元。施設データの出典表示はタイル側の attribution に含まれる
-          results: {
-            type: 'geojson',
-            data: { type: 'FeatureCollection', features: [] },
-          },
         },
         layers: [
           { id: 'gsi', type: 'raster', source: 'gsi' },
@@ -316,19 +286,6 @@
                 12, 4.5,
                 16, 7,
               ],
-            },
-          },
-          {
-            // 検索結果は全件の点より前面に、別の色で大きく描く
-            id: 'results-circle',
-            type: 'circle',
-            source: 'results',
-            paint: {
-              'circle-color': '#1f6feb',
-              'circle-opacity': 0.95,
-              'circle-radius': 7,
-              'circle-stroke-color': '#ffffff',
-              'circle-stroke-width': 2,
             },
           },
         ],
@@ -359,6 +316,59 @@
     map.on('zoom', updateHint);
     map.on('load', updateHint);
 
+    // ================= 業種フィルター =================
+    /** business_type にキーワードを含むかどうかの式（部分一致）。 */
+    const contains = (keyword) => ['in', keyword, ['get', 'business_type']];
+    // 業種の記載がある（空文字でない）かどうかの式。
+    const hasBusinessType = ['!=', ['get', 'business_type'], ''];
+
+    /**
+     * カテゴリからレイヤに渡すフィルター式を組み立てる（純粋関数）。
+     * `all` は絞り込みなし（null）、`unknown` は業種の記載が無いもの、
+     * `other` は記載があってどのキーワードにも当たらないもの。
+     */
+    function categoryFilter(category) {
+      if (category.keywords === null) return null;
+      if (category.id === 'unknown') return ['!', hasBusinessType];
+      if (category.id === 'other') {
+        // 他カテゴリのキーワードをすべて否定する＝分類から漏れた業種だけが残る。
+        // 記載なしは unknown が受け持つので、ここでは除く。
+        const allKeywords = CATEGORIES.flatMap((c) => c.keywords || []);
+        return ['all', hasBusinessType, ...allKeywords.map((kw) => ['!', contains(kw)])];
+      }
+      return ['any', ...category.keywords.map(contains)];
+    }
+
+    /** カテゴリの絞り込み条件を日本語1行で説明する（純粋関数）。 */
+    function categoryNote(category) {
+      if (category.id === 'unknown') return '元データに業種の記載がない施設を表示中';
+      if (category.id === 'other') return '記載はあるが、ほかのカテゴリに当てはまらない業種を表示中';
+      if (category.keywords && category.keywords.length) {
+        return `業種名に「${category.keywords.join('」「')}」を含む施設を表示中`;
+      }
+      return '';
+    }
+
+    /** 選択されたカテゴリを地図に反映し、説明文を更新する。 */
+    function applyCategory(id) {
+      const category = CATEGORIES.find((c) => c.id === id) || CATEGORIES[0];
+      map.setFilter('facilities-circle', categoryFilter(category));
+      // どんな条件で絞っているかは分かりにくいので、条件をそのまま見せる。
+      $('filter-note').textContent = categoryNote(category);
+    }
+
+    // 選択肢を CATEGORIES から作り、変更を地図に反映する。
+    const select = $('category');
+    for (const category of CATEGORIES) {
+      const option = document.createElement('option');
+      option.value = category.id;
+      option.textContent = category.label;
+      select.appendChild(option);
+    }
+    select.addEventListener('change', () => applyCategory(select.value));
+    // スタイル読み込み後でないと setFilter できないため、load を待って初期値を反映する。
+    map.on('load', () => applyCategory(select.value));
+
     // ================= ポップアップ =================
     // ポップアップは「そのデータが実際に持っている属性」だけを出す。
     // 見出し（施設名）以外は属性を1件ずつ行にし、値が空のものは行ごと省く。
@@ -371,18 +381,6 @@
       business_type: '業種',
       pref: '都道府県',
       city: '市区町村',
-    };
-    // 検索 API のレスポンス results[] が持つ属性のラベル。
-    const SEARCH_PROP_LABELS = {
-      name: '名称',
-      name_kana: '名称カナ',
-      business_type: '業種',
-      prefecture: '都道府県',
-      city: '市区町村',
-      address: '住所',
-      lat: '緯度',
-      lng: '経度',
-      level: 'ジオコーディング精度',
     };
 
     /**
@@ -416,116 +414,8 @@
     map.on('click', 'facilities-circle', (e) => {
       showPopup(e.lngLat, e.features[0].properties || {}, TILE_PROP_LABELS);
     });
-    // 検索結果の点をクリック（属性は検索 API のレスポンスをそのまま入れてある）。
-    map.on('click', 'results-circle', (e) => {
-      showPopup(e.lngLat, e.features[0].properties || {}, SEARCH_PROP_LABELS);
-    });
-    for (const layer of ['facilities-circle', 'results-circle']) {
-      map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
-      map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
-    }
-
-    // ================= 検索 =================
-    /** ステータス行を更新する。kind は '' | 'err'。 */
-    function setStatus(msg, kind = '') {
-      const el = $('status');
-      el.textContent = msg;
-      el.className = kind;
-    }
-
-    /** 検索 API をキーワードで呼び、結果リストと地図を更新する。 */
-    async function run() {
-      const q = $('keyword').value.trim();
-      if (!API_URL || !q) return;
-      $('search').disabled = true;
-      try {
-        setStatus('検索中…');
-        const params = new URLSearchParams();
-        params.set('q', q);
-        params.set('limit', String(SEARCH_LIMIT));
-        const res = await fetch(`${API_URL}?${params.toString()}`);
-        const body = await res.json();
-        // 400 はクエリ起因のエラー。API が返す error メッセージをそのまま見せる。
-        if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
-
-        lastRows = body.results || [];
-        renderResults();
-        renderMap();
-        setStatus(lastRows.length
-          ? `${(body.count ?? lastRows.length).toLocaleString('ja-JP')}件`
-          : '該当する施設が見つかりませんでした。');
-      } catch (err) {
-        setStatus(`エラー: ${err.message}`, 'err');
-      } finally {
-        $('search').disabled = false;
-      }
-    }
-
-    /** 結果リストを描画する（行クリックで地図がその施設へ移動する）。 */
-    function renderResults() {
-      const ul = $('results');
-      ul.innerHTML = '';
-      for (const row of lastRows) {
-        const li = document.createElement('li');
-        li.tabIndex = 0; // キーボードでも選べるようにする
-        const name = document.createElement('span');
-        name.className = 'r-name';
-        name.textContent = row.name || '（名称なし）';
-        const meta = document.createElement('span');
-        meta.className = 'r-meta';
-        // 業種と住所（住所が無ければ都道府県＋市区町村）を1行で添える。
-        meta.textContent = [
-          row.business_type,
-          row.address || [row.prefecture, row.city].filter(Boolean).join(''),
-        ].filter(Boolean).join(' · ');
-        li.append(name, meta);
-        // 座標があれば、クリック（Enter でも）で地図をその施設へ寄せてポップアップを出す。
-        const focus = () => {
-          if (!Number.isFinite(row.lat) || !Number.isFinite(row.lng)) return;
-          map.flyTo({ center: [row.lng, row.lat], zoom: Math.max(map.getZoom(), 14) });
-          showPopup([row.lng, row.lat], row, SEARCH_PROP_LABELS);
-        };
-        li.addEventListener('click', focus);
-        li.addEventListener('keydown', (e) => { if (e.key === 'Enter') focus(); });
-        ul.appendChild(li);
-      }
-      // 結果があるときだけリストの高さを確保する（無いときは 0 にして詰める）。
-      ul.style.maxHeight = lastRows.length ? '36vh' : '0';
-    }
-
-    /**
-     * 全件タイルの点の濃さを切り替える。検索結果があるときは背景として薄くし、
-     * 青い結果の点が埋もれないようにする（塗りと白フチの両方を薄くする必要がある）。
-     */
-    function dimAllFacilities(dimmed) {
-      map.setPaintProperty('facilities-circle', 'circle-opacity', dimmed ? 0.12 : 0.75);
-      map.setPaintProperty('facilities-circle', 'circle-stroke-opacity', dimmed ? 0.12 : 1);
-    }
-
-    /** 座標を持つ結果を地図に重ね、その範囲へズームする。 */
-    function renderMap() {
-      const features = [];
-      let bbox = null; // [west, south, east, north]
-      for (const row of lastRows) {
-        if (!Number.isFinite(row.lat) || !Number.isFinite(row.lng)) continue;
-        features.push({
-          type: 'Feature',
-          geometry: { type: 'Point', coordinates: [row.lng, row.lat] },
-          // API が返した属性をそのまま持たせる（ポップアップは実データの属性だけを出す）。
-          properties: { ...row },
-        });
-        if (!bbox) bbox = [row.lng, row.lat, row.lng, row.lat];
-        else {
-          bbox[0] = Math.min(bbox[0], row.lng);
-          bbox[1] = Math.min(bbox[1], row.lat);
-          bbox[2] = Math.max(bbox[2], row.lng);
-          bbox[3] = Math.max(bbox[3], row.lat);
-        }
-      }
-      map.getSource('results').setData({ type: 'FeatureCollection', features });
-      dimAllFacilities(features.length > 0);
-      if (bbox) map.fitBounds(bbox, { padding: 60, maxZoom: 15, duration: 600 });
-    }
+    map.on('mouseenter', 'facilities-circle', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'facilities-circle', () => { map.getCanvas().style.cursor = ''; });
 
     // ================= 統計（タイルの metadata.json から） =================
     // データ配信は CSV とベクトルタイルの2形式のみで、統計用の JSON は別途置かない。
@@ -546,22 +436,7 @@
           $('updated').textContent = `· 最終更新 ${ymd}`;
         }
       })
-      .catch(() => { /* 統計が取れなくても地図・検索は動く */ });
-
-    // ================= イベント・初期化 =================
-    $('search').addEventListener('click', run);
-    // キーワード欄で Enter でも検索できるようにする。
-    $('keyword').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') run();
-    });
-
-    if (API_URL) {
-      $('search').disabled = false;
-    } else {
-      // 検索 API 未設定のあいだは検索窓を無効にし、地図の閲覧だけを提供する。
-      $('keyword').disabled = true;
-      $('keyword').placeholder = '検索は準備中です';
-    }
+      .catch(() => { /* 統計が取れなくても地図は動く */ });
   </script>
 </body>
 </html>
