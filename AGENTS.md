@@ -99,3 +99,8 @@ attribution.html        # 出典表示ページ（sources.yaml から自動生�
 - 過去の事故: クローラーが自リポジトリに持っていた古い `config/sources.yaml` の
   スナップショットから `attribution.html` を生成して main に push し、旧リポジトリ名と
   ライセンス未確定で除外したソースが公開ページに巻き戻った
+- 過去の事故: 2026-08-01、Fargate クローラーが push した STATS ブロックを、同日に走った
+  旧 `crawl.yml`（GitHub Actions 上のクロール）が自分の結果で上書きし、README の件数が
+  実際に配信しているデータより約14万件少ない状態になった。STATS を push してよいのは
+  配信データを作った主体だけ。`crawl.yml` は廃止済みで、復活しないことを
+  `scripts/workflows.test.js` で固定している
