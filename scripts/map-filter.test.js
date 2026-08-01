@@ -1,11 +1,12 @@
 // 地図ページ(map.html)の業種フィルターの整合性テスト。
 //   node scripts/map-filter.test.js
 //
-// map.html はベクトルタイルの business_type にキーワード部分一致をかけて業種を
-// 絞り込む。元データの業種表記は自治体ごとにゆれが大きく統一コードも無いため、
-// 「どのキーワードで束ねるか」がこのページの仕様そのものになる。
-// ここではカテゴリ定義の形と、実データに現れる代表的な業種表記がどれかのカテゴリに
-// 必ず入ることを固定する。表記が増えて取りこぼしたらこのテストで気づけるようにする。
+// 業種の分類は食品衛生法の定義（営業許可32業種＋営業届出の業種）に合わせている。
+// ここでは次を固定する:
+//   1. 許可32業種が漏れなく選択肢にあること（法令の定義そのもの）
+//   2. 実データに現れる業種表記が、期待どおりの業種に割り当たること
+//      （元データは自治体ごとに表記がゆれるため、部分一致キーワードで判定している）
+//   3. 業種の記載なしを「その他」と混ぜないこと
 //
 // 検索機能は廃止した（検索 API は未公開）。復活していないこともここで固定する。
 // 旧 playground.html は map.html へのリダイレクトだけを残してある。
@@ -28,104 +29,168 @@ function test(name, fn) {
 }
 
 /**
- * map.html の CATEGORIES 定義を読み出す（{ id, label, keywords } の配列）。
+ * map.html の CATEGORY_GROUPS 定義を読み出す（区分 → 業種 の入れ子配列）。
  * ページ内のリテラルをそのまま評価して、定義とテストがズレないようにする。
  */
-function readCategories() {
-  const m = HTML.match(/const CATEGORIES = (\[[\s\S]*?\n {4}\]);/);
-  assert.ok(m, 'map.html に CATEGORIES が定義されている');
+function readGroups() {
+  const m = HTML.match(/const CATEGORY_GROUPS = (\[[\s\S]*?\n {4}\]);/);
+  assert.ok(m, 'map.html に CATEGORY_GROUPS が定義されている');
   // 定義はプレーンなオブジェクトリテラル（関数・参照を含まない）なので評価してよい。
   return new Function(`return ${m[1]}`)();
 }
 
-const CATEGORIES = readCategories();
+const GROUPS = readGroups();
+const TYPES = GROUPS.flatMap((g) => g.types.map((t) => ({ ...t, group: g.id })));
 
-// 配信中の全件CSV に実際に現れる業種表記の代表例（サンプル集計から抜粋）。
-// 「どのカテゴリにも入らない」表記が増えたら、その他カテゴリ扱いになる前に気づきたい。
-const REAL_BUSINESS_TYPES = [
+// --- 食品衛生法施行令 第35条の営業許可 32業種（2021年6月1日施行） ---
+// 出典: 福島市「営業許可業種・営業届出業種」
+// https://www.city.fukushima.fukushima.jp/soshiki/9/1046/2/1/3014.html
+// 「複合型そうざい製造業」「複合型冷凍食品製造業」は、そうざい製造業・冷凍食品製造業の
+// キーワードで一緒に拾えるため、選択肢としては分けていない。
+const LICENSED_TYPES = [
   '飲食店営業',
-  '① 飲食店営業',
-  '飲食店営業(1)一般食堂・レストラン等',
-  '飲食店営業（5）簡易な営業',
-  '喫茶店営業',
-  '⑯ コーヒー製造・加工業（飲料の製造を除く。）',
-  '菓子製造業',
-  '⑪ 菓子製造業',
-  'アイスクリーム類製造業',
+  '調理の機能を有する自動販売機',
   '食肉販売業',
-  '② 食肉販売業（包装済みの食肉のみの販売）',
   '魚介類販売業',
-  '水産製品製造業',
-  'そうざい製造業',
-  '飲食店営業(2)仕出し屋・弁当屋',
-  '⑥ 弁当販売業',
-  '㉖ 集団給食施設',
-  '⑩ コンビニエンスストア',
-  '⑪ 百貨店、総合スーパー',
-  '⑬ その他の食料・飲料販売業',
-  '清涼飲料水製造業',
+  '魚介類競り売り営業',
+  '集乳業',
+  '乳処理業',
+  '特別牛乳搾取処理業',
   '食肉処理業',
-];
-
-// 逆に、意図して「その他の業種」に落とす表記（サンプル集計では全体の 0.7% ほど）。
-// 名前付きカテゴリに吸われ始めたら分類が雑になった合図なので、こちらも固定する。
-const OTHER_BUSINESS_TYPES = [
-  '食品の冷凍又は冷蔵業',
+  '食品の放射線照射業',
+  '菓子製造業',
+  'アイスクリーム類製造業',
+  '乳製品製造業',
+  '清涼飲料水製造業',
+  '食肉製品製造業',
+  '水産製品製造業',
+  '氷雪製造業',
+  '液卵製造業',
+  '食用油脂製造業',
+  'みそ又はしょうゆ製造業',
+  '酒類製造業',
+  '豆腐製造業',
+  '納豆製造業',
+  '麺類製造業',
+  'そうざい製造業',
+  '冷凍食品製造業',
+  '漬物製造業',
+  '密封包装食品製造業',
   '食品の小分け業',
-  '㉑ 製茶業',
-  '⑳ 精穀・製粉業',
-  '㉕ 行商',
-  '㉓ 卵選別包装業',
+  '添加物製造業',
+];
+// 許可業種を置く区分（法令の並び順どおり）。
+const LICENSED_GROUPS = ['cooking', 'sale', 'processing', 'manufacture'];
+
+// 配信中の全件CSV に実際に現れる業種表記 → 割り当たってほしい業種ラベル。
+// （約15万行のサンプル集計から、件数の多いものと表記のゆれが大きいものを抜粋）
+const REAL_TO_TYPE = [
+  ['飲食店営業', '飲食店営業'],
+  ['① 飲食店営業', '飲食店営業'],
+  ['飲食店営業(1)一般食堂・レストラン等', '飲食店営業'],
+  ['飲食店（バー）', '飲食店営業'],
+  ['飲食店（屋台型臨時営業）', '飲食店営業'],
+  ['② 調理機能を有する自動販売機（要許可）', '調理の機能を有する自動販売機'],
+  ['③ 食肉販売業', '食肉販売業'],
+  ['② 食肉販売業（包装済みの食肉のみの販売）', '食肉販売業'],
+  ['魚介類販売業', '魚介類販売業'],
+  ['魚介類せり売り営業', '魚介類競り売り営業'],
+  ['食肉処理業', '食肉処理業'],
+  ['⑪ 菓子製造業', '菓子製造業'],
+  ['アイスクリーム類製造業', 'アイスクリーム類製造業'],
+  ['⑯ 水産製品製造業', '水産製品製造業'],
+  ['清涼飲料水製造業', '清涼飲料水製造業'],
+  ['みそ製造業', 'みそ又はしょうゆ製造業'],
+  ['めん類製造業', '麺類製造業'],
+  ['㉕ そうざい製造業', 'そうざい製造業'],
+  ['㉙ 漬物製造業', '漬物製造業'],
+  ['㉚ 密封包装食品製造業', '密封包装食品製造業'],
+  ['㉛ 食品の小分け業', '食品の小分け業'],
+  ['③ 乳類販売業', '乳類販売業'],
+  ['⑤ コップ式自動販売機（自動洗浄・屋内設置）', 'コップ式自動販売機'],
+  ['⑥ 弁当販売業', '弁当販売業'],
+  ['飲食店営業(2)仕出し屋・弁当屋', '飲食店営業'],
+  ['⑦ 野菜果物販売業', '野菜果物販売業'],
+  ['⑧ 米穀類販売業', '米穀類販売業'],
+  ['⑩ コンビニエンスストア', 'コンビニエンスストア'],
+  ['⑪ 百貨店、総合スーパー', '百貨店、総合スーパー'],
+  ['⑬ その他の食料・飲料販売業', 'その他の食料・飲料販売業'],
+  ['㉖ 集団給食施設', '集団給食施設'],
+  ['㉕ 行商', '行商'],
+  ['⑯ コーヒー製造・加工業（飲料の製造を除く。）', 'コーヒー製造・加工業'],
+  ['⑰ 農産保存食料品製造・加工業', '農産保存食料品製造・加工業'],
+  ['⑱ 調味料製造・加工業', '調味料製造・加工業'],
+  ['⑳ 精穀・製粉業', '精穀・製粉業'],
+  ['㉑ 製茶業', '製茶業'],
+  ['㉓ 卵選別包装業', '卵選別包装業'],
+  ['㉔ その他の食料品製造・加工業', 'その他の食料品製造・加工業'],
+  ['食品の冷凍又は冷蔵業', '食品の冷凍又は冷蔵業'],
+  ['喫茶店営業', '喫茶店営業'],
+  ['ソース類製造業', 'ソース類製造業'],
+  ['缶詰又は瓶詰食品製造業', '缶詰又は瓶詰食品製造業'],
+  ['魚肉ねり製品製造業', '魚肉ねり製品製造業'],
 ];
 
-/** business_type がカテゴリのキーワードに部分一致するか（map.html の contains と同じ判定）。 */
-function matches(category, businessType) {
-  return (category.keywords || []).some((kw) => businessType.includes(kw));
+// 法令の区分に当てはめず「その他」に落とす表記（サンプルでは全体の 0.3% 未満）。
+const OTHER_BUSINESS_TYPES = [
+  '㉙ その他',
+  '許可届出不要その他の営業(ボランティア食等)',
+  '魚介類加工業',
+];
+
+/** business_type に対して最初に一致した業種を返す（map.html の判定順と同じ）。 */
+function classify(businessType) {
+  for (const type of TYPES) {
+    if (type.keywords.some((kw) => businessType.includes(kw))) return type.label;
+  }
+  return null;
 }
 
-test('カテゴリ定義が { id, label, keywords } の形で並んでいる', () => {
-  assert.ok(CATEGORIES.length >= 5, `カテゴリが十分ある (${CATEGORIES.length}件)`);
-  for (const c of CATEGORIES) {
-    assert.ok(typeof c.id === 'string' && c.id, 'id がある');
-    assert.ok(typeof c.label === 'string' && c.label, `${c.id} に label がある`);
-    assert.ok(c.keywords === null || Array.isArray(c.keywords), `${c.id} の keywords が配列か null`);
+test('営業許可32業種が漏れなく選択肢にある', () => {
+  const labels = TYPES.filter((t) => LICENSED_GROUPS.includes(t.group)).map((t) => t.label);
+  for (const name of LICENSED_TYPES) {
+    assert.ok(labels.includes(name), `許可業種「${name}」が選択肢にある`);
   }
-  const ids = CATEGORIES.map((c) => c.id);
-  assert.equal(new Set(ids).size, ids.length, 'id が重複していない');
-  // 絞り込み無し（all）、分類から漏れた業種（other）、業種の記載なし（unknown）は必ず用意する。
-  assert.ok(CATEGORIES.some((c) => c.id === 'all' && c.keywords === null), '絞り込み無しの all がある');
-  assert.ok(CATEGORIES.some((c) => c.id === 'other'), '取りこぼし用の other がある');
-  assert.ok(CATEGORIES.some((c) => c.id === 'unknown'), '業種の記載なし用の unknown がある');
+});
+
+test('区分・業種の定義が { id, label, keywords } の形で並んでいる', () => {
+  const ids = TYPES.map((t) => t.id);
+  assert.equal(new Set(ids).size, ids.length, '業種 id が重複していない');
+  const groupIds = GROUPS.map((g) => g.id);
+  assert.equal(new Set(groupIds).size, groupIds.length, '区分 id が重複していない');
+  for (const t of TYPES) {
+    assert.ok(t.label, `${t.id} に label がある`);
+    assert.ok(Array.isArray(t.keywords) && t.keywords.length, `${t.id} に keywords がある`);
+  }
+  // 届出業種・旧法業種の区分も用意する（許可業種だけでは実データを分類しきれない）。
+  for (const id of [...LICENSED_GROUPS, 'notified', 'legacy']) {
+    assert.ok(groupIds.includes(id), `区分 ${id} がある`);
+  }
+});
+
+test('実データの業種表記が期待どおりの業種に割り当たる', () => {
+  for (const [businessType, expected] of REAL_TO_TYPE) {
+    assert.equal(classify(businessType), expected, `「${businessType}」→「${expected}」`);
+  }
+});
+
+test('区分に当てはまらない表記は「その他」に落ちる', () => {
+  for (const businessType of OTHER_BUSINESS_TYPES) {
+    assert.equal(classify(businessType), null, `「${businessType}」がその他に落ちる`);
+  }
 });
 
 test('業種の記載なしを「その他」と混ぜない', () => {
-  // 自治体によっては業種欄が無く（都心部では多数派）、空文字を「その他の業種」に
-  // 混ぜると分類が実態とズレる。空文字は unknown だけが拾う構造を固定する。
+  // 自治体によっては業種欄が無く（都心部では多数派）、空文字を「その他」に混ぜると
+  // 分類が実態とズレる。空文字は unknown だけが拾う構造を固定する。
   assert.ok(
     /const hasBusinessType = \['!=', \['get', 'business_type'\], ''\]/.test(HTML),
     '業種の記載有無を判定する式がある',
   );
-  assert.ok(/if \(category\.id === 'unknown'\) return \['!', hasBusinessType\]/.test(HTML),
+  assert.ok(/if \(value === 'unknown'\) return \['!', hasBusinessType\]/.test(HTML),
     'unknown は記載なしだけを拾う');
-  assert.ok(/return \['all', hasBusinessType, \.\.\.allKeywords/.test(HTML),
+  assert.ok(/return \['all', hasBusinessType, \.\.\.ALL_KEYWORDS/.test(HTML),
     'other は記載ありに限定する');
-});
-
-test('実データの代表的な業種表記がどれかのカテゴリに入る', () => {
-  // all / other は判定対象外（other は「どれにも入らないもの」の受け皿）。
-  const named = CATEGORIES.filter((c) => c.id !== 'all' && c.id !== 'other');
-  for (const businessType of REAL_BUSINESS_TYPES) {
-    const hit = named.filter((c) => matches(c, businessType)).map((c) => c.id);
-    assert.ok(hit.length > 0, `「${businessType}」がどれかのカテゴリに入る`);
-  }
-});
-
-test('分類しないと決めた業種表記が「その他」に落ちる', () => {
-  const named = CATEGORIES.filter((c) => c.id !== 'all' && c.id !== 'other');
-  for (const businessType of OTHER_BUSINESS_TYPES) {
-    const hit = named.filter((c) => matches(c, businessType)).map((c) => c.id);
-    assert.equal(hit.length, 0, `「${businessType}」がその他に落ちる (今は ${hit.join(',') || 'なし'})`);
-  }
 });
 
 test('フィルターがタイルの business_type 属性を見ている', () => {
@@ -134,9 +199,10 @@ test('フィルターがタイルの business_type 属性を見ている', () =>
   assert.ok(/setFilter\('facilities-circle'/.test(HTML), 'facilities-circle レイヤに setFilter する');
 });
 
-test('選択肢はカテゴリ定義から組み立てる（定義の二重管理をしない）', () => {
+test('選択肢は定義から組み立てる（定義の二重管理をしない）', () => {
   // <option> をベタ書きすると定義とラベルがズレるため、DOM 生成であることを固定する。
-  assert.ok(/for \(const category of CATEGORIES\)/.test(HTML), 'CATEGORIES から option を生成する');
+  assert.ok(/for \(const group of CATEGORY_GROUPS\)/.test(HTML), 'CATEGORY_GROUPS から選択肢を生成する');
+  assert.ok(/createElement\('optgroup'\)/.test(HTML), '法令の区分ごとに optgroup で束ねる');
   assert.ok(!/<option /.test(HTML), 'HTML に <option> をベタ書きしていない');
 });
 
