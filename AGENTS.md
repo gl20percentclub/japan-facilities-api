@@ -21,7 +21,11 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
 - キーワード・近傍検索は [geosearch](https://github.com/naogify/geosearch) の検索 API を
   使った `playground.html`（検索プレイグラウンド）で試せる。API のエンドポイントは
   `playground.html` の `DEFAULT_API_URL`（または `?api=` パラメータ）で設定する
-- データは CC BY 4.0。出典表示: 「© Japan Food Facilities Data（各自治体オープンデータ）」
+- 商用・非商用を問わず利用可だが出典表示が必要。ライセンスは元データの提供元ごとに異なる
+  （単一ライセンスではないので「CC BY 4.0」と一括で書かない）。出典表示:
+  「出典：Japan Food Facilities（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）」
+  ＋ 出典・ライセンス一覧 `https://gl20percentclub.github.io/japan-food-facilities/attribution.html`
+  地図（ベクトルタイル）では source の `attribution` に指定する
 
 ## 開発コマンド
 

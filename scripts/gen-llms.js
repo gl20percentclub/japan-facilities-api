@@ -92,7 +92,7 @@ export function renderLlmsTxt(readme) {
 
 > 日本全国の食品営業許可・届出施設（飲食店・喫茶店・食品製造業など）を収集し、
 > 全国共通フォーマットの全件CSVとベクトルタイルで無料配信するオープンデータ。
-> 登録不要・APIキー不要・商用利用可（データは CC BY 4.0）。毎週自動更新。
+> 登録不要・APIキー不要・商用利用可（出典表示が必要。ライセンスは元データの提供元ごとに異なる）。毎週自動更新。
 
 重要な事実:
 
@@ -167,6 +167,10 @@ map.addSource('facilities', {
   tiles: ['${DATA}/api/tiles/{z}/{x}/{y}.pbf'],
   minzoom: 6,
   maxzoom: 12,
+  // 出典表示は必須。source の attribution に入れると地図の出典表示に自動で出る
+  attribution:
+    '出典：<a href="${PAGES}/" target="_blank" rel="noopener">Japan Food Facilities</a>'
+    + '（<a href="${PAGES}/attribution.html" target="_blank" rel="noopener">各自治体・厚生労働省のオープンデータを加工して作成</a>）',
 });
 map.addLayer({
   id: 'facilities-points',
@@ -188,8 +192,13 @@ map.addLayer({
 - 同一施設が業種違いで複数レコード存在する。ユニーク施設が必要なら name + lat/lng で重複排除する。
 - キーワード検索・位置検索（「近くのラーメン屋」等）を提供したい場合は、静的配信のみの
   ため検索 API は無い。CSV を SQLite や PostgreSQL 等に取り込んで自前の検索を実装する。
-- データ利用時は出典表示が必要（CC BY 4.0）:
-  「© Japan Food Facilities Data（各自治体オープンデータ）」
+- 商用・非商用を問わず利用できるが、利用・再配布時は出典表示が必要:
+  「出典：Japan Food Facilities（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）」
+  と、元データの出典・ライセンス一覧（${PAGES}/attribution.html）を併記する。
+  地図の場合は上記のとおり source の \`attribution\` に入れれば自動で表示される。
+- 複数の提供元のデータを含むため、各元データにはそれぞれの提供元が定めるライセンス・
+  利用条件が適用される（単一のライセンスではない）。特定自治体のデータだけを使う場合は、
+  その自治体の条件を ${PAGES}/attribution.html で確認する。
 `;
 }
 
