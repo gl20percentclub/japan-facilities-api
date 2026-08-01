@@ -360,42 +360,66 @@
     map.on('load', updateHint);
 
     // ================= ポップアップ =================
+    // ポップアップは「そのデータが実際に持っている属性」だけを出す。
+    // 見出し（施設名）以外は属性を1件ずつ行にし、値が空のものは行ごと省く。
+    // ラベルが未定義のキーが増えたときは、キー名をそのまま見出しに使って必ず表示する。
+
+    // ベクトルタイル(facilities レイヤ)が持つ属性のラベル。
+    // scripts/gen-tiles.js の buildFeatureCollection が作る properties と対応させる。
+    const TILE_PROP_LABELS = {
+      name: '名称',
+      business_type: '業種',
+      pref: '都道府県',
+      city: '市区町村',
+    };
+    // 検索 API のレスポンス results[] が持つ属性のラベル。
+    const SEARCH_PROP_LABELS = {
+      name: '名称',
+      name_kana: '名称カナ',
+      business_type: '業種',
+      prefecture: '都道府県',
+      city: '市区町村',
+      address: '住所',
+      lat: '緯度',
+      lng: '経度',
+      level: 'ジオコーディング精度',
+    };
+
     /**
-     * 施設のポップアップを表示する。`info` は { name, business_type, place, address } で、
-     * ベクトルタイルの feature と検索結果の行の両方から組み立てて渡す。
+     * 属性オブジェクトからポップアップの HTML を組み立てる（純粋な文字列生成）。
+     * `name` は見出しに使い、それ以外の値のある属性をラベル付きの行にする。
      */
-    function showPopup(lngLat, info) {
+    function popupHtml(props, labels) {
       const rows = [];
-      if (info.business_type) rows.push(`<p class="fac-row"><span class="k">業種</span>${esc(info.business_type)}</p>`);
-      if (info.place) rows.push(`<p class="fac-row"><span class="k">所在</span>${esc(info.place)}</p>`);
-      if (info.address) rows.push(`<p class="fac-row"><span class="k">住所</span>${esc(info.address)}</p>`);
-      new maplibregl.Popup({ offset: 8, maxWidth: '280px' })
+      for (const [key, value] of Object.entries(props)) {
+        // 見出しに使う name と、空文字・null・undefined の属性は行にしない。
+        if (key === 'name') continue;
+        if (value === null || value === undefined || value === '') continue;
+        rows.push(`<p class="fac-row"><span class="k">${esc(labels[key] || key)}</span>${esc(value)}</p>`);
+      }
+      const title = props.name ? esc(props.name) : '（名称なし）';
+      return `<p class="fac-name">${title}</p>${rows.join('')}`;
+    }
+
+    let currentPopup = null; // 表示中のポップアップ（属性が混ざらないよう常に1つに保つ）
+
+    /** 施設のポップアップを地図上に表示する。`props` はそのデータが持つ属性そのまま。 */
+    function showPopup(lngLat, props, labels) {
+      if (currentPopup) currentPopup.remove();
+      currentPopup = new maplibregl.Popup({ offset: 8, maxWidth: '280px' })
         .setLngLat(lngLat)
-        .setHTML(`<p class="fac-name">${esc(info.name) || '（名称なし）'}</p>${rows.join('')}`)
+        .setHTML(popupHtml(props, labels))
         .addTo(map);
     }
 
-    /** 検索結果の1行からポップアップ用の情報を組み立てる。 */
-    function rowToInfo(row) {
-      return {
-        name: row.name,
-        business_type: row.business_type,
-        place: [row.prefecture, row.city].filter(Boolean).join(' '),
-        address: row.address,
-      };
-    }
-
-    // ベクトルタイルの点をクリック（属性は name / business_type / pref / city）。
+    // ベクトルタイルの点をクリック（属性はタイルが持つものをそのまま出す）。
     map.on('click', 'facilities-circle', (e) => {
-      const p = e.features[0].properties || {};
-      showPopup(e.lngLat, {
-        name: p.name,
-        business_type: p.business_type,
-        place: [p.pref, p.city].filter(Boolean).join(' '),
-      });
+      showPopup(e.lngLat, e.features[0].properties || {}, TILE_PROP_LABELS);
     });
     // 検索結果の点をクリック（属性は検索 API のレスポンスをそのまま入れてある）。
-    map.on('click', 'results-circle', (e) => showPopup(e.lngLat, rowToInfo(e.features[0].properties || {})));
+    map.on('click', 'results-circle', (e) => {
+      showPopup(e.lngLat, e.features[0].properties || {}, SEARCH_PROP_LABELS);
+    });
     for (const layer of ['facilities-circle', 'results-circle']) {
       map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
       map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
@@ -459,7 +483,7 @@
         const focus = () => {
           if (!Number.isFinite(row.lat) || !Number.isFinite(row.lng)) return;
           map.flyTo({ center: [row.lng, row.lat], zoom: Math.max(map.getZoom(), 14) });
-          showPopup([row.lng, row.lat], rowToInfo(row));
+          showPopup([row.lng, row.lat], row, SEARCH_PROP_LABELS);
         };
         li.addEventListener('click', focus);
         li.addEventListener('keydown', (e) => { if (e.key === 'Enter') focus(); });
@@ -487,13 +511,8 @@
         features.push({
           type: 'Feature',
           geometry: { type: 'Point', coordinates: [row.lng, row.lat] },
-          properties: {
-            name: row.name,
-            business_type: row.business_type,
-            prefecture: row.prefecture,
-            city: row.city,
-            address: row.address,
-          },
+          // API が返した属性をそのまま持たせる（ポップアップは実データの属性だけを出す）。
+          properties: { ...row },
         });
         if (!bbox) bbox = [row.lng, row.lat, row.lng, row.lat];
         else {
