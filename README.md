@@ -12,7 +12,7 @@
 [公式サイト](https://gl20percentclub.github.io/japan-food-facilities/) ·
 [地図で見る](https://gl20percentclub.github.io/japan-food-facilities/map.html) ·
 [検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html) ·
-[CSVをダウンロード](https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv) ·
+[CSVをダウンロード](https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv) ·
 [収録状況](docs/COVERAGE.md) ·
 [出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)
 
@@ -35,12 +35,12 @@
 >
 > | 項目 | 値 |
 > |---|---|
-> | 施設レコード数 | 1,488,756 件 |
-> | 座標を持つ施設 | 1,359,322 件 |
+> | 施設レコード数 | 1,345,338 件 |
+> | 座標を持つ施設 | 1,244,023 件 |
 > | 都道府県 | 48 |
-> | 市区町村 | 1,796 |
-> | 結合CSV | 約 430.3 MB |
-> | ベクトルタイル | 8,866 枚 / 約 469.1 MB |
+> | 市区町村 | 1,789 |
+> | 結合CSV | 約 397.1 MB |
+> | ベクトルタイル | 8,763 枚 / 約 431.7 MB |
 <!-- STATS:END -->
 
 1レコードは、原則として1件の営業許可・届出を表します。同じ施設が複数の業種で許可を持つ場合は、複数レコードとして収録されます。
@@ -53,20 +53,20 @@
 
 | ファイル | URL |
 |---|---|
-| 全件CSV | https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv |
+| 全件CSV | https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv |
 
 - 文字コード: UTF-8（BOMなし）
 - 全列が一致する重複レコードは除去済み
 
 ```bash
-curl -O https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv
+curl -O https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv"
+    "https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv"
 )
 ```
 
@@ -80,7 +80,7 @@ df = pd.read_csv(
 map.addSource("facilities", {
   type: "vector",
   tiles: [
-    "https://gl20percentclub.github.io/japan-food-facilities/api/tiles/{z}/{x}/{y}.pbf",
+    "https://d1nptpfogf2ynv.cloudfront.net/api/tiles/{z}/{x}/{y}.pbf",
   ],
   minzoom: 6,
   maxzoom: 12,
@@ -89,7 +89,7 @@ map.addSource("facilities", {
 
 - レイヤー名: `facilities`
 - 主な属性: `name` / `business_type` / `pref` / `city`
-- 詳細: [`api/tiles/metadata.json`](https://gl20percentclub.github.io/japan-food-facilities/api/tiles/metadata.json)
+- 詳細: [`api/tiles/metadata.json`](https://d1nptpfogf2ynv.cloudfront.net/api/tiles/metadata.json)
 
 収録データは[プレビュー地図](https://gl20percentclub.github.io/japan-food-facilities/map.html)でも確認できます。
 

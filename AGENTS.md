@@ -2,17 +2,19 @@
 
 AI コーディングエージェント（Claude Code / Codex 等）向けのガイド。
 このリポジトリは、全国の食品営業許可・届出データを収集・正規化し、
-**全件CSV** と **ベクトルタイル** の2形式で GitHub Pages から無料配信するオープンデータプロジェクト。
+**全件CSV** と **ベクトルタイル** の2形式で無料配信するオープンデータプロジェクト。
+静的ページは GitHub Pages、データ（`api/`）は S3 + CloudFront から配信する。
 
 ## このデータでアプリを作る場合
 
 **まず https://gl20percentclub.github.io/japan-food-facilities/llms-full.txt を読むこと。**
 データ仕様・コピペで動く利用例・注意事項がすべてまとまっている。要点だけ挙げる:
 
-- 全件CSV（gzip）: `https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv.gz`
-  - UTF-8 **BOM付き**、約150万レコード、非圧縮で約540MB
+- 全件CSV: `https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv`
+  - UTF-8 **BOMなし**、100万件超・数百MB（gzip 版は配信していない）。
+    正確な件数・サイズは README の統計ブロック（自動生成）を参照する
   - 列: `prefecture, city, city_raw, name, name_kana, business_type, address, lat, lng, geocoding_level, phone, license_no, license_date, expire_date, sources, licenses`
-- ベクトルタイル（MVT）: `https://gl20percentclub.github.io/japan-food-facilities/api/tiles/{z}/{x}/{y}.pbf`
+- ベクトルタイル（MVT）: `https://d1nptpfogf2ynv.cloudfront.net/api/tiles/{z}/{x}/{y}.pbf`
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`
 - 市区町村別 JSON や検索 API は**このリポジトリからは配信していない**。データ抽出は
   CSV（DuckDB 推奨）、地図表示はタイルを使う。ブラウザから非圧縮 CSV を直接 fetch しない
@@ -61,8 +63,13 @@ attribution.html        # 出典表示ページ（sources.yaml から自動生�
 
 ## 配信の仕組み
 
-- データ（`api/`）は **gh-pages ブランチのみ**で配信。main には置かない（履歴肥大の防止）
-- `crawl.yml`: 毎週月曜 18:00 UTC にクロール → リポジトリ直下ごと gh-pages へ配信（`keep_files: false`）
-- `pages.yml`: 静的ページ（LP・地図・出典・llms.txt）の変更を main への push で反映（`keep_files: true` で `api/` を保護）
-- `publish_dir: .` のため `.gitignore` を配信対象から除外しないと gh-pages 上の `api/` が
-  全消えする事故が起きる（過去に発生済み。workflows.test.js が再発を防いでいる）
+- **データ（`api/`）は S3 + CloudFront で配信**する。ベース URL は
+  `https://d1nptpfogf2ynv.cloudfront.net`（CORS 全オリジン許可済み）。
+  クロールと S3 への配信は別リポジトリ
+  [japan-facilities-crawler](https://github.com/gl20percentclub/japan-facilities-crawler)
+  の Fargate タスクが毎週月曜 18:00 UTC に実行する。このリポジトリでは `api/` を生成も
+  管理もしない（結合CSV は 430MB あり、GitHub の 100MB 制限で Git 配信できないため）
+- `pages.yml`: 静的ページ（LP・地図・出典・llms.txt）の変更を main への push で
+  gh-pages へ反映する
+- `crawl.yml` は gh-pages へデータを配信していた旧構成の名残で、現在は使っていない
+  （停止・削除は別途対応）。設定は `scripts/workflows.test.js` で固定されている
