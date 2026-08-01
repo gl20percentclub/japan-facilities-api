@@ -213,26 +213,122 @@
     // 全国を収める fitBounds ではなく中心＋ズーム指定で開く。
     const INITIAL_CENTER = [138.2, 36.4];
 
-    // 業種（business_type）の大分類。元データの表記は自治体ごとにゆれが大きく
-    // （「飲食店営業」「① 飲食店営業」「飲食店営業(1)一般食堂・レストラン等」など）、
-    // 統一コードも無いため、部分一致するキーワードで束ねて絞り込む。
-    // keywords のいずれかを business_type に含めばそのカテゴリに入る（重複はあり得る）。
-    const CATEGORIES = [
-      { id: 'all', label: 'すべての業種', keywords: null },
-      { id: 'restaurant', label: '飲食店', keywords: ['飲食店'] },
-      { id: 'cafe', label: '喫茶店・コーヒー', keywords: ['喫茶', 'コーヒー'] },
-      { id: 'deli', label: 'そうざい・弁当・仕出し', keywords: ['そうざい', '惣菜', '弁当', '仕出'] },
-      { id: 'sweets', label: '菓子・アイスクリーム', keywords: ['菓子', 'アイスクリーム'] },
-      { id: 'meat_fish', label: '食肉・魚介', keywords: ['食肉', '魚介', '水産'] },
-      { id: 'canteen', label: '給食施設', keywords: ['給食'] },
-      { id: 'sale', label: '販売業（小売・自販機など）', keywords: ['販売', 'スーパー', 'コンビニ', '百貨店'] },
-      { id: 'manufacture', label: '製造・加工業', keywords: ['製造', '加工', '処理'] },
-      // 上のどのキーワードにも当たらない業種（表記ゆれの取りこぼしもここに入る）
-      { id: 'other', label: 'その他の業種', keywords: [] },
-      // 元データに業種の記載がない施設。自治体によっては業種欄が無く、
-      // 都心部ではこれが多数派になるため「その他」とは分けて扱う。
-      { id: 'unknown', label: '業種の記載なし', keywords: [] },
+    // 業種の分類は食品衛生法の定義に合わせる。
+    //   営業許可 32業種（食品衛生法施行令 第35条。2021年6月施行）を法令の区分
+    //   （調理業・販売業・処理業・製造業）ごとに並べ、あわせて営業届出の業種、
+    //   2021年の改正前にあった旧法の業種を別グループにしている。
+    //   参考: 福島市「営業許可業種・営業届出業種」
+    //   https://www.city.fukushima.fukushima.jp/soshiki/9/1046/2/1/3014.html
+    //
+    // 元データの business_type は自治体ごとに表記がゆれる（「飲食店営業」「① 飲食店営業」
+    // 「飲食店営業(1)一般食堂・レストラン等」「飲食店（バー）」など）ため、業種名そのままの
+    // 完全一致ではなく keywords の部分一致で判定する。
+    const CATEGORY_GROUPS = [
+      {
+        id: 'cooking',
+        label: '調理業（営業許可）',
+        types: [
+          { id: 'restaurant', label: '飲食店営業', keywords: ['飲食店'] },
+          { id: 'vending_cook', label: '調理の機能を有する自動販売機', keywords: ['調理の機能を有する自動販売機', '調理機能を有する自動販売機'] },
+        ],
+      },
+      {
+        id: 'sale',
+        label: '販売業（営業許可）',
+        types: [
+          { id: 'meat_sale', label: '食肉販売業', keywords: ['食肉販売'] },
+          { id: 'fish_sale', label: '魚介類販売業', keywords: ['魚介類販売'] },
+          { id: 'fish_auction', label: '魚介類競り売り営業', keywords: ['競り売り', 'せり売'] },
+        ],
+      },
+      {
+        id: 'processing',
+        label: '処理業（営業許可）',
+        types: [
+          { id: 'milk_collect', label: '集乳業', keywords: ['集乳'] },
+          { id: 'milk_process', label: '乳処理業', keywords: ['乳処理'] },
+          { id: 'special_milk', label: '特別牛乳搾取処理業', keywords: ['特別牛乳'] },
+          { id: 'meat_process', label: '食肉処理業', keywords: ['食肉処理'] },
+          { id: 'irradiation', label: '食品の放射線照射業', keywords: ['放射線照射'] },
+        ],
+      },
+      {
+        id: 'manufacture',
+        label: '製造業（営業許可）',
+        types: [
+          { id: 'sweets', label: '菓子製造業', keywords: ['菓子製造'] },
+          { id: 'ice_cream', label: 'アイスクリーム類製造業', keywords: ['アイスクリーム'] },
+          { id: 'dairy', label: '乳製品製造業', keywords: ['乳製品製造'] },
+          { id: 'soft_drink', label: '清涼飲料水製造業', keywords: ['清涼飲料水'] },
+          { id: 'meat_product', label: '食肉製品製造業', keywords: ['食肉製品製造'] },
+          { id: 'marine_product', label: '水産製品製造業', keywords: ['水産製品製造'] },
+          { id: 'ice', label: '氷雪製造業', keywords: ['氷雪製造'] },
+          { id: 'liquid_egg', label: '液卵製造業', keywords: ['液卵'] },
+          { id: 'edible_oil', label: '食用油脂製造業', keywords: ['食用油脂'] },
+          { id: 'miso_soy', label: 'みそ又はしょうゆ製造業', keywords: ['みそ', 'しょうゆ', '味噌', '醤油'] },
+          { id: 'liquor', label: '酒類製造業', keywords: ['酒類製造'] },
+          { id: 'tofu', label: '豆腐製造業', keywords: ['豆腐'] },
+          { id: 'natto', label: '納豆製造業', keywords: ['納豆'] },
+          { id: 'noodle', label: '麺類製造業', keywords: ['麺類製造', 'めん類製造'] },
+          { id: 'deli_make', label: 'そうざい製造業', keywords: ['そうざい製造', '惣菜製造'] },
+          { id: 'frozen_food', label: '冷凍食品製造業', keywords: ['冷凍食品製造'] },
+          { id: 'pickles', label: '漬物製造業', keywords: ['漬物製造', 'つけ物製造'] },
+          { id: 'sealed_food', label: '密封包装食品製造業', keywords: ['密封包装食品'] },
+          { id: 'repack', label: '食品の小分け業', keywords: ['小分け'] },
+          { id: 'additive', label: '添加物製造業', keywords: ['添加物'] },
+        ],
+      },
+      {
+        id: 'notified',
+        label: '営業届出の業種',
+        types: [
+          { id: 'milk_sale', label: '乳類販売業', keywords: ['乳類販売'] },
+          { id: 'ice_sale', label: '氷雪販売業', keywords: ['氷雪販売'] },
+          { id: 'vending_sale', label: '自動販売機による販売業', keywords: ['自動販売機による販売'] },
+          { id: 'vending_cup', label: 'コップ式自動販売機', keywords: ['コップ式自動販売機'] },
+          { id: 'bento_sale', label: '弁当販売業', keywords: ['弁当販売', '仕出'] },
+          { id: 'vegetable_sale', label: '野菜果物販売業', keywords: ['野菜果物'] },
+          { id: 'rice_sale', label: '米穀類販売業', keywords: ['米穀'] },
+          { id: 'mail_order', label: '通信販売・訪問販売による販売業', keywords: ['通信販売', '訪問販売'] },
+          { id: 'convenience', label: 'コンビニエンスストア', keywords: ['コンビニ'] },
+          { id: 'department', label: '百貨店、総合スーパー', keywords: ['百貨店', 'スーパー'] },
+          { id: 'other_sale', label: 'その他の食料・飲料販売業', keywords: ['その他の食料・飲料販売', '食品販売', '食料品等販売'] },
+          { id: 'canteen', label: '集団給食施設', keywords: ['給食'] },
+          { id: 'peddling', label: '行商', keywords: ['行商'] },
+          { id: 'stall', label: '露店・仮設店舗等', keywords: ['露店', '仮設店舗'] },
+          { id: 'preserved', label: '農産保存食料品製造・加工業', keywords: ['農産保存'] },
+          { id: 'coffee', label: 'コーヒー製造・加工業', keywords: ['コーヒー'] },
+          { id: 'seasoning', label: '調味料製造・加工業', keywords: ['調味料'] },
+          { id: 'sugar', label: '糖類製造・加工業', keywords: ['糖類'] },
+          { id: 'milling', label: '精穀・製粉業', keywords: ['精穀', '製粉'] },
+          { id: 'tea', label: '製茶業', keywords: ['製茶'] },
+          { id: 'seaweed', label: '海藻製造・加工業', keywords: ['海藻'] },
+          { id: 'egg_packing', label: '卵選別包装業', keywords: ['卵選別'] },
+          { id: 'health_food', label: 'いわゆる健康食品の製造・加工業', keywords: ['健康食品'] },
+          { id: 'container', label: '器具・容器包装の製造・加工業', keywords: ['器具', '容器包装'] },
+          { id: 'cold_storage', label: '食品の冷凍又は冷蔵業', keywords: ['冷凍又は冷蔵', '冷凍・冷蔵', '冷凍冷蔵'] },
+          // 「食品製造業」のような広い表記までは拾わない（「缶詰又は瓶詰食品製造業」など
+          // 個別の業種まで巻き込むため）。拾えなかった表記は「その他」に落ちる。
+          { id: 'other_manufacture', label: 'その他の食料品製造・加工業', keywords: ['その他の食料品製造'] },
+        ],
+      },
+      {
+        id: 'legacy',
+        label: '旧法の業種（2021年改正前）',
+        types: [
+          { id: 'cafe', label: '喫茶店営業', keywords: ['喫茶'] },
+          { id: 'sauce', label: 'ソース類製造業', keywords: ['ソース類'] },
+          { id: 'canned', label: '缶詰又は瓶詰食品製造業', keywords: ['缶詰', 'かん詰'] },
+          { id: 'fish_paste', label: '魚肉ねり製品製造業', keywords: ['魚肉ねり', '魚肉練り'] },
+          { id: 'lactic', label: '乳酸菌飲料製造業', keywords: ['乳酸菌'] },
+          { id: 'bean_paste', label: 'あん類製造業', keywords: ['あん類'] },
+          { id: 'margarine', label: 'マーガリン又はショートニング製造業', keywords: ['マーガリン', 'ショートニング'] },
+        ],
+      },
     ];
+
+    // すべての業種のキーワード（「その他の業種」の判定に使う）。
+    const ALL_KEYWORDS = CATEGORY_GROUPS.flatMap((g) => g.types.flatMap((t) => t.keywords));
 
     // ================= 状態 =================
     const $ = (id) => document.getElementById(id);
@@ -328,48 +424,82 @@
     const hasBusinessType = ['!=', ['get', 'business_type'], ''];
 
     /**
-     * カテゴリからレイヤに渡すフィルター式を組み立てる（純粋関数）。
-     * `all` は絞り込みなし（null）、`unknown` は業種の記載が無いもの、
-     * `other` は記載があってどのキーワードにも当たらないもの。
+     * 選択値（option の value）から、その選択が対象とする業種の keywords を集める。
+     * 値は 'all' | 'unknown' | 'other' | 'group:<区分id>' | 'type:<業種id>' のいずれか。
      */
-    function categoryFilter(category) {
-      if (category.keywords === null) return null;
-      if (category.id === 'unknown') return ['!', hasBusinessType];
-      if (category.id === 'other') {
-        // 他カテゴリのキーワードをすべて否定する＝分類から漏れた業種だけが残る。
+    function keywordsForSelection(value) {
+      if (value.startsWith('group:')) {
+        const group = CATEGORY_GROUPS.find((g) => g.id === value.slice(6));
+        return group ? group.types.flatMap((t) => t.keywords) : [];
+      }
+      if (value.startsWith('type:')) {
+        const type = CATEGORY_GROUPS.flatMap((g) => g.types).find((t) => t.id === value.slice(5));
+        return type ? type.keywords : [];
+      }
+      return [];
+    }
+
+    /**
+     * 選択値からレイヤに渡すフィルター式を組み立てる（純粋関数）。
+     * `all` は絞り込みなし（null）、`unknown` は業種の記載が無いもの、
+     * `other` は記載があってどの業種のキーワードにも当たらないもの。
+     */
+    function categoryFilter(value) {
+      if (value === 'all') return null;
+      if (value === 'unknown') return ['!', hasBusinessType];
+      if (value === 'other') {
+        // 全業種のキーワードをすべて否定する＝分類から漏れた業種だけが残る。
         // 記載なしは unknown が受け持つので、ここでは除く。
-        const allKeywords = CATEGORIES.flatMap((c) => c.keywords || []);
-        return ['all', hasBusinessType, ...allKeywords.map((kw) => ['!', contains(kw)])];
+        return ['all', hasBusinessType, ...ALL_KEYWORDS.map((kw) => ['!', contains(kw)])];
       }
-      return ['any', ...category.keywords.map(contains)];
+      return ['any', ...keywordsForSelection(value).map(contains)];
     }
 
-    /** カテゴリの絞り込み条件を日本語1行で説明する（純粋関数）。 */
-    function categoryNote(category) {
-      if (category.id === 'unknown') return '元データに業種の記載がない施設を表示中';
-      if (category.id === 'other') return '記載はあるが、ほかのカテゴリに当てはまらない業種を表示中';
-      if (category.keywords && category.keywords.length) {
-        return `業種名に「${category.keywords.join('」「')}」を含む施設を表示中`;
+    /** 選択中の絞り込み条件を日本語1行で説明する（純粋関数）。 */
+    function categoryNote(value) {
+      if (value === 'all') return '';
+      if (value === 'unknown') return '元データに業種の記載がない施設を表示中';
+      if (value === 'other') return '記載はあるが、法令の業種区分に当てはまらない表記の施設を表示中';
+      const keywords = keywordsForSelection(value);
+      // 区分まとめ（group:）はキーワードが多すぎるので件数だけ、個別業種は語をそのまま見せる。
+      if (value.startsWith('group:')) {
+        const group = CATEGORY_GROUPS.find((g) => g.id === value.slice(6));
+        return group ? `${group.label}の${group.types.length}業種すべてを表示中` : '';
       }
-      return '';
+      return keywords.length ? `業種名に「${keywords.join('」「')}」を含む施設を表示中` : '';
     }
 
-    /** 選択されたカテゴリを地図に反映し、説明文を更新する。 */
-    function applyCategory(id) {
-      const category = CATEGORIES.find((c) => c.id === id) || CATEGORIES[0];
-      map.setFilter('facilities-circle', categoryFilter(category));
+    /** 選択された業種・区分を地図に反映し、説明文を更新する。 */
+    function applyCategory(value) {
+      map.setFilter('facilities-circle', categoryFilter(value));
       // どんな条件で絞っているかは分かりにくいので、条件をそのまま見せる。
-      $('filter-note').textContent = categoryNote(category);
+      $('filter-note').textContent = categoryNote(value);
     }
 
-    // 選択肢を CATEGORIES から作り、変更を地図に反映する。
+    // 選択肢を CATEGORY_GROUPS から作る（法令の区分ごとに optgroup で束ねる）。
     const select = $('category');
-    for (const category of CATEGORIES) {
+    /** value / ラベルを指定して option を作る小さなヘルパ。 */
+    function addOption(parent, value, label) {
       const option = document.createElement('option');
-      option.value = category.id;
-      option.textContent = category.label;
-      select.appendChild(option);
+      option.value = value;
+      option.textContent = label;
+      parent.appendChild(option);
     }
+    addOption(select, 'all', 'すべての業種');
+    for (const group of CATEGORY_GROUPS) {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = group.label;
+      // 区分まるごとの絞り込みを先頭に置き、その下に個別の業種を並べる。
+      addOption(optgroup, `group:${group.id}`, `${group.label} すべて`);
+      for (const type of group.types) addOption(optgroup, `type:${type.id}`, type.label);
+      select.appendChild(optgroup);
+    }
+    const misc = document.createElement('optgroup');
+    misc.label = 'その他';
+    addOption(misc, 'other', '区分に当てはまらない表記');
+    addOption(misc, 'unknown', '業種の記載なし');
+    select.appendChild(misc);
+
     select.addEventListener('change', () => applyCategory(select.value));
     // スタイル読み込み後でないと setFilter できないため、load を待って初期値を反映する。
     map.on('load', () => applyCategory(select.value));
