@@ -149,7 +149,7 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 | 列 | 内容 |
 |---|---|
 | `prefecture` | 都道府県 |
-| `city` | 正規化後の市区町村名（政令市は市に集約、町村は郡付き） |
+| `city` | 正規化後の市区町村名（政令市は市に集約、町村は郡名なし） |
 | `city_raw` | 元データの市区町村表記 |
 | `name` / `name_kana` | 施設名・カナ |
 | `business_type` | 営業許可・届出の業種 |
@@ -161,7 +161,9 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 | `license_date` / `expire_date` | 許可日・有効期限 |
 | `sources` / `licenses` | 元データの出典・ライセンス |
 
-市区町村名は、[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses) を利用して公式表記に正規化しています。粒度は市区町村に揃えており、政令指定都市の行政区は市に集約し（「横浜市戸塚区」→「横浜市」）、町村は郡付きの表記（「河北郡津幡町」）を使います。元データの表記は `city_raw` に残しています。
+市区町村名は、[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses) を利用して公式表記に正規化しています。粒度は市区町村に揃えており、政令指定都市の行政区は市に集約し（「横浜市戸塚区」→「横浜市」）、町村は郡名を外した表記（「河北郡津幡町」→「津幡町」）を使います。元データの表記は `city_raw` に残しています。
+
+都道府県・市区町村を特定できなかったレコードには `不明` が入ります。統計の「都道府県」「市区町村」は実在の自治体だけを数えるため、これらは含みません（レコード自体はCSVに含まれます）。
 
 ## 収録範囲
 
