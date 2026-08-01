@@ -190,7 +190,7 @@
       <span id="updated"></span><br>
       <a href="./">トップ</a> ·
       <a href="https://github.com/gl20percentclub/japan-food-facilities">GitHub</a> ·
-      <a href="https://d1nptpfogf2ynv.cloudfront.net/api/facilities-all.csv">全件CSV</a> ·
+      <a href="https://food.japan-facilities.com/api/facilities-all.csv">全件CSV</a> ·
       <a href="./attribution.html">出典・ライセンス</a>
     </p>
   </div>
@@ -203,7 +203,7 @@
     // データ配信ベース URL。このページ自身は GitHub Pages だが、データ（api/）は
     // S3 + CloudFront から配信されるため、相対参照ではなく絶対 URL を指す。
     // CORS は全オリジン許可済みなので、ローカルで開いた場合もそのまま読める。
-    const API_BASE = 'https://d1nptpfogf2ynv.cloudfront.net/api';
+    const API_BASE = 'https://food.japan-facilities.com/api';
     // ベクトルタイルのズーム範囲（scripts/gen-tiles.js の設定と一致させる）
     const TILE_MIN_ZOOM = 6;
     const TILE_MAX_ZOOM = 12;
