@@ -268,7 +268,8 @@ sources:
       resourceId: c1769ec0-e049-4256-a8c0-c0afd319843d
     source: 久留米市 久留米市新規食品営業許可施設一覧
     sourceUrl: https://data.bodik.jp/dataset/f85dc2fb-b148-4ed8-a00e-51a51e953793
-    license: Creative Commons Attribution
+    # 久留米市オープンデータ利用規約（https://odcs.bodik.jp/402036/tos/）が表示2.1日本を指定
+    license: CC BY 2.1 JP
   - key: bodik-5a58e9d4
     acquire:
       type: ckan
@@ -336,7 +337,8 @@ sources:
       resourceId: 76e0c6d1-2332-4ca9-afd5-1ef442733eff
     source: 静岡市 食品衛生関係営業許可台帳
     sourceUrl: https://data.bodik.jp/dataset/86a8d652-beb2-41b7-8da6-f9245e04217d
-    license: Creative Commons Attribution
+    # 静岡市オープンデータ利用規約（https://odcs.bodik.jp/221007/tos/）が表示4.0国際を指定
+    license: CC BY 4.0
   - key: bodik-be0e8464
     acquire:
       type: ckan
@@ -392,7 +394,8 @@ sources:
       resourceId: 70d22acf-2353-4bc1-b45d-f12d45da5216
     source: 福岡市 福岡市　飲食店営業等営業許可施設一覧
     sourceUrl: https://data.bodik.jp/dataset/5925a9fb-3326-4499-9acd-7b18c03d5e32
-    license: Creative Commons Attribution
+    # 福岡市オープンデータサイト利用規約（https://odcs.bodik.jp/401307/tos/）が表示4.0国際を指定
+    license: CC BY 4.0
   - key: bodik-2d6870cc
     acquire:
       type: ckan
@@ -416,7 +419,8 @@ sources:
       resourceId: dab2c5a1-393e-4bd2-9bab-7350296a05da
     source: 北九州市 北九州市　食品衛生法等許可施設一覧
     sourceUrl: https://data.bodik.jp/dataset/822fb681-346a-444e-b482-33c67b50cac3
-    license: Creative Commons Attribution
+    # 北九州市オープンデータ利用規約（https://odcs.bodik.jp/401005/tos/）が表示4.0国際を指定
+    license: CC BY 4.0
   - key: bodik-979f325a
     acquire:
       type: ckan
@@ -678,8 +682,9 @@ sources:
       format: csv
       encoding: shift_jis
     source: 富山県食品営業許可施設一覧
-    sourceUrl: https://opendata.pref.toyama.jp/dataset/syokuhin
-    license: CC BY
+    # 旧ポータル閉鎖（2026-05-29）に伴い富山データ連携基盤へ移転。CKAN の license_id は cc-zero
+    sourceUrl: https://ckan-front.tdcp.pref.toyama.jp/dataset/syokuhin
+    license: CC0 1.0
     defaultPref: 富山県
   - key: toyama-city
     acquire:
@@ -688,7 +693,8 @@ sources:
       format: xlsx
     source: 富山市食品営業許可施設
     sourceUrl: https://opdt.city.toyama.lg.jp/dataset/fb1198c6-3ac2-42fc-ae99-81ea5ba09a2d
-    license: CC BY
+    # 富山市オープンデータ利用規約（https://opdt.city.toyama.lg.jp/pages/terms）が表示4.0国際を指定
+    license: CC BY 4.0
     defaultPref: 富山県
     defaultCity: 富山市
   - key: kanazawa
@@ -712,7 +718,8 @@ sources:
       encoding: utf-8
     source: 福井県食品営業許可取得施設
     sourceUrl: https://ckan.odp.jig.jp/dataset/jp-fukui-776-odp
-    license: CC BY
+    # データセットページの追加情報に「CC-BY-2.1」表記あり
+    license: CC BY 2.1 JP
     defaultPref: 福井県
   - key: fukui-city
     acquire:
@@ -789,7 +796,8 @@ sources:
       encoding: shift_jis
     source: 浜松市食品衛生台帳（新規）
     sourceUrl: https://opendata.pref.shizuoka.jp/dataset/11921.html
-    license: CC BY
+    # 静岡県オープンデータポータル利用規約（https://opendata.pref.shizuoka.jp/privacy.html）が表示4.0国際を指定
+    license: CC BY 4.0
     defaultPref: 静岡県
     defaultCity: 浜松市
   - key: aichi-pref
@@ -876,7 +884,8 @@ sources:
       format: xlsx
     source: 西宮市食品営業許可施設一覧
     sourceUrl: http://opendata.nishi.or.jp/opendata/ResultDetail.php?id=9
-    license: CC BY相当
+    # 西宮市オープンデータ利用規約 第2.0版（https://opendata.nishi.or.jp/opendata/kiyaku.pdf）が PDL1.0 を適用
+    license: 公共データ利用規約（第1.0版, PDL1.0）
     defaultPref: 兵庫県
     defaultCity: 西宮市
   - key: nara-city
@@ -897,8 +906,9 @@ sources:
       format: csv
       encoding: utf-8
     source: 鳥取市食品等営業許可・届出一覧
-    sourceUrl: https://odp-pref-tottori.tori-info.co.jp/dataset/1858
-    license: CC BY
+    sourceUrl: https://odp-pref-tottori.tori-info.co.jp/dataset/1858.html
+    # 鳥取県オープンデータポータル利用規約（https://odp-pref-tottori.tori-info.co.jp/agreement.html）が表示2.1日本を指定
+    license: CC BY 2.1 JP
     defaultPref: 鳥取県
     defaultCity: 鳥取市
   - key: fukuyama
@@ -909,7 +919,8 @@ sources:
       encoding: auto
     source: 福山市営業許認可等施設一覧
     sourceUrl: https://data.city.fukuyama.hiroshima.jp/dataset/61f415c5-88f7-46d0-8ada-4bb8855685a0
-    license: CC BY
+    # 福山市オープンデータカタログサイト利用規約（https://data.city.fukuyama.hiroshima.jp/terms）が PDL1.0 を適用
+    license: 公共データ利用規約（第1.0版, PDL1.0）
     defaultPref: 広島県
     defaultCity: 福山市
   - key: yamaguchi-pref
@@ -920,7 +931,8 @@ sources:
       encoding: utf-8
     source: 山口県食品営業許可施設情報一覧
     sourceUrl: https://yamaguchi-opendata.jp/ckan/dataset/9d0d2325-62b4-447c-8817-a381c968a5cd
-    license: CC BY
+    # 山口県オープンデータカタログサイト利用規約（https://yamaguchi-opendata.jp/www/terms.html）が CC BY 4.0 での利用を許諾
+    license: CC BY 4.0
     defaultPref: 山口県
   - key: shimonoseki
     acquire:
@@ -930,7 +942,8 @@ sources:
       encoding: utf-8
     source: 下関市食品営業許可施設一覧（マップ用）
     sourceUrl: https://yamaguchi-opendata.jp/ckan/dataset/50c21bfa-4ee1-4553-b166-8ed2e625a6f5
-    license: CC BY
+    # 山口県オープンデータカタログサイト利用規約（https://yamaguchi-opendata.jp/www/terms.html）が CC BY 4.0 での利用を許諾
+    license: CC BY 4.0
     defaultPref: 山口県
     defaultCity: 下関市
   - key: tokushima-pref
@@ -940,8 +953,9 @@ sources:
       format: csv
       encoding: utf-8
     source: 徳島県食品等営業許可・届出一覧
-    sourceUrl: https://opendata.pref.tokushima.lg.jp/dataset/4615
-    license: CC BY
+    sourceUrl: https://opendata.pref.tokushima.lg.jp/dataset/4615.html
+    # ポータル説明ページ（https://opendata.pref.tokushima.lg.jp/about.html）が表示4.0国際を明記
+    license: CC BY 4.0
     defaultPref: 徳島県
   - key: takamatsu
     acquire:
@@ -951,7 +965,8 @@ sources:
       encoding: utf-8
     source: 高松市食品等営業許可施設一覧
     sourceUrl: https://opendata.smartcity-takamatsu.jp/ckan/dataset/licensed_food_business_facility_list
-    license: CC BY
+    # スマートシティたかまつポータル利用規約（https://opendata.smartcity-takamatsu.jp/odp/tos/）が表示4.0国際を指定
+    license: CC BY 4.0
     defaultPref: 香川県
     defaultCity: 高松市
   - key: matsuyama
@@ -964,7 +979,8 @@ sources:
       encoding: utf-8
     source: 松山市食品営業許可全施設一覧
     sourceUrl: https://www.city.matsuyama.ehime.jp/shisei/opendata/metadata/shokuhin.html
-    license: CC BY
+    # 松山市オープンデータサイト（https://www.city.matsuyama.ehime.jp/shisei/opendata/top.html）が表示4.0国際を明記
+    license: CC BY 4.0
     defaultPref: 愛媛県
     defaultCity: 松山市
   - key: kumamoto-city

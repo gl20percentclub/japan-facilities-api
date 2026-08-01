@@ -106,6 +106,16 @@ const LICENSE_GROUPS = [
     noteModified: true,
   },
   {
+    id: 'cc0-1-0',
+    label: 'CC0 1.0',
+    url: 'https://creativecommons.org/publicdomain/zero/1.0/deed.ja',
+    match: ['CC0 1.0', 'CC0', 'Creative Commons CCZero'],
+    requirement:
+      'CC0（パブリックドメイン提供）のため出典表示は法的には不要ですが、'
+      + '本 API ではデータの来歴を示すため出典を明示しています（表示例も同形式で掲載します）。',
+    noteModified: true,
+  },
+  {
     id: 'local-terms',
     label: '自治体独自の利用規約',
     url: null,
