@@ -1,4 +1,4 @@
-# Japan Facilities Data
+# Japan Food Facilities Data
 
 > 日本全国の食品営業許可・届出施設（飲食店・喫茶店・食品製造業など）を収集し、
 > 全国共通フォーマットの全件CSV・ベクトルタイル・検索用Parquetで無料配信するオープンデータ。
@@ -6,14 +6,14 @@
 
 重要な事実:
 
-- 全件CSV（gzip 推奨）: https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv.gz
-- 全件CSV（非圧縮・約540MB）: https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv
+- 全件CSV（gzip 推奨）: https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv.gz
+- 全件CSV（非圧縮・約540MB）: https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv
 - CSV は UTF-8（BOM付き）。列: prefecture, city, city_raw, name, name_kana,
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
-- ベクトルタイル（MVT）: https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
-- 検索用 Parquet（都道府県別・列は CSV と同一）: https://gl20percentclub.github.io/japan-food-facilities-api/api/parquet/{JISコード}.parquet
-  （例: 13.parquet = 東京都。一覧は https://gl20percentclub.github.io/japan-food-facilities-api/api/parquet/manifest.json）
+- ベクトルタイル（MVT）: https://gl20percentclub.github.io/japan-food-facilities/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
+- 検索用 Parquet（都道府県別・列は CSV と同一）: https://gl20percentclub.github.io/japan-food-facilities/api/parquet/{JISコード}.parquet
+  （例: 13.parquet = 東京都。一覧は https://gl20percentclub.github.io/japan-food-facilities/api/parquet/manifest.json）
 - サーバー型の検索 API や市区町村別 JSON は配信していない。キーワード検索は
   Parquet + DuckDB（CLI / Wasm）、一括抽出は CSV、地図表示はタイルで行う
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
@@ -32,9 +32,9 @@
 
 ## ドキュメント
 
-- [llms-full.txt](https://gl20percentclub.github.io/japan-food-facilities-api/llms-full.txt): データ仕様・利用例・注意事項の全文（まずこれを読む）
-- [README](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main/README.md): プロジェクト概要
-- [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities-api/main/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
-- [タイルメタデータ](https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
-- [検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities-api/playground.html): ブラウザ内 DuckDB で Parquet を SQL 検索して試せる
-- [出典・ライセンス表示](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html): 利用時に必要な出典表示の文例
+- [llms-full.txt](https://gl20percentclub.github.io/japan-food-facilities/llms-full.txt): データ仕様・利用例・注意事項の全文（まずこれを読む）
+- [README](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/README.md): プロジェクト概要
+- [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
+- [タイルメタデータ](https://gl20percentclub.github.io/japan-food-facilities/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
+- [検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html): ブラウザ内 DuckDB で Parquet を SQL 検索して試せる
+- [出典・ライセンス表示](https://gl20percentclub.github.io/japan-food-facilities/attribution.html): 利用時に必要な出典表示の文例

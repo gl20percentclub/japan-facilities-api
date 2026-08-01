@@ -4,17 +4,17 @@
 
 **全国の食品営業許可・届出データを、共通形式で無料配信するオープンデータプロジェクト**
 
-[![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/graphs/contributors)
+[![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-food-facilities)](https://github.com/gl20percentclub/japan-food-facilities/graphs/contributors)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-food-facilities-api)](https://github.com/gl20percentclub/japan-food-facilities-api/issues)
+[![GitHub Issues](https://img.shields.io/github/issues/gl20percentclub/japan-food-facilities)](https://github.com/gl20percentclub/japan-food-facilities/issues)
 [![Weekly Crawl](https://img.shields.io/badge/更新-毎週自動-blue)](#更新頻度)
 
-[公式サイト](https://gl20percentclub.github.io/japan-food-facilities-api/) ·
-[地図で見る](https://gl20percentclub.github.io/japan-food-facilities-api/map.html) ·
-[検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities-api/playground.html) ·
-[CSVをダウンロード](https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv) ·
+[公式サイト](https://gl20percentclub.github.io/japan-food-facilities/) ·
+[地図で見る](https://gl20percentclub.github.io/japan-food-facilities/map.html) ·
+[検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html) ·
+[CSVをダウンロード](https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv) ·
 [収録状況](docs/COVERAGE.md) ·
-[出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)
+[出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)
 
 </div>
 
@@ -53,20 +53,20 @@
 
 | ファイル | URL |
 |---|---|
-| 全件CSV | https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv |
+| 全件CSV | https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv |
 
 - 文字コード: UTF-8（BOMなし）
 - 全列が一致する重複レコードは除去済み
 
 ```bash
-curl -O https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv
+curl -O https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://gl20percentclub.github.io/japan-food-facilities-api/api/facilities-all.csv"
+    "https://gl20percentclub.github.io/japan-food-facilities/api/facilities-all.csv"
 )
 ```
 
@@ -80,7 +80,7 @@ df = pd.read_csv(
 map.addSource("facilities", {
   type: "vector",
   tiles: [
-    "https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/{z}/{x}/{y}.pbf",
+    "https://gl20percentclub.github.io/japan-food-facilities/api/tiles/{z}/{x}/{y}.pbf",
   ],
   minzoom: 6,
   maxzoom: 12,
@@ -89,9 +89,9 @@ map.addSource("facilities", {
 
 - レイヤー名: `facilities`
 - 主な属性: `name` / `business_type` / `pref` / `city`
-- 詳細: [`api/tiles/metadata.json`](https://gl20percentclub.github.io/japan-food-facilities-api/api/tiles/metadata.json)
+- 詳細: [`api/tiles/metadata.json`](https://gl20percentclub.github.io/japan-food-facilities/api/tiles/metadata.json)
 
-収録データは[プレビュー地図](https://gl20percentclub.github.io/japan-food-facilities-api/map.html)でも確認できます。
+収録データは[プレビュー地図](https://gl20percentclub.github.io/japan-food-facilities/map.html)でも確認できます。
 
 ### 検索用Parquet
 
@@ -99,17 +99,17 @@ map.addSource("facilities", {
 
 | ファイル | URL |
 |---|---|
-| 都道府県別Parquet | `https://gl20percentclub.github.io/japan-food-facilities-api/api/parquet/{都道府県コード}.parquet` |
-| ファイル一覧（manifest） | https://gl20percentclub.github.io/japan-food-facilities-api/api/parquet/manifest.json |
+| 都道府県別Parquet | `https://gl20percentclub.github.io/japan-food-facilities/api/parquet/{都道府県コード}.parquet` |
+| ファイル一覧（manifest） | https://gl20percentclub.github.io/japan-food-facilities/api/parquet/manifest.json |
 
 - 都道府県コードは JIS X 0401（`01`=北海道 〜 `47`=沖縄県、`99`=都道府県不明）
 - 列は全件CSVと同一
-- ブラウザで試すには[検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities-api/playground.html)を利用してください
+- ブラウザで試すには[検索プレイグラウンド](https://gl20percentclub.github.io/japan-food-facilities/playground.html)を利用してください
 
 ```sql
 -- DuckDB（CLI / Python / Wasm）からそのまま検索できます
 SELECT name, business_type, address, lat, lng
-FROM read_parquet('https://gl20percentclub.github.io/japan-food-facilities-api/api/parquet/13.parquet')  -- 13 = 東京都
+FROM read_parquet('https://gl20percentclub.github.io/japan-food-facilities/api/parquet/13.parquet')  -- 13 = 東京都
 WHERE name LIKE '%ラーメン%'
 LIMIT 100;
 ```
@@ -120,8 +120,8 @@ Claude Code や Codex などのコーディングエージェントでこのデ�
 
 | ファイル | URL |
 |---|---|
-| llms.txt（索引） | https://gl20percentclub.github.io/japan-food-facilities-api/llms.txt |
-| llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-food-facilities-api/llms-full.txt |
+| llms.txt（索引） | https://gl20percentclub.github.io/japan-food-facilities/llms.txt |
+| llms-full.txt（全仕様） | https://gl20percentclub.github.io/japan-food-facilities/llms-full.txt |
 
 ## データ項目
 
@@ -200,7 +200,7 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 ```html
 出典:
-<a href="https://github.com/gl20percentclub/japan-food-facilities-api">
+<a href="https://github.com/gl20percentclub/japan-food-facilities">
   Japan Food Facilities Data
 </a>
 （各自治体の食品営業許可オープンデータを加工して作成）
@@ -214,7 +214,7 @@ GitHub Actionsで毎週月曜18:00 UTC（日本時間 火曜3:00）に更新し�
 
 特定自治体のデータだけを利用する場合は、CSVの `sources` 列に記載された自治体名も併記してください。
 
-自治体ごとの出典表示文は、[出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-food-facilities-api/attribution.html)で確認できます。
+自治体ごとの出典表示文は、[出典・ライセンス表示ページ](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)で確認できます。
 
 ## 免責事項
 
