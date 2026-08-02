@@ -4,8 +4,8 @@
 //
 // 過去に、publish_dir が . のため .gitignore ごと配信され、配信先で git add --all
 // された結果 api/ が一切コミットされず（.gitignore が api/ を無視するため）、
-// gh-pages 上のデータが全削除される事故があった。同じ壊れ方を繰り返さないよう、
-// 配信ステップの設定をテストで固定する。
+// gh-pages 上のデータが全削除される事故があった。現在は配信元を site/ に限定して
+// 同じ壊れ方を構造的に起きなくしてあるので、その前提のほうをテストで固定する。
 //
 // データ（api/）の配信は外部の Fargate クローラー（S3 + CloudFront）へ移したため、
 // gh-pages へ配信するのは静的ページだけ。旧 crawl.yml は廃止済みで、復活しないことも
@@ -62,7 +62,7 @@ const gitignore = fs.readFileSync(path.join(ROOT, '.gitignore'), 'utf8');
 const ignoresApi = gitignore.split('\n').some((line) => line.trim() === 'api/');
 assert(ignoresApi, '.gitignore が api/ を無視している（配信物は Git 管理しない）');
 
-// --- 配信ステップは .gitignore を配信対象から除外する ---
+// --- 配信元が公開用ディレクトリ（site/）に限定されている ---
 const allDeploySteps = deploySteps(pages).map((step) => ['pages.yml', step]);
 assert(allDeploySteps.length === 1, '配信ステップは pages.yml の1つだけ');
 
@@ -75,19 +75,33 @@ for (const [file, step] of allDeploySteps) {
     withInputs.publish_branch === 'gh-pages',
     `${file}: 配信先ブランチが gh-pages である`,
   );
+  // 配信元は公開用ディレクトリ（site/）に限定する。リポジトリのルートを配信すると
+  // README・docs/・config/ まで公開され、さらに .gitignore ごと配信された場合は
+  // 配信先の git add --all で api/ が無視されて gh-pages 上のデータが消える。
+  // 除外リストで塞ぐより、配信元を分けて構造的に起きなくするほうが確実。
+  const publishDir = String(withInputs.publish_dir ?? '');
   assert(
-    !ignoresApi || withInputs.publish_dir !== '.' || excluded.includes('.gitignore'),
-    `${file}: publish_dir が . のとき .gitignore を除外している（api/ 消失の防止）`,
+    publishDir !== '.' && publishDir !== '' && publishDir !== './',
+    `${file}: publish_dir がリポジトリのルートではない（実際: ${publishDir || '未指定'}）`,
   );
+  // 配信元に混ざってはいけないものが実際に無いことを確認する（除外リストの代わり）。
+  for (const forbidden of ['.gitignore', 'node_modules', 'scripts', 'package.json']) {
+    assert(
+      !fs.existsSync(path.join(ROOT, publishDir, forbidden)),
+      `${file}: 配信元 ${publishDir}/ に ${forbidden} が無い`,
+    );
+  }
+  // 除外リストを併用する場合は、上の前提を崩さない範囲であること。
   assert(
-    excluded.includes('node_modules') && excluded.includes('.cache'),
-    `${file}: node_modules と .cache を配信しない`,
+    excluded.every((e) => e === ''),
+    `${file}: 配信元を site/ に絞ったため exclude_assets は不要`,
   );
 }
 
 // --- 役割 ---
 // pages.yml はページだけを上書きし、gh-pages 上の既存ファイルを消さない。
 const pagesDeploy = deploySteps(pages)[0]?.with ?? {};
+const pagesPublishDir = String(pagesDeploy.publish_dir ?? 'site');
 assert(
   pagesDeploy.keep_files === true,
   'pages.yml: keep_files が true（gh-pages 上の既存ファイルを消さない）',
@@ -103,12 +117,17 @@ assert(
 // --- ページの変更が push で配信される ---
 const pushPaths = pages.on?.push?.paths ?? [];
 assert(pages.on?.push?.branches?.includes('main'), 'pages.yml: main への push で動く');
-for (const page of ['index.html', 'map.html', 'playground.html', 'attribution.html']) {
-  assert(pushPaths.includes(page), `pages.yml: ${page} の変更を配信対象にしている`);
-}
-// 配信されるページがリポジトリに実在することも確認する（リネーム時の追従漏れ防止）。
-for (const page of pushPaths.filter((p) => p.endsWith('.html'))) {
-  assert(fs.existsSync(path.join(ROOT, page)), `pages.yml: ${page} がリポジトリに存在する`);
+// 配信元ディレクトリ配下は一括で拾う。個別列挙だとページ追加時に書き忘れる。
+assert(
+  pushPaths.includes(`${pagesPublishDir}/**`),
+  `pages.yml: ${pagesPublishDir}/** の変更を配信対象にしている`,
+);
+// 公開しているページが配信元に実在することを確認する（移動・リネーム時の追従漏れ防止）。
+for (const page of ['index.html', 'map.html', 'playground.html', 'attribution.html', 'llms.txt', 'llms-full.txt']) {
+  assert(
+    fs.existsSync(path.join(ROOT, pagesPublishDir, page)),
+    `pages.yml: ${pagesPublishDir}/${page} がリポジトリに存在する`,
+  );
 }
 
 // --- 自動生成ページは配信前に生成元から作り直す ---
@@ -153,7 +172,7 @@ const ciRun = Object.values(ci.jobs ?? {})
   .join('\n');
 assert(ci.on?.pull_request !== undefined, 'ci.yml: PR でテストが走る');
 assert(ciRun.includes('test:unit'), 'ci.yml: ユニットテスト（生成物の同期検査を含む）を実行する');
-for (const generated of ['attribution.html', 'llms.txt', 'llms-full.txt']) {
+for (const generated of ['site/attribution.html', 'site/llms.txt', 'site/llms-full.txt']) {
   assert(
     genDocsPushPaths.includes(generated),
     `generated-docs.yml: ${generated} への push を検査対象にしている（外部の古い自動コミット対策）`,

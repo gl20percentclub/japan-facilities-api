@@ -114,10 +114,10 @@ Claude CodeやCodexなどに、次のURLを渡してください。
 
 | 項目                                                | 概要                                                        |
 | ------------------------------------------------- | --------------------------------------------------------- |
-| [収録範囲](https://gl20percentclub.github.io/japan-food-facilities/docs/DATA.md#収録範囲)                     | 全国1,741市区町村のうち1,727市区町村（99%）をカバー          |
-| [緯度経度](https://gl20percentclub.github.io/japan-food-facilities/docs/DATA.md#緯度経度)                   | 元データに座標がない場合は住所からジオコーディング。精度は`geocoding_level`で確認 |
-| [鮮度と網羅性](https://gl20percentclub.github.io/japan-food-facilities/docs/DATA.md#鮮度と網羅性)           | 廃業済みや許可期限切れの施設が含まれる場合がある            |
-| [更新頻度](https://gl20percentclub.github.io/japan-food-facilities/docs/DATA.md#更新頻度)                   | 毎週月曜18:00 UTC（日本時間 火曜3:00）に自動更新。URLは不変 |
+| [収録範囲](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/DATA.md#収録範囲)                     | 全国1,741市区町村のうち1,727市区町村（99%）をカバー          |
+| [緯度経度](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/DATA.md#緯度経度)                   | 元データに座標がない場合は住所からジオコーディング。精度は`geocoding_level`で確認 |
+| [鮮度と網羅性](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/DATA.md#鮮度と網羅性)           | 廃業済みや許可期限切れの施設が含まれる場合がある            |
+| [更新頻度](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/DATA.md#更新頻度)                   | 毎週月曜18:00 UTC（日本時間 火曜3:00）に自動更新。URLは不変 |
 
 自治体ごとの収録状況は、[`docs/COVERAGE.md`](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/COVERAGE.md)で確認できます。
 
@@ -126,7 +126,7 @@ Claude CodeやCodexなどに、次のURLを渡してください。
 | 対象          | 条件                  |
 | ----------- | ------------------- |
 | CSV・ベクトルタイル | 各元データのライセンス・利用条件に従う |
-| リポジトリ内のコード  | [MIT License](https://gl20percentclub.github.io/japan-food-facilities/LICENSE) |
+| リポジトリ内のコード  | [MIT License](https://github.com/gl20percentclub/japan-food-facilities/blob/main/LICENSE) |
 
 本データは、商用・非商用を問わず、アプリ、Webサービス、研究、分析、再配布などに利用できます。
 

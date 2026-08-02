@@ -53,17 +53,40 @@ export function extractStats(readme) {
 }
 
 /**
+ * GitHub Pages に配信されるページ（site/ 配下のファイル名）。
+ * リポジトリのルートではなく site/ を publish_dir にしているため、
+ * ここに無いファイルは Pages の URL では取得できない。
+ */
+export const PUBLISHED_PAGES = new Set([
+  'index.html',
+  'map.html',
+  'playground.html',
+  'attribution.html',
+  'llms.txt',
+  'llms-full.txt',
+]);
+
+/**
  * README 内の相対リンクを絶対 URL に変換する（純粋関数）。
  * llms-full.txt は単体ファイルとして読まれるため、相対リンクのままだと
- * エージェントがリンク先を辿れない。リンク先の拡張子で基点を出し分ける:
- *   - .md   → GitHub raw（Markdown をそのまま fetch できる）
- *   - それ以外（.html 等） → GitHub Pages（配信されている実体）
+ * エージェントがリンク先を辿れない。リンク先ごとに基点を出し分ける:
+ *   - .md              → GitHub raw（Markdown をそのまま fetch できる）
+ *   - 配信されるページ  → GitHub Pages（配信されている実体）
+ *   - それ以外          → GitHub blob（LICENSE 等、Pages には無いリポジトリ内ファイル）
  * http(s)・ページ内アンカー（#）・mailto は変換しない。
+ *
+ * 判定はアンカー（#...）を外したパスで行う。`docs/DATA.md#収録範囲` のように
+ * アンカー付きのリンクが .md 判定から漏れ、Pages 側の URL になっていたことがある。
  */
 export function absolutizeLinks(markdown) {
   return markdown.replace(
     /\]\((?!https?:\/\/|#|mailto:)([^)]+)\)/g,
-    (_, target) => (target.endsWith('.md') ? `](${RAW}/${target})` : `](${PAGES}/${target})`),
+    (_, target) => {
+      const [filePath] = target.split('#');
+      if (filePath.endsWith('.md')) return `](${RAW}/${target})`;
+      if (PUBLISHED_PAGES.has(filePath)) return `](${PAGES}/${target})`;
+      return `](${REPO}/blob/main/${target})`;
+    },
   );
 }
 
@@ -236,7 +259,7 @@ export function generateLlmsFiles() {
   ];
   const written = [];
   for (const [name, content] of outputs) {
-    const outPath = path.join(ROOT, name);
+    const outPath = path.join(ROOT, 'site', name);
     // 既存内容と比較し、変わったときだけ書き込む
     const prev = fs.existsSync(outPath) ? fs.readFileSync(outPath, 'utf-8') : null;
     if (prev !== content) {

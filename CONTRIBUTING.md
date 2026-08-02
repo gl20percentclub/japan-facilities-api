@@ -99,8 +99,8 @@ npm ci
 
 | 生成物 | 生成元 | 再生成コマンド |
 | --- | --- | --- |
-| `attribution.html` | `config/sources.yaml` | `npm run build:attribution` |
-| `llms.txt` / `llms-full.txt` | `README.md` | `npm run build:llms` |
+| `site/attribution.html` | `config/sources.yaml` | `npm run build:attribution` |
+| `site/llms.txt` / `site/llms-full.txt` | `README.md` | `npm run build:llms` |
 | `README.md` の STATS ブロック | クロール結果 | 週次クローラーが更新 |
 | `docs/COVERAGE.md` | クロール結果 | 週次クローラーが更新 |
 

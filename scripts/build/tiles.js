@@ -64,7 +64,7 @@ export function buildFeatureCollection(facilities) {
  * 施設配列から z/x/y ベクトルタイルと TileJSON を生成する。
  *
  * `stats`（結合CSV 側で集計した件数）は metadata.json に埋め込み、
- * プレビュー地図(index.html)が JSON データを別途配信せずに件数を表示できるようにする。
+ * プレビュー地図(site/map.html)が JSON データを別途配信せずに件数を表示できるようにする。
  *
  * 生成結果 `{ tiles, points, bytes }` を返す。
  */
