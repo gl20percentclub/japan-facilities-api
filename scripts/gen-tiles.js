@@ -66,9 +66,9 @@ export function buildFeatureCollection(facilities) {
  * `stats`（結合CSV 側で集計した件数）は metadata.json に埋め込み、
  * プレビュー地図(index.html)が JSON データを別途配信せずに件数を表示できるようにする。
  *
- * 生成結果 `{ tiles, points, bytes }` を返す。
+ * 生成結果 `{ tiles, points, bytes }` を返す（書き出しが非同期のため async）。
  */
-export function generateTiles(facilities, {
+export async function generateTiles(facilities, {
   minZoom = MIN_ZOOM,
   maxZoom = MAX_ZOOM,
   outDir = TILES_DIR,
@@ -105,19 +105,35 @@ export function generateTiles(facilities, {
     }
   }
 
+  // タイルの生成（getTile + エンコード）は CPU 主体でメインスレッドのまま、
+  // ファイル書き出しだけを非同期の同時実行プールに逃がして I/O 待ちを重ねる。
+  // ディレクトリ作成は同期のまま重複を Set で省く（mkdir の連打を避ける）。
+  const WRITE_CONCURRENCY = 64;
   let written = 0;
   let bytes = 0;
+  const madeDirs = new Set();
+  const pending = new Set();
   for (const key of coords) {
     const [z, x, y] = key.split('/').map(Number);
     const tile = index.getTile(z, x, y);
     if (!tile || !tile.features.length) continue;
     const buf = Buffer.from(fromGeojsonVt({ [LAYER]: tile }, { version: 2 }));
     const dir = path.join(outDir, String(z), String(x));
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, `${y}.pbf`), buf);
+    if (!madeDirs.has(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      madeDirs.add(dir);
+    }
+    const p = fs.promises.writeFile(path.join(dir, `${y}.pbf`), buf).then(() => {
+      pending.delete(p);
+    });
+    pending.add(p);
     written++;
     bytes += buf.length;
+    // 書き出し待ちが溜まりすぎたら1本はけるまで待つ（メモリと fd を抑える）
+    if (pending.size >= WRITE_CONCURRENCY) await Promise.race(pending);
   }
+  // 残りの書き出しをすべて待つ（書き切る前に検証や配信が走るのを防ぐ）
+  await Promise.all(pending);
 
   // TileJSON（利用側は tiles テンプレートと vector_layers を参照）。
   // stats はプレビュー地図が読む拡張フィールド。

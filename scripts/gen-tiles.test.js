@@ -9,30 +9,30 @@ import path from 'node:path';
 import { lonLatToTile, buildFeatureCollection, generateTiles } from './gen-tiles.js';
 
 let passed = 0;
-function test(name, fn) {
-  fn();
+async function test(name, fn) {
+  await fn();
   passed++;
   console.log(`  ✓ ${name}`);
 }
 
 // --- lonLatToTile: スリッピータイル座標（独立した基準で検証） ---
-test('lonLatToTile: z0 は常に (0,0)', () => {
+await test('lonLatToTile: z0 は常に (0,0)', async () => {
   assert.deepEqual(lonLatToTile(139.7, 35.6, 0), [0, 0]);
   assert.deepEqual(lonLatToTile(-70, 40, 0), [0, 0]);
 });
-test('lonLatToTile: z1 は経度・緯度の符号で象限が決まる', () => {
+await test('lonLatToTile: z1 は経度・緯度の符号で象限が決まる', async () => {
   assert.deepEqual(lonLatToTile(0.1, 0.1, 1), [1, 0]);   // 東・北
   assert.deepEqual(lonLatToTile(-0.1, 0.1, 1), [0, 0]);  // 西・北
   assert.deepEqual(lonLatToTile(0.1, -0.1, 1), [1, 1]);  // 東・南
   assert.deepEqual(lonLatToTile(-0.1, -0.1, 1), [0, 1]); // 西・南
 });
-test('lonLatToTile: 範囲外の座標は 0..2^z-1 にクランプ', () => {
+await test('lonLatToTile: 範囲外の座標は 0..2^z-1 にクランプ', async () => {
   const [x, y] = lonLatToTile(999, 999, 3); // 8x8 グリッド
   assert.ok(x >= 0 && x <= 7 && y >= 0 && y <= 7, `クランプされる (${x},${y})`);
 });
 // 逆変換でタイルの地理境界を求め、元の点がそのタイルに含まれることを確認する
 // （実装式の自己参照でなく、独立した基準での正しさ検証）。
-test('lonLatToTile: 返したタイルの境界内に元の点が含まれる', () => {
+await test('lonLatToTile: 返したタイルの境界内に元の点が含まれる', async () => {
   const tile2lng = (x, z) => (x / 2 ** z) * 360 - 180;
   const tile2lat = (y, z) => (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / 2 ** z))) * 180) / Math.PI;
   for (const [lng, lat] of [[139.7671, 35.6812], [135.5, 34.7], [141.35, 43.06], [127.68, 26.21]]) {
@@ -59,7 +59,7 @@ function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'tiles-test-'));
 }
 
-test('buildFeatureCollection: 座標を持つ施設だけを点に変換する', () => {
+await test('buildFeatureCollection: 座標を持つ施設だけを点に変換する', async () => {
   const fc = buildFeatureCollection(makeFacilities());
   assert.equal(fc.type, 'FeatureCollection');
   assert.equal(fc.features.length, 2); // 座標なしは除外
@@ -71,11 +71,11 @@ test('buildFeatureCollection: 座標を持つ施設だけを点に変換する',
   assert.ok('name' in f.properties && 'business_type' in f.properties);
 });
 
-test('generateTiles: metadata.json と、各点に対応する非空 pbf タイルを生成する', () => {
+await test('generateTiles: metadata.json と、各点に対応する非空 pbf タイルを生成する', async () => {
   const dir = tmpDir();
   const outDir = path.join(dir, 'tiles');
   try {
-    const { tiles: written, points } = generateTiles(makeFacilities(), {
+    const { tiles: written, points } = await generateTiles(makeFacilities(), {
       minZoom: 12,
       maxZoom: 12,
       outDir,

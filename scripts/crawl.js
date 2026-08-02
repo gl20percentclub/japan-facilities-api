@@ -219,7 +219,7 @@ async function main() {
   const prefCsv = await buildPrefectureCsvs(csv.unique, { outDir: PREF_CSV_DIR, updated });
   // タイルは CSV と同じ集合（重複除去後）から作る。元の facilities を渡すと
   // CSV に載らない重複点がタイルに入り、配信物どうしで件数が食い違う。
-  const tiles = generateTiles(csv.unique, { updated, stats: csv });
+  const tiles = await generateTiles(csv.unique, { updated, stats: csv });
   generateReadmeStats({ updated, csv, prefCsv, tiles });
   // README の統計更新後に、AI エージェント向けの llms.txt / llms-full.txt を
   // README から再生成する（統計込みで最新化するため、必ず統計更新の後に呼ぶ）
