@@ -2,7 +2,7 @@
 
 # 🍽️ Japan Food Facilities Data
 
-**全国の食品営業許可・届出データを、共通形式で無料配信するオープンデータプロジェクト**
+**全国の食品営業許可・届出データを、共通形式で配信するオープンデータプロジェクト**
 
 [![Contributors](https://img.shields.io/github/contributors/gl20percentclub/japan-food-facilities)](https://github.com/gl20percentclub/japan-food-facilities/graphs/contributors)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -23,11 +23,8 @@
 
 自治体が食品衛生法にもとづいて公開している、飲食店・喫茶店・食品製造業などの**食品営業許可・届出施設一覧**を収集し、全国共通のフォーマットに統合しています。
 
-- 登録不要・APIキー不要
-- 商用利用可能
 - 全件CSV・都道府県別CSV・ベクトルタイルで配信
 - 住所の正規化と緯度経度の補完に対応
-- 毎週自動更新
 
 <!-- STATS:START -->
 > **最終更新: 2026-08-02**
