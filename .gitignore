@@ -9,3 +9,9 @@ api/
 config/_bodik-generated.yaml
 # 分析用の出力（コミットしない）
 analysis/
+# 動作確認で撮ったスクリーンショット（ルートに溜まりやすいので除外）
+map-*.png
+map-*.jpeg
+map-*.jpg
+# Playwright MCP の作業ディレクトリ
+.playwright-mcp/
