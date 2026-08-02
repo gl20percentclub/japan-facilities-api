@@ -1004,7 +1004,7 @@
 | 静岡県 | 榛原郡吉田町 | 静岡県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 静岡県 | 榛原郡川根本町 | 静岡県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 静岡県 | 周智郡森町 | 静岡県（都道府県） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
-| 愛知県 | 名古屋市 | 名古屋市（指定都市） | ✅ | 自身 | [link](https://data.bodik.jp/dataset/979f325a-1b27-45d0-8eb5-dd4aeb85b1f5) | Creative Commons Attribution 4.0 International |
+| 愛知県 | 名古屋市 | 名古屋市（指定都市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 愛知県 | 豊橋市 | 豊橋市（中核市） | ✅ | i2fas | [link](https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action) | 公共データ利用規約（第1.0版, PDL1.0） |
 | 愛知県 | 岡崎市 | 岡崎市（中核市） | ✅ | 自身 | [link](https://data.bodik.jp/dataset/aabced9d-d86e-422d-8ad0-2781d0f30671) | Creative Commons Attribution 4.0 International |
 | 愛知県 | 一宮市 | 一宮市（中核市） | ✅ | 自身 | [link](https://www.city.ichinomiya.aichi.jp/_res/projects/default_project/_page_/001/040/636/232033_Food_Business_All_20260331.csv) | CC BY 4.0 |
