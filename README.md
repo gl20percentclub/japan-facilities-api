@@ -50,10 +50,6 @@
 https://food.japan-facilities.com/api/facilities-all.csv
 ```
 
-* 文字コード: UTF-8（BOMなし）
-* 全列が一致する重複レコードは除去済み
-* 市区町村別CSVや検索APIは配信していません
-
 ### ベクトルタイル
 
 座標を持つ施設をMapbox Vector Tile形式で配信しています。MapLibre GL JSなどから直接読み込めます。
@@ -61,7 +57,6 @@ https://food.japan-facilities.com/api/facilities-all.csv
 | 項目            | 値                                                             |
 | ------------- | ------------------------------------------------------------- |
 | タイルURL        | `https://food.japan-facilities.com/api/tiles/{z}/{x}/{y}.pbf` |
-| Source ID     | `facilities`                                                  |
 | Source layer名 | `facilities`                                                  |
 | 対応ズーム         | `6`〜`12`                                                      |
 | 主な属性          | `name` / `business_type` / `pref` / `city`                    |
@@ -75,8 +70,7 @@ map.addSource("facilities", {
   minzoom: 6,
   maxzoom: 12,
   attribution:
-    '出典：<a href="https://gl20percentclub.github.io/japan-food-facilities/" target="_blank" rel="noopener">Japan Food Facilities</a>'
-    + '（<a href="https://gl20percentclub.github.io/japan-food-facilities/attribution.html" target="_blank" rel="noopener">元データの出典・ライセンス</a>）',
+    '出典：<a href="https://gl20percentclub.github.io/japan-food-facilities/">Japan Food Facilities</a>（<a href="https://gl20percentclub.github.io/japan-food-facilities/attribution.html" target=">自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成</a>）',
 });
 
 map.addLayer({
@@ -91,7 +85,7 @@ map.addLayer({
 });
 ```
 
-`source`には`addSource`で指定したSource IDを、`source-layer`にはベクトルタイル内部のレイヤー名である`facilities`を指定してください。
+`source-layer`にはベクトルタイル内部のレイヤー名である`facilities`を指定してください。
 
 詳細は[metadata.json](https://food.japan-facilities.com/api/tiles/metadata.json)を参照してください。
 
@@ -193,15 +187,7 @@ Claude CodeやCodexなどに、次のURLを渡してください。
 
 ```text
 出典：Japan Food Facilities
-元データの出典・ライセンス一覧：
-https://gl20percentclub.github.io/japan-food-facilities/attribution.html
-```
-
-より詳しく表示する場合は、次の表記を利用できます。
-
-```text
-出典：Japan Food Facilities
-（各自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）
+（自治体・厚生労働省が公開する食品営業許可オープンデータを加工して作成）
 元データの出典・ライセンス一覧：
 https://gl20percentclub.github.io/japan-food-facilities/attribution.html
 ```
