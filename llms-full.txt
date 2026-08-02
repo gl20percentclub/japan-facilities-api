@@ -107,14 +107,6 @@ Claude CodeやCodexなどに、次のURLを渡してください。
 
 市区町村名は、[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses)を利用して正規化しています。
 
-* 政令指定都市の行政区は市に集約
-  例: `横浜市戸塚区` → `横浜市`
-* 町村は郡名を除去
-  例: `河北郡津幡町` → `津幡町`
-* 元の表記は`city_raw`に保存
-
-都道府県や市区町村を特定できなかった場合は、`不明`が入ります。
-
 ## 収録範囲
 
 全国1,741市区町村のうち、**1,727市区町村（99%）**をカバーしています。
@@ -181,8 +173,6 @@ https://gl20percentclub.github.io/japan-food-facilities/attribution.html
 ```
 
 各レコードの出典とライセンスは、CSVの`sources`列と`licenses`列でも確認できます。
-
-特定の自治体のデータだけを利用する場合は、該当する自治体名も併記してください。
 
 ## コントリビューション
 
