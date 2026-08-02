@@ -67,12 +67,12 @@ async function writeCsv(facilities, opts = {}) {
 
 // --- 依存関係: 配信物の生成・検証は config/sources.yaml を要求しない ---
 // クローラー（別リポジトリ）は sources.yaml をコミットせず、クロール実行時だけ
-// CONFIG_PATH で公開リポのクローンを指す。配信物バリデーション（scripts/test.js）は
+// CONFIG_PATH で公開リポのクローンを指す。配信物バリデーション（scripts/validate-api.js）は
 // その環境変数なしで走るため、ここから config.js に到達すると起動時に落ちる。
 // 実際に「build-merged-csv.js → lib/normalize.js → loadConfig()」の連鎖でクロールが
 // 停止したことがあるので、到達不可であることを固定する。
 await test('依存関係: 配信物まわりのモジュールが lib/config.js に依存しない', () => {
-  for (const entry of ['./scripts/test.js', './scripts/build-merged-csv.js']) {
+  for (const entry of ['./scripts/validate-api.js', './scripts/build-merged-csv.js']) {
     const reached = [...reachableModules(entry)];
     const config = reached.find((p) => p.endsWith(`${path.sep}lib${path.sep}config.js`));
     assert.equal(config, undefined, `${entry} から lib/config.js に到達してはいけない`);
@@ -391,7 +391,7 @@ await test('resolvePrefCity: 都道府県が不明でも住所が県名で始ま
 });
 
 // --- 配信物どうしの整合 ---
-// scripts/test.js が本番データで確認している不変条件を、小さなフィクスチャで先に潰す。
+// scripts/validate-api.js が本番データで確認している不変条件を、小さなフィクスチャで先に潰す。
 // 実際に metadata.stats.points（タイル基準）と CSV の座標あり件数がズレて
 // クロールが失敗したことがある（タイルだけ重複除去前の配列から作っていた）。
 await test('配信物: metadata.stats が CSV の件数と一致する', async () => {

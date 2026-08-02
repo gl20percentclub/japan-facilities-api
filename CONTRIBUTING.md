@@ -41,7 +41,7 @@ sources:
 node scripts/crawl.js --only=osaka-city
 ```
 
-BODIK に掲載されているデータは、`scripts/gen-bodik-sources.mjs` でエントリを生成して
+BODIK に掲載されているデータは、`scripts/gen-bodik-sources.js` でエントリを生成して
 手動マージできます。
 
 ---
@@ -62,6 +62,7 @@ npm ci
 | --- | --- |
 | `npm test` | 全テスト（ユニット + 配信物のバリデーション） |
 | `npm run test:unit` | 純粋関数のユニットテストのみ（高速。PR前はこれを通す） |
+| `npm run test:api` | 生成済み `api/` のバリデーション（クロール後でないと動かない） |
 | `npm run build:dry` | キャッシュを使ったクロール（ダウンロードなし） |
 | `npm run build` | 本番クロール（全ソースをダウンロード） |
 | `npm run build:llms` | `llms.txt` / `llms-full.txt` を README から再生成 |

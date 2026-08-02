@@ -38,8 +38,9 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
 
 ```bash
 npm ci                  # 依存関係のインストール
-npm test                # 全テスト（unit + 統合）。PR 前に必ず通すこと
+npm test                # 全テスト（unit + 配信物バリデーション）。PR 前に必ず通すこと
 npm run test:unit       # 純粋関数のユニットテストのみ（高速）
+npm run test:api        # 生成済み api/ のバリデーション（クロール後でないと動かない）
 npm run build:dry       # キャッシュを使ったクロール（ダウンロードなし）
 npm run build           # 本番クロール（全ソースをダウンロード。重い・メモリ大量消費）
 npm run build:llms      # llms.txt / llms-full.txt を README から再生成

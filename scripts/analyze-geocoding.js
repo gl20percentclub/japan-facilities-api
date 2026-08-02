@@ -9,9 +9,9 @@
 //   analysis/no-coord.csv   座標を付与できなかった住所だけ（原因分析用・reason 付き）
 //
 // 使い方:
-//   node scripts/analyze-geocoding.mjs                全ソース
-//   node scripts/analyze-geocoding.mjs --only=osaka-city,okinawa-bodik   指定ソースのみ
-//   node scripts/analyze-geocoding.mjs --concurrency=8
+//   node scripts/analyze-geocoding.js                全ソース
+//   node scripts/analyze-geocoding.js --only=osaka-city,okinawa-bodik   指定ソースのみ
+//   node scripts/analyze-geocoding.js --concurrency=8
 
 import fs from 'node:fs';
 import path from 'node:path';
