@@ -15,8 +15,8 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
   - UTF-8 **BOMなし**、100万件超・数百MB（gzip 版は配信していない）。
     正確な件数・サイズは README の統計ブロック（自動生成）を参照する
   - 列: `prefecture, city, city_raw, name, name_kana, business_type, address, lat, lng, geocoding_level, phone, license_no, license_date, expire_date, sources, licenses`
-- 都道府県別CSV: `https://food.japan-facilities.com/api/prefectures/{JISコード2桁}-{ローマ字}.csv`
-  - 例 `13-tokyo.csv` / `01-hokkaido.csv`。47都道府県すべて存在し、列・内容は全件CSV と同じ。
+- 都道府県別CSV: `https://food.japan-facilities.com/api/prefectures/{都道府県コード2桁}.csv`
+  - 例 `13.csv`（東京都）/ `01.csv`（北海道）。47都道府県すべて存在し、列・内容は全件CSV と同じ。
     ファイル一覧と件数は `api/prefectures/index.json`。1県だけ必要ならこちらを使う
 - ベクトルタイル（MVT）: `https://food.japan-facilities.com/api/tiles/{z}/{x}/{y}.pbf`
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`
