@@ -1,9 +1,17 @@
 // ジオコーディング: 緯度経度の無い施設を、住所から座標に変換して補完する。
 // @geolonia/normalize-japanese-addresses を使い、結果は .cache/geocode-cache.json に永続化。
 // 併せて正規化結果の都道府県・市区町村も取得し、これらのカラムが無いデータの _pref/_city 補完に使う。
+//
+// 大量クエリ（初回フル実行で数十万件）は worker_threads で複数コアに分散する。
+// normalize() は市区町村辞書の照合が CPU 主体（シングルスレッドでは1コアに
+// 張り付く）ため、ワーカー分散で実行時間がほぼ線形に縮む。
+// 少量（週次の差分など）はスレッド起動コストを避けてインラインで処理する。
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
+import { Worker } from 'node:worker_threads';
+import { fileURLToPath } from 'node:url';
 import { normalize, config as njaConfig } from '@geolonia/normalize-japanese-addresses';
 import { ROOT } from './config.js';
 import { isPlaceholderAddress } from './normalize.js';
@@ -11,7 +19,20 @@ import { isPlaceholderAddress } from './normalize.js';
 const CACHE_DIR = path.join(ROOT, '.cache');
 const GEOCODE_CACHE_PATH = path.join(CACHE_DIR, 'geocode-cache.json');
 // 公開APIに優しくするため並列は控えめに（同一市区町村は LRU キャッシュで再利用される）。
+// ワーカー分散時も、クエリは市区町村単位でワーカーに分かれるため
+// 辞書ファイル取得の実負荷はワーカー数にほぼ比例しない。
 const GEOCODE_CONCURRENCY = 8;
+// ワーカースレッド数。Fargate タスクの 8 vCPU に合わせた上限。
+// 環境変数 GEOCODE_WORKERS で上書きできる（1 でインライン処理に固定）。
+const GEOCODE_WORKERS = Math.max(
+  1,
+  Number(process.env.GEOCODE_WORKERS) || Math.min(8, os.availableParallelism()),
+);
+// これ未満のクエリ数ならワーカーを起動せずインラインで処理する
+const WORKER_THRESHOLD = 2000;
+// キャッシュ保存の最短間隔（毎バッチ全量シリアライズすると数十MBの JSON を
+// 数百回書くことになるため、時間ベースで間引く）
+const CACHE_SAVE_INTERVAL_MS = 30_000;
 
 // ジオコーディング用の住所クエリを組み立てる。
 // 神戸市・仙台市等は住所列が区/町名始まり（市名は別列）のため、市名を前置しないと
@@ -55,6 +76,76 @@ async function runPool(items, concurrency, worker) {
   await Promise.all(workers);
 }
 
+// クエリをソートしてから n 個の連続チャンクに分割する（純粋関数・テスト対象）。
+// 日本の住所クエリは「都道府県+市区町村」始まりなので、ソート後の連続チャンクは
+// ほぼ市区町村単位でまとまり、各ワーカーの辞書 LRU ヒット率が上がる
+// （同じ市区町村の辞書を複数ワーカーが重複ダウンロードするのも防ぐ）。
+export function partitionQueries(queries, n) {
+  const sorted = [...queries].sort();
+  const chunks = [];
+  const base = Math.floor(sorted.length / n);
+  const extra = sorted.length % n;
+  let offset = 0;
+  for (let i = 0; i < n; i++) {
+    // 余りは先頭のチャンクから1件ずつ多く持たせる（サイズ差は最大1）
+    const size = base + (i < extra ? 1 : 0);
+    if (size > 0) chunks.push(sorted.slice(offset, offset + size));
+    offset += size;
+  }
+  return chunks;
+}
+
+// worker_threads でクエリ集合を分散処理し、結果をキャッシュへ書き込む。
+// ワーカーからの結果はバッチで届き、進捗表示と時間ベースのキャッシュ保存を行う。
+// ワーカーがクラッシュした場合、その分のクエリは未取得のまま残る
+// （キャッシュに載らないため次回実行時に自動で再試行される）。
+async function geocodeWithWorkers(toFetch, cache, { workers, concurrency, cacheSize }) {
+  const workerUrl = new URL('./geocode-worker.js', import.meta.url);
+  const chunks = partitionQueries(toFetch, workers);
+  console.log(`  ワーカー ${chunks.length}スレッド × 並列${concurrency} で分散処理`);
+
+  let done = 0;
+  let failed = 0;
+  let errored = 0;
+  let lastSave = Date.now();
+  let lastLog = 0;
+
+  await Promise.all(
+    chunks.map(
+      (queries) =>
+        new Promise((resolve) => {
+          const w = new Worker(fileURLToPath(workerUrl), {
+            workerData: { queries, concurrency, cacheSize },
+          });
+          w.on('message', (msg) => {
+            if (msg.type !== 'batch') return;
+            Object.assign(cache, msg.entries);
+            done += Object.keys(msg.entries).length + msg.errored;
+            failed += msg.failed;
+            errored += msg.errored;
+            // 進捗は5,000件刻みで表示（CloudWatch のログ量を抑える）
+            if (done - lastLog >= 5000) {
+              console.log(`    ...${done}/${toFetch.length}件 取得`);
+              lastLog = done;
+            }
+            // 全量シリアライズは重いので時間ベースで間引いて保存する
+            if (Date.now() - lastSave >= CACHE_SAVE_INTERVAL_MS) {
+              saveGeocodeCache(cache);
+              lastSave = Date.now();
+            }
+          });
+          // クラッシュしても全体は止めない（未取得分は次回再試行される）
+          w.on('error', (err) => {
+            console.warn(`  ⚠ ジオコーディングワーカーでエラー: ${err.message}`);
+            resolve();
+          });
+          w.on('exit', () => resolve());
+        }),
+    ),
+  );
+  return { failed, errored };
+}
+
 // 緯度経度の無い施設を住所からジオコーディングして補完する（facilities を破壊的に更新）。
 export async function enrichWithGeocoding(facilities, { concurrency = GEOCODE_CONCURRENCY } = {}) {
   // 座標が無く、かつ住所が実体を持つ施設だけをジオコーディング対象にする。
@@ -82,33 +173,51 @@ export async function enrichWithGeocoding(facilities, { concurrency = GEOCODE_CO
 
   njaConfig.cacheSize = 4000;
 
-  let done = 0;
   let failed = 0; // 住所として解決できなかった（恒久的な失敗）
   let errored = 0; // ネットワーク障害等の一過性エラー（キャッシュせず次回再試行）
-  await runPool(toFetch, concurrency, async (query) => {
-    try {
-      const r = await normalize(query);
-      if (r && r.point && Number.isFinite(r.point.lat) && Number.isFinite(r.point.lng)) {
-        cache[query] = { lat: r.point.lat, lng: r.point.lng, level: r.point.level ?? null, pref: r.pref || null, city: r.city || null };
-      } else if (r && (r.pref || r.city)) {
-        // 座標は取れなかったが都道府県・市区町村は解決できた場合も記録（_pref/_city 補完に使う）。
-        cache[query] = { lat: null, lng: null, level: null, pref: r.pref || null, city: r.city || null };
-        failed++;
-      } else {
-        // 住所として解決できなかった恒久的な失敗。null を記録し再試行を避ける。
-        cache[query] = null;
-        failed++;
+
+  if (GEOCODE_WORKERS > 1 && toFetch.length >= WORKER_THRESHOLD) {
+    // 大量クエリ: worker_threads で複数コアに分散する（初回フル実行など）
+    const r = await geocodeWithWorkers(toFetch, cache, {
+      workers: GEOCODE_WORKERS,
+      concurrency,
+      cacheSize: 4000,
+    });
+    failed = r.failed;
+    errored = r.errored;
+  } else {
+    // 少量クエリ: スレッド起動コストを避けてインラインで処理する（週次の差分など）
+    let done = 0;
+    let lastSave = Date.now();
+    await runPool(toFetch, concurrency, async (query) => {
+      try {
+        const r = await normalize(query);
+        if (r && r.point && Number.isFinite(r.point.lat) && Number.isFinite(r.point.lng)) {
+          cache[query] = { lat: r.point.lat, lng: r.point.lng, level: r.point.level ?? null, pref: r.pref || null, city: r.city || null };
+        } else if (r && (r.pref || r.city)) {
+          // 座標は取れなかったが都道府県・市区町村は解決できた場合も記録（_pref/_city 補完に使う）。
+          cache[query] = { lat: null, lng: null, level: null, pref: r.pref || null, city: r.city || null };
+          failed++;
+        } else {
+          // 住所として解決できなかった恒久的な失敗。null を記録し再試行を避ける。
+          cache[query] = null;
+          failed++;
+        }
+      } catch {
+        // 一過性エラーはキャッシュに書かず、次回実行時（!(q in cache)）に再試行させる。
+        errored++;
       }
-    } catch {
-      // 一過性エラーはキャッシュに書かず、次回実行時（!(q in cache)）に再試行させる。
-      errored++;
-    }
-    done++;
-    if (done % 1000 === 0) {
-      console.log(`    ...${done}/${toFetch.length}件 取得`);
-      saveGeocodeCache(cache);
-    }
-  });
+      done++;
+      if (done % 1000 === 0) {
+        console.log(`    ...${done}/${toFetch.length}件 取得`);
+        // 全量シリアライズは重いので時間ベースで間引いて保存する
+        if (Date.now() - lastSave >= CACHE_SAVE_INTERVAL_MS) {
+          saveGeocodeCache(cache);
+          lastSave = Date.now();
+        }
+      }
+    });
+  }
   saveGeocodeCache(cache);
 
   // キャッシュの結果を施設へ反映（座標と、未確定の都道府県・市区町村）

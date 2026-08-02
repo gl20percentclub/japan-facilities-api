@@ -406,7 +406,7 @@ await test('配信物: metadata.stats が CSV の件数と一致する', async (
   );
   try {
     const outDir = path.join(path.dirname(outPath), 'tiles');
-    generateTiles(stats.unique, { minZoom: 12, maxZoom: 12, outDir, stats, log: () => {} });
+    await generateTiles(stats.unique, { minZoom: 12, maxZoom: 12, outDir, stats, log: () => {} });
     const meta = JSON.parse(fs.readFileSync(path.join(outDir, 'metadata.json'), 'utf-8'));
 
     const withCoords = rows.filter((r) => r[col.lat] !== '' && r[col.lng] !== '').length;
@@ -421,7 +421,8 @@ await test('配信物: 重複除去前の配列からタイルを作ろうとす
   const facilities = [fac(), fac()];
   const { dir, outPath, stats } = await writeCsv(facilities, { gzip: false });
   try {
-    assert.throws(
+    // generateTiles は async のため、同期 throw ではなく reject を検証する
+    await assert.rejects(
       () => generateTiles(facilities, {
         outDir: path.join(path.dirname(outPath), 'tiles'),
         stats,

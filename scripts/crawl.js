@@ -59,11 +59,53 @@ const ONLY = (() => {
   return new Set(arg.slice('--only='.length).split(',').map((s) => s.trim()).filter(Boolean));
 })();
 
+// 配列を破壊的に連結する（純粋関数・テスト対象）。`target.push(...items)` の代わり。
+//
+// スプレッドは配列の全要素を関数の引数として展開するため、要素数が数万〜十数万を
+// 超えると "Maximum call stack size exceeded" で落ちる。i2fas は単体で 71 万件あり、
+// 実際に全ソース取り込み直後のマージでクロールが停止した。ループなら件数の上限がない。
+export function appendAll(target, items) {
+  for (const item of items) target.push(item);
+  return target;
+}
+
 // 施設を1件も取り込めなかったソースを返す。
 // keptBySource に載っていない（＝処理前に落ちた）ソースも 0 件扱いにする。
 export function findEmptySources(sources, keptBySource) {
   return sources.filter((s) => (keptBySource.get(s.key) || 0) === 0);
 }
+
+// ソースの取得先ホストを求める（純粋関数・テスト対象）。
+// 同一ホスト（BODIK の CKAN 等）へ同時に多重アクセスしないよう、
+// ダウンロードの並列化はホスト単位のグループで行う。
+// URL を持たない取得方法（i2fasglob = ローカルキャッシュ読み）は 'local'。
+export function sourceHost(source) {
+  const a = source.acquire || {};
+  const u = a.url || (a.urls && a.urls[0]) || a.ckanBase || null;
+  if (!u) return 'local';
+  try {
+    return new URL(u).host;
+  } catch {
+    return 'local';
+  }
+}
+
+// ソースをホスト単位のグループに分ける（純粋関数・テスト対象）。
+// グループ間は並列、グループ内は逐次で処理することで、
+// 同一サーバーへの同時アクセスを常に1本に保つ。
+export function groupSourcesByHost(sources) {
+  const groups = new Map();
+  for (const s of sources) {
+    const host = sourceHost(s);
+    if (!groups.has(host)) groups.set(host, []);
+    groups.get(host).push(s);
+  }
+  return [...groups.values()];
+}
+
+// ホストグループ間のダウンロード並列数（環境変数で上書き可能）。
+// 相手は別々の自治体サーバーなので、この程度なら行儀は保てる。
+const DOWNLOAD_CONCURRENCY = Math.max(1, Number(process.env.DOWNLOAD_CONCURRENCY) || 6);
 
 async function main() {
   const { sources: allSources, columnMap } = loadConfig();
@@ -71,25 +113,30 @@ async function main() {
   console.log(`全国 食品営業許可 データクローラー${DRY_RUN ? ' (--dry-run)' : ''}`);
   console.log(`対象ソース: ${sources.length}件${ONLY ? `（--only=${[...ONLY].join(',')}）` : ''}\n`);
 
-  const facilities = [];
   const keptBySource = new Map(); // source.key -> 取り込めた施設数
+  // ソースごとの取り込み結果。facilities への結合はソース定義順で行い、
+  // 並列実行でも出力（CSV の行順・重複除去の勝ち負け）を決定的に保つ。
+  const resultBySource = new Map(); // source.key -> facility[]
 
-  for (const source of sources) {
-    console.log(`▼ ${source.key}: ${source.source}`);
+  // 1ソースを取得→パース→正規化する。ログは1ブロックにまとめて出力し、
+  // 並列実行時に他ソースの行と混ざらないようにする。
+  async function processSource(source) {
+    const lines = [`▼ ${source.key}: ${source.source}`];
+    const collected = [];
     let kept = 0;
     try {
       const files = await acquire(source, { cacheDir: CACHE_DIR, dryRun: DRY_RUN });
       const rawRecords = [];
       for (const { cachePath, format } of files) {
-        rawRecords.push(...(await parseSource(source, cachePath, format, columnMap)));
+        appendAll(rawRecords, await parseSource(source, cachePath, format, columnMap));
       }
-      console.log(`  ${rawRecords.length}行を読み込み (${files.map((f) => f.format).join('+')})`);
+      lines.push(`  ${rawRecords.length}行を読み込み (${files.map((f) => f.format).join('+')})`);
 
       for (const raw of rawRecords) {
         const rec = mapRecord(raw, columnMap);
         const facility = toFacility(rec);
         if (facility) {
-          facilities.push({
+          collected.push({
             ...facility,
             _pref: resolvePrefecture(rec, source),
             _city: resolveCity(rec, source),
@@ -99,11 +146,34 @@ async function main() {
           kept++;
         }
       }
-      console.log(`  有効施設: ${kept}件`);
+      lines.push(`  有効施設: ${kept}件`);
     } catch (err) {
-      console.error(`  ⚠ ${source.key} をスキップ: ${err.message}`);
+      lines.push(`  ⚠ ${source.key} をスキップ: ${err.message}`);
     }
+    console.log(lines.join('\n'));
     keptBySource.set(source.key, kept);
+    resultBySource.set(source.key, collected);
+  }
+
+  // ホスト単位のグループに分け、グループ間だけを並列化する
+  // （同一サーバーへの同時アクセスは常に1本 = 逐次実行と同じ行儀を保つ）。
+  const hostGroups = groupSourcesByHost(sources);
+  let nextGroup = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(DOWNLOAD_CONCURRENCY, hostGroups.length) }, async () => {
+      while (nextGroup < hostGroups.length) {
+        const group = hostGroups[nextGroup++];
+        for (const source of group) {
+          await processSource(source);
+        }
+      }
+    }),
+  );
+
+  // ソース定義順に結合して以降の処理（重複除去・タイル生成）を決定的にする
+  const facilities = [];
+  for (const source of sources) {
+    appendAll(facilities, resultBySource.get(source.key) || []);
   }
 
   console.log(`\n有効な施設: 合計 ${facilities.length}件`);
@@ -149,7 +219,7 @@ async function main() {
   const prefCsv = await buildPrefectureCsvs(csv.unique, { outDir: PREF_CSV_DIR, updated });
   // タイルは CSV と同じ集合（重複除去後）から作る。元の facilities を渡すと
   // CSV に載らない重複点がタイルに入り、配信物どうしで件数が食い違う。
-  const tiles = generateTiles(csv.unique, { updated, stats: csv });
+  const tiles = await generateTiles(csv.unique, { updated, stats: csv });
   generateReadmeStats({ updated, csv, prefCsv, tiles });
   // README の統計更新後に、AI エージェント向けの llms.txt / llms-full.txt を
   // README から再生成する（統計込みで最新化するため、必ず統計更新の後に呼ぶ）

@@ -13,7 +13,10 @@ import {
   toFacility,
   parseCSVText,
   splitPrefCity,
+  appendAll,
   findEmptySources,
+  sourceHost,
+  groupSourcesByHost,
   fetchWithRetry,
   resolveLinkFromHtml,
   isPlaceholderAddress,
@@ -296,6 +299,48 @@ test('resolveLinkFromHtml: 複数一致を all で返す', () => {
   assert.equal(hit.count, 2);
   assert.equal(hit.all.length, 2);
   assert.deepEqual(hit.all.map((h) => h.url), ['https://x/f/5622702.csv', 'https://x/f/5622703.csv']);
+});
+
+// --- sourceHost / groupSourcesByHost: ダウンロード並列化のグループ分け ---
+test('sourceHost: url / urls / ckanBase からホストを求める', () => {
+  assert.equal(sourceHost({ acquire: { type: 'get', url: 'https://city.example.jp/a.csv' } }), 'city.example.jp');
+  assert.equal(sourceHost({ acquire: { type: 'get', urls: ['https://pref.example.jp/1.csv', 'https://other.jp/2.csv'] } }), 'pref.example.jp');
+  assert.equal(sourceHost({ acquire: { type: 'ckan', ckanBase: 'https://data.bodik.jp', resourceId: 'x' } }), 'data.bodik.jp');
+});
+
+test('sourceHost: URL を持たない取得方法は local になる', () => {
+  assert.equal(sourceHost({ acquire: { type: 'i2fasglob' } }), 'local');
+  assert.equal(sourceHost({}), 'local');
+});
+
+test('groupSourcesByHost: 同一ホストが同じグループに寄り、全ソースが漏れない', () => {
+  const sources = [
+    { key: 'a', acquire: { type: 'ckan', ckanBase: 'https://data.bodik.jp', resourceId: '1' } },
+    { key: 'b', acquire: { type: 'get', url: 'https://osaka.example.jp/x.csv' } },
+    { key: 'c', acquire: { type: 'ckan', ckanBase: 'https://data.bodik.jp', resourceId: '2' } },
+    { key: 'd', acquire: { type: 'i2fasglob' } },
+  ];
+  const groups = groupSourcesByHost(sources);
+  assert.equal(groups.flat().length, sources.length);
+  const bodik = groups.find((g) => g.some((s) => s.key === 'a'));
+  assert.deepEqual(bodik.map((s) => s.key), ['a', 'c']);
+});
+
+// --- appendAll: 巨大配列の連結 ---
+test('appendAll: 順序を保って連結し、戻り値は連結先', () => {
+  const target = [1, 2];
+  const result = appendAll(target, [3, 4]);
+  assert.deepEqual(target, [1, 2, 3, 4]);
+  assert.equal(result, target, '連結先の参照をそのまま返す');
+  assert.deepEqual(appendAll([1], []), [1], '空配列は何も足さない');
+});
+
+test('appendAll: 数十万件でもスタックを溢れさせない（i2fas は71万件）', () => {
+  // target.push(...items) だとここで "Maximum call stack size exceeded" になる。
+  const huge = new Array(800_000).fill(0);
+  const target = [];
+  appendAll(target, huge);
+  assert.equal(target.length, 800_000);
 });
 
 const runAsync = async () => {
