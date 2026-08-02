@@ -117,6 +117,7 @@ ${stats}
 
 - [llms-full.txt](${PAGES}/llms-full.txt): データ仕様・利用例・注意事項の全文（まずこれを読む）
 - [README](${RAW}/README.md): プロジェクト概要
+- [データの詳細](${RAW}/docs/DATA.md): 収集元・正規化・収録範囲・緯度経度の精度・鮮度・更新頻度
 - [収録状況](${RAW}/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
 - [タイルメタデータ](${DATA}/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
 - [地図ページ](${PAGES}/map.html): 収録データをベクトルタイルで表示するプレビュー地図
