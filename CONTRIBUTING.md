@@ -41,7 +41,7 @@ sources:
 node scripts/crawl.js --only=osaka-city
 ```
 
-BODIK に掲載されているデータは、`scripts/gen-bodik-sources.js` でエントリを生成して
+BODIK に掲載されているデータは、`scripts/tools/gen-bodik-sources.js` でエントリを生成して
 手動マージできます。
 
 ---
@@ -114,7 +114,7 @@ npm ci
 - **コード・コメントは日本語**で書きます。
 - すべての関数に doc コメント、非自明なロジックにインラインコメントを付けます。
 - 整形・生成ロジックは**純粋関数として export** し、固定入力でテストできる形にします。
-- テストは `scripts/*.test.js` に、外部ライブラリを使わない自前の `assert` で書きます。
+- テストは実装と同じディレクトリに `*.test.js` として置き、外部ライブラリを使わない自前の `assert` で書きます。
   追加したら `package.json` の `test:unit` チェーンにも追加してください。
 
 ---

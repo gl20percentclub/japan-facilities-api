@@ -1,9 +1,9 @@
 // gen-readme-stats.js の整形ロジックを検証する。
 // renderStats() は純粋関数なので固定入力で検証する。
 //
-//   node scripts/gen-readme-stats.test.js
+//   node scripts/generate/readme-stats.test.js
 
-import { renderStats } from './gen-readme-stats.js';
+import { renderStats } from './readme-stats.js';
 
 let failures = 0;
 function assert(cond, msg) {
@@ -15,7 +15,7 @@ function assert(cond, msg) {
   }
 }
 
-console.log('gen-readme-stats テスト\n');
+console.log('README統計 生成 テスト\n');
 
 const fixed = {
   updated: 1783366001, // 2026-07-06
@@ -60,4 +60,4 @@ if (failures > 0) {
   console.error(`\n❌ ${failures}件のチェックに失敗`);
   process.exit(1);
 }
-console.log('\n✅ gen-readme-stats テストに合格');
+console.log('\n✅ README統計 生成 テストに合格');

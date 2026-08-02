@@ -1,4 +1,4 @@
-<!-- このファイルは README.md から自動生成されています（scripts/gen-llms.js）。直接編集しないでください。 -->
+<!-- このファイルは README.md から自動生成されています（scripts/generate/llms.js）。直接編集しないでください。 -->
 
 # 🍽️ Japan Food Facilities Data
 

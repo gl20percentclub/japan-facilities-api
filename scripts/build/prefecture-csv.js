@@ -17,7 +17,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { CSV_COLUMNS, csvCell, toRow } from './build-merged-csv.js';
+import { CSV_COLUMNS, csvCell, toRow } from './merged-csv.js';
 
 /**
  * JIS都道府県コード順の都道府県定義。

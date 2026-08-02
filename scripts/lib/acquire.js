@@ -132,10 +132,10 @@ async function extractFromZip(zipBuf, entryPattern) {
 export async function acquire(source, { cacheDir, dryRun = false } = {}) {
   const a = source.acquire;
 
-  // i2fasglob: scripts/fetch-i2fas.js が取得した .cache/i2fas/*.csv をまとめて読む。
+  // i2fasglob: scripts/tools/fetch-i2fas.js が取得した .cache/i2fas/*.csv をまとめて読む。
   if (a.type === 'i2fasglob') {
     const dir = path.join(cacheDir, 'i2fas');
-    if (!fs.existsSync(dir)) throw new Error(`.cache/i2fas がありません（先に node scripts/fetch-i2fas.js を実行）`);
+    if (!fs.existsSync(dir)) throw new Error(`.cache/i2fas がありません（先に node scripts/tools/fetch-i2fas.js を実行）`);
     const files = fs.readdirSync(dir).filter((f) => f.endsWith('.csv')).sort();
     if (files.length === 0) throw new Error('.cache/i2fas に CSV がありません');
     console.log(`  i2fas キャッシュ ${files.length} ファイルを使用`);

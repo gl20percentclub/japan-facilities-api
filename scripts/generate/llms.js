@@ -12,7 +12,7 @@
 // 最新の統計へ追従する。生成物はリポジトリ直下に置かれ、gh-pages 配信で
 // サイトルート（/llms.txt /llms-full.txt）から取得できる。
 //
-//   node scripts/gen-llms.js   単体実行（README.md を読んで2ファイルを書き出す）
+//   node scripts/generate/llms.js   単体実行（README.md を読んで2ファイルを書き出す）
 // ---------------------------------------------------------------------------
 
 import fs from 'node:fs';
@@ -20,7 +20,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..', '..');
 const README_PATH = path.join(ROOT, 'README.md');
 
 // 配信 URL の基点。静的ページは GitHub Pages、データ（api/）は S3 + CloudFront
@@ -132,7 +132,7 @@ ${stats}
  */
 export function renderLlmsFullTxt(readme) {
   const body = absolutizeLinks(stripHtmlNoise(readme)).trim();
-  return `<!-- このファイルは README.md から自動生成されています（scripts/gen-llms.js）。直接編集しないでください。 -->
+  return `<!-- このファイルは README.md から自動生成されています（scripts/generate/llms.js）。直接編集しないでください。 -->
 
 ${body}
 
@@ -250,7 +250,7 @@ export function generateLlmsFiles() {
   return written;
 }
 
-// 単体実行（node scripts/gen-llms.js）されたときだけ生成を走らせる
+// 単体実行（node scripts/generate/llms.js）されたときだけ生成を走らせる
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   console.log('llms.txt / llms-full.txt を生成');
   generateLlmsFiles();

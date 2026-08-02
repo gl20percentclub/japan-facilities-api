@@ -9,18 +9,18 @@
 //   analysis/no-coord.csv   座標を付与できなかった住所だけ（原因分析用・reason 付き）
 //
 // 使い方:
-//   node scripts/analyze-geocoding.js                全ソース
-//   node scripts/analyze-geocoding.js --only=osaka-city,okinawa-bodik   指定ソースのみ
-//   node scripts/analyze-geocoding.js --concurrency=8
+//   node scripts/tools/analyze-geocoding.js                全ソース
+//   node scripts/tools/analyze-geocoding.js --only=osaka-city,okinawa-bodik   指定ソースのみ
+//   node scripts/tools/analyze-geocoding.js --concurrency=8
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { normalize, config as njaConfig } from '@geolonia/normalize-japanese-addresses';
-import { loadConfig, ROOT } from './lib/config.js';
-import { acquire } from './lib/acquire.js';
-import { parseSource } from './lib/parse.js';
-import { mapRecord, toFacility, resolvePrefecture, resolveCity } from './lib/normalize.js';
-import { geocodeQuery } from './lib/geocode.js';
+import { loadConfig, ROOT } from '../lib/config.js';
+import { acquire } from '../lib/acquire.js';
+import { parseSource } from '../lib/parse.js';
+import { mapRecord, toFacility, resolvePrefecture, resolveCity } from '../lib/normalize.js';
+import { geocodeQuery } from '../lib/geocode.js';
 
 const CACHE_DIR = path.join(ROOT, '.cache');
 const OUT_DIR = path.join(ROOT, 'analysis');

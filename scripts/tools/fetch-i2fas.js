@@ -14,9 +14,9 @@
 // 逐次・低レート・キャッシュ（レジューム）で節度をもって取得する。
 //
 // 使い方:
-//   node scripts/fetch-i2fas.js             全自治体を取得（キャッシュ済みはスキップ）
-//   node scripts/fetch-i2fas.js --limit=5   先頭5自治体だけ（動作確認）
-//   node scripts/fetch-i2fas.js --force     キャッシュを無視して再取得
+//   node scripts/tools/fetch-i2fas.js             全自治体を取得（キャッシュ済みはスキップ）
+//   node scripts/tools/fetch-i2fas.js --limit=5   先頭5自治体だけ（動作確認）
+//   node scripts/tools/fetch-i2fas.js --force     キャッシュを無視して再取得
 
 import { chromium } from 'playwright';
 import fs from 'node:fs';
@@ -24,7 +24,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..', '..');
 const OUT = path.join(ROOT, '.cache', 'i2fas');
 const PUB = 'https://i2fas.mhlw.go.jp/faspub/IO_S010303.do?method=a_menu_o01Action';
 

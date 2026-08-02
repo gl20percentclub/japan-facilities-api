@@ -21,7 +21,7 @@ const vtpbf = vtpbfNs.default || vtpbfNs;
 const fromGeojsonVt = vtpbf.fromGeojsonVt || vtpbfNs.fromGeojsonVt;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..', '..');
 const TILES_DIR = path.join(ROOT, 'api', 'tiles');
 const LAYER = 'facilities';
 

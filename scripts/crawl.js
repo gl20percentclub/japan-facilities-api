@@ -35,11 +35,11 @@ import {
 } from './lib/normalize.js';
 import { enrichWithGeocoding } from './lib/geocode.js';
 import { buildCityNormMap, applyPrefCity } from './lib/city-normmap.js';
-import { buildMergedCsv } from './build-merged-csv.js';
-import { buildPrefectureCsvs } from './build-prefecture-csv.js';
-import { generateTiles } from './gen-tiles.js';
-import { generateReadmeStats } from './gen-readme-stats.js';
-import { generateLlmsFiles } from './gen-llms.js';
+import { buildMergedCsv } from './build/merged-csv.js';
+import { buildPrefectureCsvs } from './build/prefecture-csv.js';
+import { generateTiles } from './build/tiles.js';
+import { generateReadmeStats } from './generate/readme-stats.js';
+import { generateLlmsFiles } from './generate/llms.js';
 
 const CACHE_DIR = path.join(ROOT, '.cache');
 const API_DIR = path.join(ROOT, 'api');
