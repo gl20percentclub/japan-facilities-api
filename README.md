@@ -57,7 +57,6 @@ https://food.japan-facilities.com/api/facilities-all.csv
 | 項目            | 値                                                             |
 | ------------- | ------------------------------------------------------------- |
 | タイルURL        | `https://food.japan-facilities.com/api/tiles/{z}/{x}/{y}.pbf` |
-| Source ID     | `facilities`                                                  |
 | Source layer名 | `facilities`                                                  |
 | 対応ズーム         | `6`〜`12`                                                      |
 | 主な属性          | `name` / `business_type` / `pref` / `city`                    |
@@ -86,7 +85,7 @@ map.addLayer({
 });
 ```
 
-`source`には`addSource`で指定したSource IDを、`source-layer`にはベクトルタイル内部のレイヤー名である`facilities`を指定してください。
+`source-layer`にはベクトルタイル内部のレイヤー名である`facilities`を指定してください。
 
 詳細は[metadata.json](https://food.japan-facilities.com/api/tiles/metadata.json)を参照してください。
 
