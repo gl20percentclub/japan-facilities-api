@@ -154,3 +154,5 @@ https://gl20percentclub.github.io/japan-food-facilities/attribution.html
 バグ報告、データソース追加、ドキュメント改善、機能提案を歓迎します。
 
 開発環境のセットアップやプルリクエストの手順は、[`CONTRIBUTING.md`](CONTRIBUTING.md)を参照してください。
+
+リポジトリの構成、データが生成・配信される流れ、やりたいこと別に触るファイルは、[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)にまとめています。

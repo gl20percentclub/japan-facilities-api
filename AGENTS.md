@@ -52,6 +52,9 @@ npm run build:attribution  # attribution.html を config/sources.yaml から再�
 
 ## リポジトリ構成
 
+全体像（生成物がどこで作られ、どこへ配信されるか）は [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+にまとめてある。図・生成物と生成元の対応表・やりたいこと別に触るファイルの一覧はそちらを見る。
+
 ```
 site/                   # gh-pages に配信する静的サイト（ここの中身がそのまま公開される）
 site/index.html         # LP
