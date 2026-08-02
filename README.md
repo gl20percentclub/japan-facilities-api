@@ -35,8 +35,6 @@
 > | ベクトルタイル | 8,769 枚 / 約 434.1 MB |
 <!-- STATS:END -->
 
-1レコードは、原則として1件の営業許可または届出を表します。同じ施設が複数の業種で許可を持つ場合は、複数レコードとして収録されます。
-
 ## データを使う
 
 ### CSV
@@ -56,7 +54,9 @@ https://food.japan-facilities.com/api/facilities-all.csv
 | タイルURL        | `https://food.japan-facilities.com/api/tiles/{z}/{x}/{y}.pbf` |
 | Source layer名 | `facilities`                                                  |
 | 対応ズーム         | `6`〜`12`                                                      |
-| 主な属性          | `name` / `business_type` / `pref` / `city`                    |
+| 属性          | `name`（施設名） / `business_type`（営業許可・届出の業種） / `pref`（都道府県名） / `city`（市区町村名）                    |
+
+※ ベクトルタイルは軽量化のため上記の属性に絞って配信しています
 
 ```js
 map.addSource("facilities", {
@@ -81,8 +81,6 @@ map.addLayer({
   },
 });
 ```
-
-`source-layer`にはベクトルタイル内部のレイヤー名である`facilities`を指定してください。
 
 詳細は[metadata.json](https://food.japan-facilities.com/api/tiles/metadata.json)を参照してください。
 
