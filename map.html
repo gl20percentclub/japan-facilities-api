@@ -186,7 +186,7 @@
     </div>
 
     <p class="meta-line">
-      <span class="legend-dot"></span>各点＝1施設
+      <span class="legend-dot"></span><span id="legend-text">各点＝1施設</span>
       <span id="updated"></span><br>
       <a href="./">トップ</a> ·
       <a href="https://github.com/gl20percentclub/japan-food-facilities">GitHub</a> ·
@@ -417,6 +417,19 @@
     map.on('zoom', updateHint);
     map.on('load', updateHint);
 
+    // --- 凡例の表示制御 ---
+    // 最大ズーム未満のタイルは、重なって区別できない施設を 1 点にまとめた
+    // 代表点で構成される（gen-tiles.js の間引き）。「各点＝1施設」と出したままだと
+    // 点の数を施設数として読まれてしまうため、ズームで文言を出し分ける。
+    const legendEl = $('legend-text');
+    /** 現在のズームが間引きの対象かどうかで凡例の文言を切り替える。 */
+    function updateLegend() {
+      legendEl.textContent =
+        map.getZoom() >= TILE_MAX_ZOOM ? '各点＝1施設' : '各点＝付近の施設をまとめた代表';
+    }
+    map.on('zoom', updateLegend);
+    map.on('load', updateLegend);
+
     // ================= 業種フィルター =================
     /** business_type にキーワードを含むかどうかの式（部分一致）。 */
     const contains = (keyword) => ['in', keyword, ['get', 'business_type']];
@@ -516,21 +529,38 @@
       business_type: '業種',
       pref: '都道府県',
       city: '市区町村',
+      count: 'この地点の施設数',
     };
 
     /**
      * 属性オブジェクトからポップアップの HTML を組み立てる（純粋な文字列生成）。
      * `name` は見出しに使い、それ以外の値のある属性をラベル付きの行にする。
+     *
+     * 最大ズーム未満のタイルは、同じ地点・同じ業種の施設が 1 点にまとめられている
+     * （代表点。`name` を持たず、まとめた件数が `count` に入る）。代表点は件数を
+     * 見出しにし、名前が見られる条件を添える。ここで「（名称なし）」と出すと、
+     * 元データに名前が無い施設（最大ズームで実在する）と区別がつかなくなる。
+     * `count` の有無で代表点かどうかを判定する（件数が1でも代表点は代表点）。
      */
     function popupHtml(props, labels) {
       const rows = [];
+      // count を持つのは間引かれたズームの点だけ。件数は見出しに出すので行にしない
+      const isRepresentative = !props.name && props.count !== undefined && props.count !== null;
       for (const [key, value] of Object.entries(props)) {
-        // 見出しに使う name と、空文字・null・undefined の属性は行にしない。
+        // 見出しに使う属性と、空文字・null・undefined の属性は行にしない。
         if (key === 'name') continue;
+        if (key === 'count' && isRepresentative) continue;
         if (value === null || value === undefined || value === '') continue;
         rows.push(`<p class="fac-row"><span class="k">${esc(labels[key] || key)}</span>${esc(value)}</p>`);
       }
-      const title = props.name ? esc(props.name) : '（名称なし）';
+      if (isRepresentative) {
+        rows.push('<p class="fac-row">施設名はズームを上げると表示されます</p>');
+      }
+      const title = props.name
+        ? esc(props.name)
+        : isRepresentative
+          ? `この付近に ${Number(props.count).toLocaleString('ja-JP')} 件`
+          : '（名称なし）';
       return `<p class="fac-name">${title}</p>${rows.join('')}`;
     }
 

@@ -20,6 +20,10 @@ AI コーディングエージェント（Claude Code / Codex 等）向けのガ
     ファイル一覧と件数は `api/prefectures/index.json`。1県だけ必要ならこちらを使う
 - ベクトルタイル（MVT）: `https://food.japan-facilities.com/api/tiles/{z}/{x}/{y}.pbf`
   - レイヤ名 `facilities`、z6–12、属性 `name` / `business_type` / `pref` / `city`
+  - **全施設の点が入るのは z12 のみ**。z6–11 は同じ地点・同じ業種の施設を 1 点に
+    間引いた代表点で、`name` を持たず `count`（まとめた件数）が入る。業種は残すので
+    業種フィルターは全ズームで正しく効く。間引き設定は metadata.json の `thinning`
+    （間引かないと z6 の 1 タイルが 38MB になる。詳細はクローラーの gen-tiles.js）
 - 市区町村別 CSV/JSON や検索 API は**このリポジトリからは配信していない**。データ抽出は
   CSV（DuckDB 推奨）、地図表示はタイルを使う。ブラウザから非圧縮 CSV を直接 fetch しない
 - `map.html` は統計表示と業種フィルターだけの最小構成のプレビュー地図。業種の分類は

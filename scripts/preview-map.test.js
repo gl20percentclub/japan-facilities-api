@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildFeatureCollection, generateTiles } from './gen-tiles.js';
+import { buildFeatureCollection, thinFeatures, generateTiles } from './gen-tiles.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -104,7 +104,13 @@ test('タイルURLテンプレートが「api/tiles/ + metadata.tiles[0]」の�
 test('ポップアップのラベル定義が生成featureの属性と過不足なく一致する', () => {
   // ポップアップは feature が実際に持つ属性を出すため、ラベル定義(TILE_PROP_LABELS)が
   // 生成物とズレるとキー名がそのまま画面に出る／表示されない属性が生まれる。
-  const props = Object.keys(buildFeatureCollection(FACILITIES).features[0].properties);
+  // 最大ズームは全点そのまま（buildFeatureCollection の属性）、それ未満は間引いた
+  // 代表点（thinFeatures の属性。name が無く count が付く）なので、両方の和で見る。
+  const full = Object.keys(buildFeatureCollection(FACILITIES).features[0].properties);
+  const thinned = Object.keys(
+    thinFeatures(buildFeatureCollection(FACILITIES).features, 6)[0].properties,
+  );
+  const props = [...new Set([...full, ...thinned])];
   const m = HTML.match(/const TILE_PROP_LABELS = \{([^}]+)\}/);
   assert.ok(m, 'map.html に TILE_PROP_LABELS が定義されている');
   const labeled = [...m[1].matchAll(/^\s*([a-z_]+):/gm)].map((x) => x[1]);
@@ -114,6 +120,27 @@ test('ポップアップのラベル定義が生成featureの属性と過不足�
   for (const key of labeled) {
     assert.ok(props.includes(key), `ラベル定義の ${key} が生成feature.properties に存在する`);
   }
+});
+
+test('間引いた代表点は name を持たず、業種フィルターの参照属性は残る', () => {
+  // map.html の業種フィルターは business_type への部分一致で効かせている。
+  // 間引きで business_type が落ちると、低ズームでフィルターが全件空振りする。
+  const thinned = thinFeatures(buildFeatureCollection(FACILITIES).features, 6);
+  assert.ok(thinned.length >= 1, '間引き後も点が残る');
+  for (const f of thinned) {
+    assert.ok(!('name' in f.properties), '代表点に name は載らない');
+    assert.ok('business_type' in f.properties, '代表点にも business_type は残る');
+    assert.ok(Number.isInteger(f.properties.count), 'count に件数が入る');
+  }
+  // map.html 側が business_type を参照していることも合わせて固定する
+  assert.ok(HTML.includes("['get', 'business_type']"), 'map.html が business_type で絞り込む');
+  // 代表点は「名前が無い施設」ではないので、そう見える表示にしない。
+  // count の有無で代表点を判定し、件数を見出しに出すことを固定する。
+  assert.ok(/props\.count !== undefined/.test(HTML), '代表点かどうかを count の有無で判定する');
+  assert.ok(HTML.includes('この付近に '), '代表点のポップアップは件数を見出しに出す');
+  // 凡例は「各点＝1施設」のままだと点の数を施設数として読まれる。
+  assert.ok(/legend-text/.test(HTML), '凡例をズームで出し分ける要素がある');
+  assert.ok(HTML.includes('各点＝付近の施設をまとめた代表'), '間引き中の凡例文言がある');
 });
 
 test('ヘッダーの統計が参照する metadata.stats のキーがすべて生成される', () => {

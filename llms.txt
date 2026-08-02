@@ -15,6 +15,8 @@
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: https://food.japan-facilities.com/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
+- タイルで全施設の点が入るのは z12 のみ。z6–11 は同じ地点・同じ業種を 1 点にまとめた
+  代表点で、name を持たず count（まとめた件数）が入る。業種は残るのでフィルターは効く
 - 市区町村別 CSV/JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
   地図表示はタイルで行う
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変

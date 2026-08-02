@@ -106,6 +106,8 @@ export function renderLlmsTxt(readme) {
   business_type, address, lat, lng, geocoding_level, phone, license_no,
   license_date, expire_date, sources, licenses
 - ベクトルタイル（MVT）: ${DATA}/api/tiles/{z}/{x}/{y}.pbf （レイヤ名 facilities、z6–12）
+- タイルで全施設の点が入るのは z12 のみ。z6–11 は同じ地点・同じ業種を 1 点にまとめた
+  代表点で、name を持たず count（まとめた件数）が入る。業種は残るのでフィルターは効く
 - 市区町村別 CSV/JSON や検索 API はこのリポジトリからは配信していない。抽出は CSV から、
   地図表示はタイルで行う
 - 全ファイル CORS 開放済み（Access-Control-Allow-Origin: *）。URL は更新後も不変
@@ -205,6 +207,12 @@ map.addLayer({
 
 - **ブラウザから数百MBの CSV を fetch しない。** 地図表示はタイル、データ抽出はサーバー側
   （または DuckDB-Wasm + HTTP range request）で行う。
+- **タイルの点数を施設数として数えない。** 全施設の点が入るのは最大ズーム(z12)だけで、
+  z6–11 は同じ地点・同じ業種の施設を 1 点にまとめた代表点になっている（低ズームで
+  数万点が同じ画素に重なり、間引かないと 1 タイル 38MB になるため）。代表点は
+  \`name\` を持たず、まとめた件数が \`count\` に入る。ポップアップに施設名を出したい、
+  1 件ずつの点が必要、といった用途では z12 を使う（業種は全ズームで残るので
+  \`business_type\` での絞り込みはどのズームでも正しい）。
 - CSV は UTF-8 **BOMなし**。gzip 圧縮版（.csv.gz）は配信していない。
 - \`lat\` / \`lng\` は座標を補完できなかった施設では空になる。地図利用時は必ず除外する。
 - \`geocoding_level\` が小さいほど座標は大まか（1=都道府県、2=市区町村、3=町丁目、8=街区・地番）。
