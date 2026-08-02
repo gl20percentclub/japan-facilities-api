@@ -7,6 +7,7 @@
 [公式サイト](https://gl20percentclub.github.io/japan-food-facilities/) ·
 [地図で見る](https://gl20percentclub.github.io/japan-food-facilities/map.html) ·
 [CSVをダウンロード](https://food.japan-facilities.com/api/facilities-all.csv) ·
+[データの詳細](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/DATA.md) ·
 [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/COVERAGE.md) ·
 [出典・ライセンス](https://gl20percentclub.github.io/japan-food-facilities/attribution.html)
 
@@ -107,52 +108,18 @@ Claude CodeやCodexなどに、次のURLを渡してください。
 
 市区町村名は、[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses)を利用して正規化しています。
 
-## 収録範囲
+## データの詳細
 
-全国1,741市区町村のうち、**1,727市区町村（99%）**をカバーしています。
+収集元、市区町村名の正規化、収録範囲、緯度経度の精度、鮮度と網羅性、更新頻度は、[`docs/DATA.md`](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/DATA.md)にまとめています。利用前に次の点を確認してください。
 
-データは主に次の公開元から収集しています。
-
-1. 市区町村のオープンデータ
-2. 都道府県や保健所設置主体のオープンデータ
-3. 厚生労働省「食品衛生申請等システム（i2fas）」のオープンデータ
+| 項目                                                | 概要                                                        |
+| ------------------------------------------------- | --------------------------------------------------------- |
+| [収録範囲](https://gl20percentclub.github.io/japan-food-facilities/docs/DATA.md#収録範囲)                     | 全国1,741市区町村のうち1,727市区町村（99%）をカバー          |
+| [緯度経度](https://gl20percentclub.github.io/japan-food-facilities/docs/DATA.md#緯度経度)                   | 元データに座標がない場合は住所からジオコーディング。精度は`geocoding_level`で確認 |
+| [鮮度と網羅性](https://gl20percentclub.github.io/japan-food-facilities/docs/DATA.md#鮮度と網羅性)           | 廃業済みや許可期限切れの施設が含まれる場合がある            |
+| [更新頻度](https://gl20percentclub.github.io/japan-food-facilities/docs/DATA.md#更新頻度)                   | 毎週月曜18:00 UTC（日本時間 火曜3:00）に自動更新。URLは不変 |
 
 自治体ごとの収録状況は、[`docs/COVERAGE.md`](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/COVERAGE.md)で確認できます。
-
-## データ利用時の注意
-
-### 緯度経度
-
-元データに座標がない場合は、住所からジオコーディングしています。
-
-| level | 精度       |
-| ----- | -------- |
-| `1`   | 都道府県の代表点 |
-| `2`   | 市区町村の代表点 |
-| `3`   | 町丁目の代表点  |
-| `8`   | 街区・地番レベル |
-
-値が小さいほど位置は大まかです。建物単位の精度が必要な場合は、`geocoding_level`を確認してください。
-
-### 鮮度と網羅性
-
-次のようなデータが含まれる場合があります。
-
-* 古い時点のスナップショット
-* 掲載に同意した施設のみを含むデータ
-* 廃業後も公開元に残っている施設
-* 許可期限が切れている施設
-* 所在地を正確に特定できない施設
-
-最新かつ正式な情報は、各自治体の公開情報を確認してください。
-
-収集元・加工方法・精度のより詳しい説明は、[`docs/DATA.md`](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/DATA.md)を参照してください。
-
-## 更新頻度
-
-毎週月曜18:00 UTC（日本時間 火曜3:00）に自動更新します。
-
-更新後もCSVとベクトルタイルのURLは変わりません。
 
 ## ライセンスと出典表示
 

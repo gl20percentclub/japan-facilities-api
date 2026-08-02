@@ -34,6 +34,7 @@
 
 - [llms-full.txt](https://gl20percentclub.github.io/japan-food-facilities/llms-full.txt): データ仕様・利用例・注意事項の全文（まずこれを読む）
 - [README](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/README.md): プロジェクト概要
+- [データの詳細](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/DATA.md): 収集元・正規化・収録範囲・緯度経度の精度・鮮度・更新頻度
 - [収録状況](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/COVERAGE.md): 自治体ごとの収録有無・取得元・ライセンスの一覧
 - [タイルメタデータ](https://food.japan-facilities.com/api/tiles/metadata.json): TileJSON（レイヤ定義・ズーム範囲・bounds）
 - [地図ページ](https://gl20percentclub.github.io/japan-food-facilities/map.html): 収録データをベクトルタイルで表示するプレビュー地図
