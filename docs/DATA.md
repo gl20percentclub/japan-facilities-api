@@ -52,9 +52,11 @@ Japan Food Facilitiesで配信しているデータの収集元、加工方法�
 
 元データに緯度経度が含まれていない場合は、住所をもとにジオコーディングしています。
 
+ジオコーディングにも、市区町村名の正規化と同じ[normalize-japanese-addresses](https://github.com/geolonia/normalize-japanese-addresses)を利用しています。
+
 緯度経度はWGS84形式で、`lat`列と`lng`列に格納されます。
 
-ジオコーディング結果のおおよその精度は、`geocoding_level`列で確認できます。
+ジオコーディング結果のおおよその精度は、`geocoding_level`列で確認できます。この値はnormalize-japanese-addressesが返す正規化レベルです。
 
 | level | 精度       |
 | ----- | -------- |
