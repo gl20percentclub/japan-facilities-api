@@ -147,6 +147,8 @@ https://gl20percentclub.github.io/japan-food-facilities/attribution.html
 
 開発環境のセットアップやプルリクエストの手順は、[`CONTRIBUTING.md`](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/CONTRIBUTING.md)を参照してください。
 
+リポジトリの構成、データが生成・配信される流れ、やりたいこと別に触るファイルは、[`docs/ARCHITECTURE.md`](https://raw.githubusercontent.com/gl20percentclub/japan-food-facilities/main/docs/ARCHITECTURE.md)にまとめています。
+
 ---
 
 ## 付録: AI エージェント向け利用レシピ
