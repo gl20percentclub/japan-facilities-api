@@ -1,6 +1,6 @@
 // gen-attribution.js の分類・整形ロジックと、生成物 attribution.html の同期を検証する。
 //
-//   node scripts/gen-attribution.test.js
+//   node scripts/generate/attribution.test.js
 
 import fs from 'node:fs';
 import {
@@ -12,8 +12,8 @@ import {
   derivePublisher,
   generate,
   groupByLicense,
-} from './gen-attribution.js';
-import { loadConfig } from './lib/config.js';
+} from './attribution.js';
+import { loadConfig } from '../lib/config.js';
 
 let failures = 0;
 /** 条件を検証して結果を出力する（失敗数を数える）。 */
@@ -26,7 +26,7 @@ function assert(cond, msg) {
   }
 }
 
-console.log('gen-attribution テスト\n');
+console.log('attribution.html 生成 テスト\n');
 
 // --- classifyLicense: 表記ゆれを同じ区分にまとめる ---
 assert(
@@ -133,7 +133,7 @@ assert(
 
 // --- LP（index.html）に書いたソース数が config と一致しているか ---
 // LP は静的に「98 データソース」と表示するため、ソースを増減したら書き換えが要る。
-const lp = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf-8');
+const lp = fs.readFileSync(new URL('../../index.html', import.meta.url), 'utf-8');
 const lpCounts = [...lp.matchAll(/data-source-count>(\d[\d,]*)</g)].map((m) => Number(m[1].replaceAll(',', '')));
 assert(lpCounts.length > 0, 'LP にソース数の記載（data-source-count）がある');
 assert(
@@ -145,4 +145,4 @@ if (failures > 0) {
   console.error(`\n❌ ${failures}件のチェックに失敗`);
   process.exit(1);
 }
-console.log('\n✅ gen-attribution テストに合格');
+console.log('\n✅ attribution.html 生成 テストに合格');

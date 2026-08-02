@@ -23,8 +23,8 @@ on:
       - '_headers'
       - 'README.md'
       - 'config/sources.yaml'
-      - 'scripts/gen-attribution.js'
-      - 'scripts/gen-llms.js'
+      - 'scripts/generate/attribution.js'
+      - 'scripts/generate/llms.js'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 

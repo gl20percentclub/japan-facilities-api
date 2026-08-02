@@ -1,12 +1,12 @@
 // gen-tiles.js のユニットテスト。
-//   node scripts/gen-tiles.test.js
+//   node scripts/build/tiles.test.js
 // タイル座標計算(lonLatToTile)と、一時ディレクトリに対する generateTiles の生成結果を検証する。
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { lonLatToTile, buildFeatureCollection, generateTiles } from './gen-tiles.js';
+import { lonLatToTile, buildFeatureCollection, generateTiles } from './tiles.js';
 
 let passed = 0;
 function test(name, fn) {
@@ -116,4 +116,4 @@ test('generateTiles: metadata.json と、各点に対応する非空 pbf タイ�
   }
 });
 
-console.log(`\n✅ gen-tiles ユニットテスト: ${passed}件すべて合格`);
+console.log(`\n✅ ベクトルタイル生成 ユニットテスト: ${passed}件すべて合格`);

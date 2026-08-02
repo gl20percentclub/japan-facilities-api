@@ -55,8 +55,12 @@ npm run build:attribution  # attribution.html を config/sources.yaml から再�
 ```
 config/sources.yaml     # データソース定義（単一の情報源）。自治体の追加はここ
 scripts/crawl.js        # クローラー本体（取得→正規化→CSV・タイル生成のオーケストレーター）
+scripts/validate-api.js # 生成済み api/ のバリデーション（ユニットテストではない）
 scripts/lib/            # 取得・パース・正規化・ジオコーディング・名寄せの各実装
-scripts/*.test.js       # ユニットテスト（自前 assert、純粋関数を固定入力で検証）
+scripts/build/          # 配信物の生成（結合CSV・都道府県別CSV・ベクトルタイル）
+scripts/generate/       # ドキュメントの生成（attribution.html・llms*.txt・README統計）
+scripts/tools/          # 単発・保守用スクリプト（本番パイプラインからは呼ばれない）
+scripts/**/*.test.js    # ユニットテスト（自前 assert、純粋関数を固定入力で検証）
 docs/COVERAGE.md        # 自治体ごとの収録状況（自動生成）
 api/                    # 生成物（.gitignore 対象。Git 管理しない）
 llms.txt / llms-full.txt  # AI向けドキュメント（README から自動生成。直接編集しない）
@@ -66,7 +70,7 @@ attribution.html        # 出典表示ページ（sources.yaml から自動生�
 ## 規約と注意点
 
 - コード・コメントは日本語。すべての関数に doc コメント、非自明なロジックにインラインコメントを書く
-- テストは `scripts/*.test.js` に自前 assert で書き、`package.json` の `test:unit` チェーンに追加する
+- テストは実装と同じディレクトリに `*.test.js` として自前 assert で書き、`package.json` の `test:unit` チェーンに追加する
 - 整形・生成ロジックは純粋関数として export し、テストは固定入力で検証する（既存テストの流儀に従う）
 - `llms.txt` / `llms-full.txt` / `attribution.html` / README の STATS ブロックは自動生成。
   内容を変えたいときは生成元（README 本文・テンプレート・`config/sources.yaml`）を変更する
@@ -101,7 +105,7 @@ attribution.html        # 出典表示ページ（sources.yaml から自動生�
 
 - `pages.yml` は配信前に必ず生成物を作り直すため、公開ページは常に main の生成元と一致する
 - `generated-docs.yml` は main 上の生成物がずれていたら再生成してコミットする（自己修復）
-- `ci.yml` は PR でユニットテストを走らせる。生成物の同期テスト（`gen-attribution.test.js` 等）が
+- `ci.yml` は PR でユニットテストを走らせる。生成物の同期テスト（`scripts/generate/attribution.test.js` 等）が
   含まれるため、生成元だけ直して生成物を再生成し忘れた PR はここで落ちる
 - 過去の事故: クローラーが自リポジトリに持っていた古い `config/sources.yaml` の
   スナップショットから `attribution.html` を生成して main に push し、旧リポジトリ名と

@@ -1,7 +1,7 @@
 name: CI
 
 # PR と main への push でユニットテストを走らせる。
-# ここで走る scripts/*.test.js には「attribution.html が config/sources.yaml と
+# ここで走る scripts/**/*.test.js には「attribution.html が config/sources.yaml と
 # 同期しているか」「llms.txt が README と同期しているか」の検査も含まれるため、
 # 生成物のコミット漏れ・古い生成物の混入は PR の時点で落ちる。
 # （テスト自体は前からあったが、実行するワークフローが無く機能していなかった）

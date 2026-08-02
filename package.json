@@ -4,10 +4,10 @@
   "scripts": {
     "build": "node scripts/crawl.js",
     "build:dry": "node scripts/crawl.js --dry-run",
-    "build:attribution": "node scripts/gen-attribution.js",
-    "build:llms": "node scripts/gen-llms.js",
-    "fetch:i2fas": "node scripts/fetch-i2fas.js",
-    "test:unit": "node scripts/crawl.test.js && node scripts/lib/config.test.js && node scripts/build-merged-csv.test.js && node scripts/build-prefecture-csv.test.js && node scripts/gen-tiles.test.js && node scripts/preview-map.test.js && node scripts/map-filter.test.js && node scripts/gen-readme-stats.test.js && node scripts/gen-llms.test.js && node scripts/gen-attribution.test.js && node scripts/workflows.test.js",
+    "build:attribution": "node scripts/generate/attribution.js",
+    "build:llms": "node scripts/generate/llms.js",
+    "fetch:i2fas": "node scripts/tools/fetch-i2fas.js",
+    "test:unit": "node scripts/crawl.test.js && node scripts/lib/config.test.js && node scripts/build/merged-csv.test.js && node scripts/build/prefecture-csv.test.js && node scripts/build/tiles.test.js && node scripts/preview-map.test.js && node scripts/map-filter.test.js && node scripts/generate/readme-stats.test.js && node scripts/generate/llms.test.js && node scripts/generate/attribution.test.js && node scripts/workflows.test.js",
     "test:api": "node scripts/validate-api.js",
     "test": "npm run test:unit && npm run test:api"
   },

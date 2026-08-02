@@ -10,14 +10,14 @@
 // 変更したら本スクリプトを実行して再生成すること（`npm test` で同期を検証する）。
 //
 // 使い方:
-//   node scripts/gen-attribution.js           attribution.html を再生成
-//   node scripts/gen-attribution.js --check   再生成せず、内容が最新かだけを検証
+//   node scripts/generate/attribution.js           attribution.html を再生成
+//   node scripts/generate/attribution.js --check   再生成せず、内容が最新かだけを検証
 // ---------------------------------------------------------------------------
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { loadConfig, ROOT } from './lib/config.js';
+import { loadConfig, ROOT } from '../lib/config.js';
 
 /** 生成先。gh-pages のルートに配置され https://…/attribution.html で公開される。 */
 export const OUTPUT_PATH = path.join(ROOT, 'attribution.html');
@@ -344,7 +344,7 @@ export function renderHtml(entries) {
 
   return `<!DOCTYPE html>
 <!--
-  このファイルは scripts/gen-attribution.js が config/sources.yaml から自動生成しています。
+  このファイルは scripts/generate/attribution.js が config/sources.yaml から自動生成しています。
   直接編集せず、config/sources.yaml を更新して \`npm run build:attribution\` を実行してください。
 -->
 <html lang="ja">
@@ -517,7 +517,7 @@ ${sections.map(renderSection).join('\n')}
     <footer>
       <p>
         このページは <a href="${REPO_URL}/blob/main/config/sources.yaml">config/sources.yaml</a> から
-        <a href="${REPO_URL}/blob/main/scripts/gen-attribution.js">scripts/gen-attribution.js</a> が自動生成しています。
+        <a href="${REPO_URL}/blob/main/scripts/generate/attribution.js">scripts/generate/attribution.js</a> が自動生成しています。
         誤りを見つけた場合は <a href="${REPO_URL}/issues">Issue</a> でお知らせください。
       </p>
       <p>

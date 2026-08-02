@@ -31,7 +31,7 @@
 #   allSheets      Excel全シートを結合（京都市: 区ごとシート）
 #   locateByAddress 市区町村カラムを信用せず施設住所から導出（i2fas: カラムは管轄自治体）
 #
-# BODIK 掲載分は scripts/gen-bodik-sources.js で sources へ追記再生成できる。
+# BODIK 掲載分は scripts/tools/gen-bodik-sources.js で sources へ追記再生成できる。
 
 columns:
   city_code:

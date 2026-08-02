@@ -14,8 +14,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CSV_COLUMNS } from './build-merged-csv.js';
-import { INDEX_FILENAME, PREFECTURES } from './build-prefecture-csv.js';
+import { CSV_COLUMNS } from './build/merged-csv.js';
+import { INDEX_FILENAME, PREFECTURES } from './build/prefecture-csv.js';
 import { readCsvRows } from './lib/csv-read.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

@@ -17,8 +17,8 @@ on:
     paths:
       - 'README.md'
       - 'config/sources.yaml'
-      - 'scripts/gen-attribution.js'
-      - 'scripts/gen-llms.js'
+      - 'scripts/generate/attribution.js'
+      - 'scripts/generate/llms.js'
       # 生成物そのものへの push も対象にする（外部の自動コミットで古い内容が
       # 入ったときに、その push で即座に巻き戻せるようにするため）。
       # 自己修復コミットは GITHUB_TOKEN による push でワークフローを再発火しないため

@@ -204,7 +204,7 @@
     // S3 + CloudFront から配信されるため、相対参照ではなく絶対 URL を指す。
     // CORS は全オリジン許可済みなので、ローカルで開いた場合もそのまま読める。
     const API_BASE = 'https://food.japan-facilities.com/api';
-    // ベクトルタイルのズーム範囲（scripts/gen-tiles.js の設定と一致させる）
+    // ベクトルタイルのズーム範囲（scripts/build/tiles.js の設定と一致させる）
     const TILE_MIN_ZOOM = 6;
     const TILE_MAX_ZOOM = 12;
     // 日本のおおよその範囲 [west, south, east, north]
@@ -510,7 +510,7 @@
     // ラベルが未定義のキーが増えたときは、キー名をそのまま見出しに使って必ず表示する。
 
     // ベクトルタイル(facilities レイヤ)が持つ属性のラベル。
-    // scripts/gen-tiles.js の buildFeatureCollection が作る properties と対応させる。
+    // scripts/build/tiles.js の buildFeatureCollection が作る properties と対応させる。
     const TILE_PROP_LABELS = {
       name: '名称',
       business_type: '業種',

@@ -1,7 +1,7 @@
 // data.bodik.jp から食品営業許可データセットを列挙し、自治体(org)ごとに
 // 「全件・許可」に最も近い CSV/XLSX リソースを1つ選び、sources 定義を生成する。
 //
-//   node scripts/gen-bodik-sources.js   → config/_bodik-generated.yaml を出力
+//   node scripts/tools/gen-bodik-sources.js   → config/_bodik-generated.yaml を出力
 //   出力された sources エントリを config/sources.yaml の sources: にマージする。
 import * as yaml from 'js-yaml';
 import fs from 'node:fs';
@@ -61,7 +61,7 @@ const entries = list.map((x) => ({
   ...(x.license ? { license: x.license } : {}),
 }));
 const header = `# 自動生成: data.bodik.jp の食品営業許可データセット（自治体ごとに全件・許可の代表リソース1件）\n` +
-  `# 生成: node scripts/gen-bodik-sources.js 。この内容を config/sources.yaml の sources: にマージする。\n\n`;
+  `# 生成: node scripts/tools/gen-bodik-sources.js 。この内容を config/sources.yaml の sources: にマージする。\n\n`;
 fs.writeFileSync('config/_bodik-generated.yaml', header + yaml.dump(entries, { lineWidth: -1, noRefs: true, quotingType: '"' }));
 console.log(`\nconfig/_bodik-generated.yaml に ${entries.length} 件を出力。config/sources.yaml の sources: にマージしてください。`);
 console.log('sample:', list.slice(0, 12).map((x) => x.org + ' / ' + x.title + ' [' + x.fmt + ' sc' + x.sc + ']'));

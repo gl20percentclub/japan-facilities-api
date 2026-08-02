@@ -1,5 +1,5 @@
 // 都道府県別CSV の生成ロジックを検証する。
-//   node scripts/build-prefecture-csv.test.js
+//   node scripts/build/prefecture-csv.test.js
 //
 // 見るのは3点:
 //   - 47都道府県ぶんのファイルが必ず出る（0件の県もヘッダーだけ出す）
@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { CSV_COLUMNS } from './build-merged-csv.js';
+import { CSV_COLUMNS } from './merged-csv.js';
 import {
   PREFECTURES,
   INDEX_FILENAME,
@@ -18,8 +18,8 @@ import {
   groupByPrefecture,
   prefectureFileName,
   renderIndex,
-} from './build-prefecture-csv.js';
-import { readCsvRows } from './lib/csv-read.js';
+} from './prefecture-csv.js';
+import { readCsvRows } from '../lib/csv-read.js';
 
 let passed = 0;
 async function test(name, fn) {
@@ -28,7 +28,7 @@ async function test(name, fn) {
   console.log(`  ✓ ${name}`);
 }
 
-console.log('build-prefecture-csv テスト\n');
+console.log('都道府県別CSV テスト\n');
 
 const col = Object.fromEntries(CSV_COLUMNS.map((c, i) => [c, i]));
 
@@ -183,4 +183,4 @@ await test('CSV は BOM なし UTF-8 で書き出す', async () => {
   assert.notEqual(head, '﻿');
 });
 
-console.log(`\n✅ build-prefecture-csv テスト ${passed}件に合格`);
+console.log(`\n✅ 都道府県別CSV テスト ${passed}件に合格`);

@@ -1,5 +1,5 @@
 // 結合CSV の書き出しと、バリデーションで使う CSV リーダーの往復テスト。
-//   node scripts/build-merged-csv.test.js
+//   node scripts/build/merged-csv.test.js
 //
 // 引用符・改行・カンマを含むセルが、書き出し → 読み戻しで元の値に戻ることを確認する
 // （ここが崩れると配布CSV が壊れ、バリデーションもすり抜ける）。
@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildMergedCsv, CSV_COLUMNS, csvCell } from './build-merged-csv.js';
-import { generateTiles } from './gen-tiles.js';
-import { readCsvRows } from './lib/csv-read.js';
+import { buildMergedCsv, CSV_COLUMNS, csvCell } from './merged-csv.js';
+import { generateTiles } from './tiles.js';
+import { readCsvRows } from '../lib/csv-read.js';
 import {
   resolvePrefCity,
   applyPrefCity,
@@ -19,7 +19,7 @@ import {
   stripCountyPrefix,
   toMunicipality,
   isResolvablePair,
-} from './lib/city-normmap.js';
+} from '../lib/city-normmap.js';
 
 /**
  * `entry` から相対 import をたどって到達できるモジュールの絶対パス集合を返す。
@@ -69,10 +69,10 @@ async function writeCsv(facilities, opts = {}) {
 // クローラー（別リポジトリ）は sources.yaml をコミットせず、クロール実行時だけ
 // CONFIG_PATH で公開リポのクローンを指す。配信物バリデーション（scripts/validate-api.js）は
 // その環境変数なしで走るため、ここから config.js に到達すると起動時に落ちる。
-// 実際に「build-merged-csv.js → lib/normalize.js → loadConfig()」の連鎖でクロールが
+// 実際に「build/merged-csv.js → lib/normalize.js → loadConfig()」の連鎖でクロールが
 // 停止したことがあるので、到達不可であることを固定する。
 await test('依存関係: 配信物まわりのモジュールが lib/config.js に依存しない', () => {
-  for (const entry of ['./scripts/validate-api.js', './scripts/build-merged-csv.js']) {
+  for (const entry of ['./scripts/validate-api.js', './scripts/build/merged-csv.js']) {
     const reached = [...reachableModules(entry)];
     const config = reached.find((p) => p.endsWith(`${path.sep}lib${path.sep}config.js`));
     assert.equal(config, undefined, `${entry} から lib/config.js に到達してはいけない`);

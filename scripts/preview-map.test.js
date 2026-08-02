@@ -1,9 +1,9 @@
-// 地図・検索ページ(map.html)と gen-tiles.js の生成物との整合性テスト。
-// 検索機能そのものの整合性は scripts/map-search.test.js が見る。
+// 地図ページ(map.html)と build/tiles.js の生成物との整合性テスト。
+// 業種フィルターの整合性は scripts/map-filter.test.js が見る。
 //   node scripts/preview-map.test.js
 //
 // map.html はベクトルタイル(api/tiles)を直接読むため、レイヤ名・ズーム範囲・
-// タイルパス・利用する属性・metadata.json の統計フィールドが gen-tiles.js の出力と
+// タイルパス・利用する属性・metadata.json の統計フィールドが build/tiles.js の出力と
 // ズレると地図が黙って壊れる。ここでは実際に generateTiles を走らせた生成物と
 // map.html の記述を突き合わせ、両者が食い違ったら失敗させる。
 
@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildFeatureCollection, generateTiles } from './gen-tiles.js';
+import { buildFeatureCollection, generateTiles } from './build/tiles.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -49,17 +49,17 @@ function withTiles(opts, fn) {
   }
 }
 
-test('source-layer が gen-tiles の出力レイヤ名(metadata.vector_layers[0].id)と一致する', () => {
+test('source-layer が タイル生成の出力レイヤ名(metadata.vector_layers[0].id)と一致する', () => {
   const sourceLayer = htmlValue(/'source-layer':\s*'([^']+)'/, 'source-layer');
   withTiles({ minZoom: 6, maxZoom: 12 }, (meta) => {
     assert.equal(sourceLayer, meta.vector_layers[0].id, `source-layer(${sourceLayer}) == 生成レイヤ(${meta.vector_layers[0].id})`);
   });
 });
 
-test('TILE_MIN_ZOOM / TILE_MAX_ZOOM が gen-tiles の既定ズーム範囲と一致する', () => {
+test('TILE_MIN_ZOOM / TILE_MAX_ZOOM が タイル生成の既定ズーム範囲と一致する', () => {
   const minZoom = Number(htmlValue(/TILE_MIN_ZOOM\s*=\s*(\d+)/, 'TILE_MIN_ZOOM'));
   const maxZoom = Number(htmlValue(/TILE_MAX_ZOOM\s*=\s*(\d+)/, 'TILE_MAX_ZOOM'));
-  // 既定のズーム範囲(scripts/gen-tiles.js の MIN_ZOOM/MAX_ZOOM)で生成する。
+  // 既定のズーム範囲(scripts/build/tiles.js の MIN_ZOOM/MAX_ZOOM)で生成する。
   withTiles({}, (meta) => {
     assert.equal(minZoom, meta.minzoom, `TILE_MIN_ZOOM(${minZoom}) == metadata.minzoom(${meta.minzoom})`);
     assert.equal(maxZoom, meta.maxzoom, `TILE_MAX_ZOOM(${maxZoom}) == metadata.maxzoom(${meta.maxzoom})`);

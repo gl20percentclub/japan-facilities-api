@@ -2,7 +2,7 @@
 // renderLlmsTxt() / renderLlmsFullTxt() / extractStats() / absolutizeLinks() は
 // 純粋関数なので固定入力で検証する。
 //
-//   node scripts/gen-llms.test.js
+//   node scripts/generate/llms.test.js
 
 import {
   extractStats,
@@ -10,7 +10,7 @@ import {
   stripHtmlNoise,
   renderLlmsTxt,
   renderLlmsFullTxt,
-} from './gen-llms.js';
+} from './llms.js';
 
 let failures = 0;
 /** 条件を検証して結果を出力する（失敗数を数える）。 */
@@ -23,7 +23,7 @@ function assert(cond, msg) {
   }
 }
 
-console.log('gen-llms テスト\n');
+console.log('llms.txt 生成 テスト\n');
 
 // テスト用の README（統計ブロック・相対リンク・バッジを含む最小構成）
 const readme = `<div align="center">
@@ -105,4 +105,4 @@ if (failures > 0) {
   console.error(`\n❌ ${failures}件のチェックに失敗`);
   process.exit(1);
 }
-console.log('\n✅ gen-llms テストに合格');
+console.log('\n✅ llms.txt 生成 テストに合格');
