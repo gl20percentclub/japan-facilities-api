@@ -20,6 +20,21 @@ import {
   toMunicipality,
 } from './lib/city-normmap.js';
 
+/**
+ * `entry` から相対 import をたどって到達できるモジュールの絶対パス集合を返す。
+ * 実行せずに静的に読むだけなので、設定ファイルが無くても走る。
+ */
+function reachableModules(entry, seen = new Set()) {
+  const abs = path.resolve(entry);
+  if (seen.has(abs)) return seen;
+  seen.add(abs);
+  const src = fs.readFileSync(abs, 'utf-8');
+  for (const m of src.matchAll(/from\s+'(\.[^']+)'/g)) {
+    reachableModules(path.resolve(path.dirname(abs), m[1]), seen);
+  }
+  return seen;
+}
+
 let passed = 0;
 async function test(name, fn) {
   await fn();
@@ -48,6 +63,20 @@ async function writeCsv(facilities, opts = {}) {
   const rows = [...readCsvRows(outPath)];
   return { dir, outPath, stats, header: rows[0], rows: rows.slice(1) };
 }
+
+// --- 依存関係: 配信物の生成・検証は config/sources.yaml を要求しない ---
+// クローラー（別リポジトリ）は sources.yaml をコミットせず、クロール実行時だけ
+// CONFIG_PATH で公開リポのクローンを指す。配信物バリデーション（scripts/test.js）は
+// その環境変数なしで走るため、ここから config.js に到達すると起動時に落ちる。
+// 実際に「build-merged-csv.js → lib/normalize.js → loadConfig()」の連鎖でクロールが
+// 停止したことがあるので、到達不可であることを固定する。
+await test('依存関係: 配信物まわりのモジュールが lib/config.js に依存しない', () => {
+  for (const entry of ['./scripts/test.js', './scripts/build-merged-csv.js']) {
+    const reached = [...reachableModules(entry)];
+    const config = reached.find((p) => p.endsWith(`${path.sep}lib${path.sep}config.js`));
+    assert.equal(config, undefined, `${entry} から lib/config.js に到達してはいけない`);
+  }
+});
 
 // --- csvCell（純粋関数） ---
 await test('csvCell: 特殊文字を含むときだけ引用符で囲む', () => {
