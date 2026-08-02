@@ -18,6 +18,7 @@ import {
   stripWardSuffix,
   stripCountyPrefix,
   toMunicipality,
+  isResolvablePair,
 } from './lib/city-normmap.js';
 
 /**
@@ -328,11 +329,65 @@ await test('collectCityPairs: ユニークな (都道府県, 市区町村) を�
     { _pref: '東京都', _city: '港区', address: '' },
     { _pref: '東京都', _city: '港区', address: '東京都港区赤坂1-1' },
     { _pref: '東京都', _city: '渋谷区', address: '東京都渋谷区1-1' },
-    { address: '住所のみ' }, // pref/city 未解決は「不明」に寄せる
+    { address: '住所のみ' }, // pref/city 未解決＝自治体を特定しないので対象外
   ]);
-  assert.equal(pairs.length, 3);
+  assert.equal(pairs.length, 2);
   assert.equal(pairs.find((p) => p.city === '港区').addr, '東京都港区赤坂1-1', '空でない住所を代表にする');
-  assert.ok(pairs.some((p) => p.pref === '不明' && p.city === '不明'));
+  assert.ok(
+    !pairs.some((p) => p.city === '不明'),
+    '「不明」ペアは代表住所を立てられないので名寄せ対象にしない',
+  );
+});
+
+// --- 代表住所の焼き付き防止 ---
+// 名寄せはペアごとに代表住所1件を正規化して全件へ適用するため、自治体を
+// 特定しないペア（'不明'）に適用すると無関係なレコードに自治体名が焼き付く。
+await test('isResolvablePair: 自治体を特定しないペアは名寄せ対象にしない', () => {
+  assert.equal(isResolvablePair('三重県', '四日市市'), true);
+  assert.equal(isResolvablePair('三重県', '不明'), false);
+  assert.equal(isResolvablePair('三重県', ''), false);
+  assert.equal(isResolvablePair('不明', '不明'), false);
+  assert.equal(isResolvablePair('9300000', '四日市市'), false, '都道府県が不正なら信用しない');
+});
+
+await test('resolvePrefCity: 「不明」ペアには名寄せ表を適用しない', () => {
+  // 実際に起きた事故: (不明, 不明) のバケツに横須賀市の住所が代表として入り、
+  // 四日市市のレコード3,740件が「神奈川県横須賀市」として出力された。
+  const normMap = { '不明\t不明': { pref: '神奈川県', city: '横須賀市' } };
+  const f = { _pref: '不明', _city: '不明', address: '四日市市安島1-3-18' };
+  const r = resolvePrefCity(f, normMap);
+  assert.notEqual(r.pref, '神奈川県', '他レコードの自治体名を焼き付けない');
+  assert.equal(r.city, '不明');
+});
+
+await test('resolvePrefCity: 市区町村カラムが無いソースは「不明」のままにする', () => {
+  // 住所から推測すると大字（「南ぬ浜町」= 石垣市の町名）や政令市の行政区を
+  // 自治体名として拾ってしまうため、実在しない市区町村を作るより不明を残す。
+  const r = resolvePrefCity({ _pref: '三重県', _city: '不明', address: '四日市市安島1-3-18' }, {});
+  assert.equal(r.pref, '三重県', '都道府県は元データの値を保つ');
+  assert.equal(r.city, '不明');
+});
+
+await test('applyPrefCity: 同じ「不明」バケツの別ソースが同じ自治体に化けない', () => {
+  // 実際に起きた事故: 鹿児島県・熊本県・静岡市など8県ぶんのソース 2,641件が
+  // すべて「福岡県久留米市」として配信されていた。
+  const facilities = [
+    { _pref: '不明', _city: '不明', address: '' },
+    { _pref: '不明', _city: '不明', address: '' },
+  ];
+  applyPrefCity(facilities, { '不明\t不明': { pref: '福岡県', city: '久留米市' } });
+  for (const f of facilities) {
+    assert.equal(f.pref, '不明');
+    assert.equal(f.city, '不明');
+  }
+});
+
+await test('resolvePrefCity: 都道府県が不明でも住所が県名で始まれば列ズレ補正で復元する', () => {
+  // 既存の列ズレ補正の経路。レコードごとに自分の住所を見るので焼き付きは起きない。
+  const normMap = { '不明\t不明': { pref: '福岡県', city: '久留米市' } };
+  const r = resolvePrefCity({ _pref: '不明', _city: '不明', address: '石川県河北郡津幡町字加賀爪ニ3' }, normMap);
+  assert.equal(r.pref, '石川県');
+  assert.equal(r.city, '津幡町');
 });
 
 // --- 配信物どうしの整合 ---
