@@ -16,7 +16,7 @@ import { buildFeatureCollection, generateTiles } from './build/tiles.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const HTML = fs.readFileSync(path.join(ROOT, 'map.html'), 'utf-8');
+const HTML = fs.readFileSync(path.join(ROOT, 'site', 'map.html'), 'utf-8');
 
 let passed = 0;
 function test(name, fn) {

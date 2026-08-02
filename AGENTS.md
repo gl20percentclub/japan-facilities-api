@@ -53,6 +53,10 @@ npm run build:attribution  # attribution.html を config/sources.yaml から再�
 ## リポジトリ構成
 
 ```
+site/                   # gh-pages に配信する静的サイト（ここの中身がそのまま公開される）
+site/index.html         # LP
+site/map.html           # プレビュー地図
+site/playground.html    # map.html へのリダイレクトだけの薄いページ
 config/sources.yaml     # データソース定義（単一の情報源）。自治体の追加はここ
 scripts/crawl.js        # クローラー本体（取得→正規化→CSV・タイル生成のオーケストレーター）
 scripts/validate-api.js # 生成済み api/ のバリデーション（ユニットテストではない）
@@ -63,8 +67,9 @@ scripts/tools/          # 単発・保守用スクリプト（本番パイプラ
 scripts/**/*.test.js    # ユニットテスト（自前 assert、純粋関数を固定入力で検証）
 docs/COVERAGE.md        # 自治体ごとの収録状況（自動生成）
 api/                    # 生成物（.gitignore 対象。Git 管理しない）
-llms.txt / llms-full.txt  # AI向けドキュメント（README から自動生成。直接編集しない）
-attribution.html        # 出典表示ページ（sources.yaml から自動生成。直接編集しない）
+site/llms.txt           # AI向けドキュメント（README から自動生成。直接編集しない）
+site/llms-full.txt      # 同上
+site/attribution.html   # 出典表示ページ（sources.yaml から自動生成。直接編集しない）
 ```
 
 ## 規約と注意点
@@ -90,9 +95,13 @@ attribution.html        # 出典表示ページ（sources.yaml から自動生�
 - gh-pages へ配信するワークフローは `pages.yml` **1本だけ**。gh-pages へデータを配信して
   いた旧 `crawl.yml` は廃止した（週次クロールは Fargate 側に一本化。復活していないことを
   `scripts/workflows.test.js` で固定している）
-- `publish_dir: .` のため `.gitignore` を配信対象から除外しないと、配信先で `git add --all`
-  したときに `api/` が一切コミットされない（過去に gh-pages のデータが全消えした。
-  workflows.test.js が再発を防いでいる）
+- 配信元は `site/` だけ（`publish_dir: site`）。`site/` の中身が gh-pages のルートに
+  置かれるため、公開 URL は `/index.html`・`/map.html`・`/llms.txt` のまま。
+  ページを追加するときは `site/` に置く（`pages.yml` の paths は `site/**` で一括）
+- かつては `publish_dir: .` で、README・docs/・config/・package.json まで配信されていた。
+  さらに `.gitignore` ごと配信されると配信先の `git add --all` で `api/` が無視され、
+  gh-pages のデータが全消えする事故があった。`site/` には `.gitignore` も
+  `node_modules` も無いため、この危険は構造的に消えている（workflows.test.js で固定）
 - `pages.yml` は `keep_files: true` のためファイル削除が反映されない。ページを削除・リネーム
   したときは gh-pages 上の旧ファイルを手動で消す
 

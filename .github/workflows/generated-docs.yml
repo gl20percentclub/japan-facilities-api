@@ -23,9 +23,9 @@ on:
       # 入ったときに、その push で即座に巻き戻せるようにするため）。
       # 自己修復コミットは GITHUB_TOKEN による push でワークフローを再発火しないため
       # 無限ループにはならない。
-      - 'attribution.html'
-      - 'llms.txt'
-      - 'llms-full.txt'
+      - 'site/attribution.html'
+      - 'site/llms.txt'
+      - 'site/llms-full.txt'
       - '.github/workflows/generated-docs.yml'
   workflow_dispatch:
 
@@ -62,13 +62,13 @@ jobs:
       # 外部からの古い自動コミットを巻き戻すため、差分があれば黙って直す。
       - name: Commit regenerated files
         run: |
-          if git diff --quiet -- attribution.html llms.txt llms-full.txt; then
+          if git diff --quiet -- site/attribution.html site/llms.txt site/llms-full.txt; then
             echo "自動生成ファイルは生成元と一致しています"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add attribution.html llms.txt llms-full.txt
+          git add site/attribution.html site/llms.txt site/llms-full.txt
           git commit -m "chore: 自動生成ファイルを生成元から再生成"
           # 実行中に main が進んでいることがあるため rebase してリトライする。
           for i in 1 2 3; do

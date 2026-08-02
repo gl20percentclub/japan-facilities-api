@@ -133,7 +133,7 @@ assert(
 
 // --- LP（index.html）に書いたソース数が config と一致しているか ---
 // LP は静的に「98 データソース」と表示するため、ソースを増減したら書き換えが要る。
-const lp = fs.readFileSync(new URL('../../index.html', import.meta.url), 'utf-8');
+const lp = fs.readFileSync(new URL('../../site/index.html', import.meta.url), 'utf-8');
 const lpCounts = [...lp.matchAll(/data-source-count>(\d[\d,]*)</g)].map((m) => Number(m[1].replaceAll(',', '')));
 assert(lpCounts.length > 0, 'LP にソース数の記載（data-source-count）がある');
 assert(

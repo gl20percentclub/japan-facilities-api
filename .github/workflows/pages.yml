@@ -14,13 +14,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'index.html'
-      - 'map.html'
-      - 'playground.html'
-      - 'attribution.html'
-      - 'llms.txt'
-      - 'llms-full.txt'
-      - '_headers'
+      # site/ 配下がそのまま公開サイト。個別に列挙せず一括で拾う。
+      - 'site/**'
       - 'README.md'
       - 'config/sources.yaml'
       - 'scripts/generate/attribution.js'
@@ -59,16 +54,22 @@ jobs:
           npm run build:attribution
           npm run build:llms
 
-      # keep_files: true なので gh-pages 上の既存ファイルは残したまま、ページだけ上書きされる。
-      # 反面ファイル削除は反映されない。ページをリネーム・削除したときは gh-pages 側の
-      # 旧ファイルが残るため、必要なら手動で消す（掃除役だった crawl.yml は廃止済み）。
-      # .gitignore は api/ を無視するため、配信先に置くと gh-pages 上に api/ を置きたく
-      # なったときにコミットされなくなる。念のため除外し続ける。
+      # 配信元は site/ だけ。site/ の中身が gh-pages のルートに置かれるため、
+      # 公開 URL は従来どおり /index.html・/map.html・/llms.txt … になる。
+      #
+      # publish_dir をリポジトリのルート（.）にしていた頃は、README・docs/・config/・
+      # package.json まで gh-pages に配信されていた。さらに .gitignore ごと配信されると
+      # 配信先の git add --all で api/ が無視され、gh-pages 上のデータが全消えする事故が
+      # あったため exclude_assets で個別に除外していた。site/ には .gitignore も
+      # node_modules も存在しないので、この危険は構造的に無くなる。
+      #
+      # keep_files: true なので gh-pages 上の既存ファイルは残したまま、ページだけ
+      # 上書きされる。反面ファイル削除は反映されない。ページをリネーム・削除したときは
+      # gh-pages 側の旧ファイルが残るため、必要なら手動で消す。
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
+          publish_dir: site
           publish_branch: gh-pages
           keep_files: true
-          exclude_assets: 'node_modules,.cache,scripts,.github,.gitignore'

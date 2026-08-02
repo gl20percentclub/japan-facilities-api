@@ -20,7 +20,7 @@ import { pathToFileURL } from 'node:url';
 import { loadConfig, ROOT } from '../lib/config.js';
 
 /** 生成先。gh-pages のルートに配置され https://…/attribution.html で公開される。 */
-export const OUTPUT_PATH = path.join(ROOT, 'attribution.html');
+export const OUTPUT_PATH = path.join(ROOT, 'site', 'attribution.html');
 
 /** 公開サイトの URL（一括表記の例で使う）。 */
 const SITE_URL = 'https://gl20percentclub.github.io/japan-food-facilities/';
