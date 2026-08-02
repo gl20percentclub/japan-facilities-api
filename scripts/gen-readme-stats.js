@@ -17,6 +17,10 @@ const README_PATH = path.join(ROOT, 'README.md');
 const START = '<!-- STATS:START -->';
 const END = '<!-- STATS:END -->';
 
+// 全国の市区町村数（東京23区を含む）。収録率の分母として使う固定値で、
+// 市町村合併があったときだけ更新する。
+const TOTAL_CITIES = 1741;
+
 /** バイト数を目安のサイズ表記（KB / MB / GB）にする。 */
 function humanSize(bytes) {
   if (bytes >= 1024 ** 3) return `約 ${(bytes / 1024 ** 3).toFixed(1)} GB`;
@@ -33,7 +37,8 @@ function num(n) {
 /**
  * 統計から README に埋め込む Markdown テーブルを組み立てる（純粋関数）。
  * `s` は `{ updated, csv: {...}, prefCsv: {...}, tiles: {...} }`。
- * `prefCsv`（都道府県別CSV の統計）は省略可で、無ければその行を出さない。
+ * README の読者が最初に知りたい「どれだけの量が・どこまでの範囲で入っているか」に
+ * 絞った 5 行だけを出す（都道府県数・都道府県別CSV の内訳は本文と docs/DATA.md に任せる）。
  */
 export function renderStats(s) {
   const date = s.updated ? new Date(s.updated * 1000).toISOString().slice(0, 10) : '—';
@@ -44,14 +49,9 @@ export function renderStats(s) {
     '> |---|---|',
     `> | 施設レコード数 | ${num(s.csv.rowsOut)} 件 |`,
     `> | 座標を持つ施設 | ${num(s.tiles.points)} 件 |`,
-    `> | 都道府県 | ${num(s.csv.prefectures)} |`,
-    `> | 市区町村 | ${num(s.csv.cities)} |`,
-    // 「不明」等で自治体に紐づけられなかったレコードは異なり数に数えていないので、
-    // 数え落としに見えないよう件数を別行で出す（0件なら行ごと省く）。
-    ...(s.csv.cityUnknown ? [`> | うち市区町村を特定できない施設 | ${num(s.csv.cityUnknown)} 件 |`] : []),
+    // 収録できた市区町村の異なり数を全国の総数と並べて出す（「不明」は分子に数えない）。
+    `> | 収録市区町村 | ${num(s.csv.cities)} / ${num(TOTAL_CITIES)} |`,
     `> | 結合CSV | ${humanSize(s.csv.bytes)} |`,
-    // 都道府県別CSV は全件CSV と同じレコードの分割配信なので、件数ではなくファイル数と総量を出す。
-    ...(s.prefCsv ? [`> | 都道府県別CSV | ${num(s.prefCsv.files)} ファイル / ${humanSize(s.prefCsv.bytes)} |`] : []),
     `> | ベクトルタイル | ${num(s.tiles.tiles)} 枚 / ${humanSize(s.tiles.bytes)} |`,
   ].join('\n');
 }

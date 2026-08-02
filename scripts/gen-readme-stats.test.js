@@ -22,7 +22,7 @@ const fixed = {
   csv: {
     rowsOut: 1495048,
     prefectures: 47,
-    cities: 1741,
+    cities: 1726,
     bytes: 540 * 1024 * 1024,
   },
   prefCsv: { files: 47, records: 1495048, unassigned: 0, bytes: 538 * 1024 * 1024 },
@@ -33,29 +33,24 @@ const md = renderStats(fixed);
 assert(md.includes('最終更新: 2026-07-06'), 'updated が日付に整形される');
 assert(md.includes('| 施設レコード数 | 1,495,048 件 |'), '施設レコード数が3桁区切りで出る');
 assert(md.includes('| 座標を持つ施設 | 1,106,198 件 |'), '座標ありの件数が出る');
-assert(md.includes('| 都道府県 | 47 |'), '都道府県数が出る');
-assert(md.includes('| 市区町村 | 1,741 |'), '市区町村数が出る');
+assert(md.includes('| 収録市区町村 | 1,726 / 1,741 |'), '収録市区町村を全国の総数と並べて出す');
 assert(md.includes('| 結合CSV | 約 540.0 MB |'), 'CSV サイズが出る');
 assert(!md.includes('gzip'), 'gzip 表記は出さない（非圧縮CSVのみ配布）');
-assert(md.includes('| 都道府県別CSV | 47 ファイル / 約 538.0 MB |'), '都道府県別CSV のファイル数とサイズが出る');
 assert(md.includes('| ベクトルタイル | 12,345 枚 / 約 250.0 MB |'), 'タイル枚数とサイズが出る');
 
-assert(
-  !md.includes('市区町村を特定できない施設'),
-  '特定できない施設が0件ならその行を出さない',
-);
+// README 本文と docs/DATA.md で説明している内訳は、統計テーブルには出さない。
+assert(md.split('\n').length === 9, '見出し2行＋テーブル7行（ヘッダ2行＋5項目）だけを出す');
+assert(!md.includes('| 都道府県 |'), '都道府県数の行は出さない');
+assert(!md.includes('都道府県別CSV'), '都道府県別CSV の行は出さない');
+assert(!md.includes('市区町村を特定できない施設'), '特定できない施設の行は出さない');
 
-// 市区町村を特定できないレコードがある場合は、異なり数と別に件数を出す。
+// 市区町村を特定できないレコードがあっても、収録市区町村の分子には数えない。
 const withUnknown = renderStats({ ...fixed, csv: { ...fixed.csv, cityUnknown: 61234 } });
-assert(
-  withUnknown.includes('| うち市区町村を特定できない施設 | 61,234 件 |'),
-  '特定できない施設の件数を別行で出す',
-);
-assert(withUnknown.includes('| 市区町村 | 1,741 |'), '異なり数には数えない');
+assert(withUnknown.includes('| 収録市区町村 | 1,726 / 1,741 |'), '異なり数には数えない');
 
-// prefCsv を渡さない場合は都道府県別CSV の行を出さない（旧形式の統計でも壊れないこと）。
+// prefCsv を渡さなくても壊れない（旧形式の統計を受け取った場合の互換）。
 const noPref = renderStats({ ...fixed, prefCsv: undefined });
-assert(!noPref.includes('都道府県別CSV'), 'prefCsv が無ければ都道府県別CSV の行を出さない');
+assert(noPref === md, 'prefCsv の有無で出力が変わらない');
 
 // updated が無い場合はダッシュ表記。
 const noDate = renderStats({ ...fixed, updated: 0 });
