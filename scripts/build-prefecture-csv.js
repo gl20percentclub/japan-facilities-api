@@ -1,4 +1,4 @@
-// 都道府県別CSV の生成（api/prefectures/{code}-{romaji}.csv）。
+// 都道府県別CSV の生成（api/prefectures/{prefcode}.csv）。
 //
 // 全件CSV（facilities-all.csv）は数百MB あり、1県分だけ欲しい利用者には重すぎる。
 // そこで同じ列・同じレコード集合を都道府県ごとに分割した CSV も配信する。
@@ -8,8 +8,8 @@
 // 「県別の合計 ≠ 全件」という食い違いが生まれる。
 //
 // 出力:
-//   api/prefectures/{code}-{romaji}.csv   47都道府県ぶん（0件の県もヘッダーだけ出す）
-//   api/prefectures/index.json            ファイル一覧・件数・バイト数の索引
+//   api/prefectures/{prefcode}.csv   47都道府県ぶん（0件の県もヘッダーだけ出す）
+//   api/prefectures/index.json       ファイル一覧・件数・バイト数の索引
 //
 // 都道府県が特定できなかったレコード（pref が '不明' 等、47都道府県に一致しない）は
 // 県別CSV には含めない。件数は index.json の `unassigned` とログに残し、
@@ -21,8 +21,8 @@ import { CSV_COLUMNS, csvCell, toRow } from './build-merged-csv.js';
 
 /**
  * JIS都道府県コード順の都道府県定義。
- * `code` はファイル名の接頭辞（ゼロ埋め2桁）、`romaji` はローマ字のスラッグ。
- * URL に日本語を含めずに済むよう `{code}-{romaji}.csv` をファイル名に使う。
+ * `code` は都道府県コード（prefcode。ゼロ埋め2桁）で、そのまま `{prefcode}.csv` という
+ * ファイル名になる。`romaji` はファイル名には使わず、index.json に載せる英字ラベル。
  */
 export const PREFECTURES = [
   { code: '01', name: '北海道', romaji: 'hokkaido' },
@@ -81,12 +81,12 @@ const BY_NAME = new Map(PREFECTURES.map((p) => [p.name, p]));
 export const INDEX_FILENAME = 'index.json';
 
 /**
- * 都道府県名 → CSV ファイル名（例: '東京都' → '13-tokyo.csv'）。
+ * 都道府県名 → CSV ファイル名（例: '東京都' → '13.csv'）。
  * 47都道府県に一致しない名前（'不明' 等）は null を返す。
  */
 export function prefectureFileName(pref) {
   const def = BY_NAME.get(String(pref || '').trim());
-  return def ? `${def.code}-${def.romaji}.csv` : null;
+  return def ? `${def.code}.csv` : null;
 }
 
 /** 書き込みバッファが埋まったら drain を待つ Promise を返す（不要なら null）。 */
@@ -145,7 +145,7 @@ export async function buildPrefectureCsvs(facilities, { outDir, updated, log = c
 
   // 47ファイルを同時に開くとメモリを食うため、県ごとに開いて閉じる。
   for (const def of PREFECTURES) {
-    const file = `${def.code}-${def.romaji}.csv`;
+    const file = `${def.code}.csv`;
     const outPath = path.join(outDir, file);
     const out = fs.createWriteStream(outPath, { encoding: 'utf-8' });
 

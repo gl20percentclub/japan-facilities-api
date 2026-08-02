@@ -62,18 +62,20 @@ await test('PREFECTURES: JISコード順の47都道府県', () => {
   assert.equal(PREFECTURES.length, 47);
   assert.deepEqual(PREFECTURES[0], { code: '01', name: '北海道', romaji: 'hokkaido' });
   assert.deepEqual(PREFECTURES[46], { code: '47', name: '沖縄県', romaji: 'okinawa' });
-  // コード・ローマ字・名前はいずれも重複しない（ファイル名の衝突を防ぐ）
+  // コード・ローマ字・名前はいずれも重複しない（code の重複はファイル名の衝突になる）
   for (const key of ['code', 'name', 'romaji']) {
     assert.equal(new Set(PREFECTURES.map((p) => p[key])).size, 47, `${key} が一意`);
   }
-  // ローマ字は URL に安全な小文字英字のみ
+  // ローマ字は index.json 用の英字ラベル（小文字英字のみ）
   assert.ok(PREFECTURES.every((p) => /^[a-z]+$/.test(p.romaji)), 'romaji は小文字英字のみ');
 });
 
 await test('prefectureFileName: 都道府県名 → ファイル名', () => {
-  assert.equal(prefectureFileName('東京都'), '13-tokyo.csv');
-  assert.equal(prefectureFileName('北海道'), '01-hokkaido.csv');
-  assert.equal(prefectureFileName(' 沖縄県 '), '47-okinawa.csv');
+  assert.equal(prefectureFileName('東京都'), '13.csv');
+  assert.equal(prefectureFileName('北海道'), '01.csv');
+  assert.equal(prefectureFileName(' 沖縄県 '), '47.csv');
+  // 全県ぶんが「都道府県コード2桁 + .csv」だけの名前になっている（ローマ字は付けない）
+  assert.ok(PREFECTURES.every((p) => /^\d{2}\.csv$/.test(prefectureFileName(p.name))));
   // 47都道府県に無い値は null（呼び出し側で未分類として扱う）
   assert.equal(prefectureFileName('不明'), null);
   assert.equal(prefectureFileName(''), null);
@@ -94,13 +96,13 @@ await test('groupByPrefecture: 47県ぶんのバケツを必ず作り、不明�
 await test('renderIndex: 索引JSON の形', () => {
   const index = renderIndex({
     updated: 1783366001,
-    entries: [{ code: '13', name: '東京都', romaji: 'tokyo', file: '13-tokyo.csv', records: 2, bytes: 300 }],
+    entries: [{ code: '13', name: '東京都', romaji: 'tokyo', file: '13.csv', records: 2, bytes: 300 }],
     unassigned: 1,
   });
   assert.equal(index.updated, 1783366001);
   assert.deepEqual(index.columns, CSV_COLUMNS);
   assert.equal(index.unassigned, 1);
-  assert.equal(index.prefectures[0].file, '13-tokyo.csv');
+  assert.equal(index.prefectures[0].file, '13.csv');
   // updated 未指定は null（JSON に undefined を書かない）
   assert.equal(renderIndex({ entries: [], unassigned: 0 }).updated, null);
 });
@@ -112,10 +114,10 @@ await test('47ファイルを必ず出力し、0件の県もヘッダーだけ�
   assert.equal(stats.files, 47);
   assert.equal(stats.records, 2);
   for (const def of PREFECTURES) {
-    const file = path.join(outDir, `${def.code}-${def.romaji}.csv`);
+    const file = path.join(outDir, `${def.code}.csv`);
     assert.ok(fs.existsSync(file), `${def.name} のCSV が存在する`);
   }
-  const empty = readRows(outDir, '26-kyoto.csv');
+  const empty = readRows(outDir, '26.csv');
   assert.deepEqual(empty.header, CSV_COLUMNS, '0件の県もヘッダーは書く');
   assert.equal(empty.rows.length, 0);
 });
@@ -125,13 +127,13 @@ await test('各県のCSV にはその県のレコードだけが入る', async (
     fac({ name: '東京A' }), fac({ name: '東京B' }), fac({ pref: '沖縄県', city: '那覇市', name: '那覇A' }),
   ]);
 
-  const tokyo = readRows(outDir, '13-tokyo.csv');
+  const tokyo = readRows(outDir, '13.csv');
   assert.deepEqual(tokyo.header, CSV_COLUMNS);
   assert.equal(tokyo.rows.length, 2);
   assert.deepEqual(tokyo.rows.map((r) => r[col.name]), ['東京A', '東京B']);
   assert.ok(tokyo.rows.every((r) => r[col.prefecture] === '東京都'));
 
-  const okinawa = readRows(outDir, '47-okinawa.csv');
+  const okinawa = readRows(outDir, '47.csv');
   assert.equal(okinawa.rows.length, 1);
   assert.equal(okinawa.rows[0][col.city], '那覇市');
 });
@@ -139,7 +141,7 @@ await test('各県のCSV にはその県のレコードだけが入る', async (
 await test('特殊文字を含むセルが書き出し→読み戻しで元に戻る', async () => {
   const tricky = fac({ name: 'カフェ, "ABC"\n2階', address: '港区赤坂1-1, 2F' });
   const { outDir } = await writeCsvs([tricky]);
-  const { rows } = readRows(outDir, '13-tokyo.csv');
+  const { rows } = readRows(outDir, '13.csv');
   assert.equal(rows[0][col.name], 'カフェ, "ABC"\n2階');
   assert.equal(rows[0][col.address], '港区赤坂1-1, 2F');
 });
@@ -152,7 +154,7 @@ await test('都道府県が不明なレコードは県別CSV に入れず unassi
   const index = JSON.parse(fs.readFileSync(path.join(outDir, INDEX_FILENAME), 'utf-8'));
   assert.equal(index.unassigned, 1);
   // どのファイルにも紛れ込んでいないこと
-  const all = PREFECTURES.flatMap((d) => readRows(outDir, `${d.code}-${d.romaji}.csv`).rows);
+  const all = PREFECTURES.flatMap((d) => readRows(outDir, `${d.code}.csv`).rows);
   assert.ok(!all.some((r) => r[col.name] === '不明店'));
 });
 
@@ -177,7 +179,7 @@ await test('index.json が実ファイルの件数・バイト数と一致する
 
 await test('CSV は BOM なし UTF-8 で書き出す', async () => {
   const { outDir } = await writeCsvs([fac()]);
-  const head = fs.readFileSync(path.join(outDir, '13-tokyo.csv'), { encoding: 'utf-8' }).slice(0, 1);
+  const head = fs.readFileSync(path.join(outDir, '13.csv'), { encoding: 'utf-8' }).slice(0, 1);
   assert.notEqual(head, '﻿');
 });
 

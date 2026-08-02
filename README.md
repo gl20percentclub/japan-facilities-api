@@ -77,21 +77,21 @@ df = pd.read_csv(
 
 | ファイル | URL |
 |---|---|
-| 都道府県別CSV | `https://food.japan-facilities.com/api/prefectures/{JISコード}-{ローマ字}.csv` |
+| 都道府県別CSV | `https://food.japan-facilities.com/api/prefectures/{都道府県コード}.csv` |
 | ファイル一覧（JSON） | https://food.japan-facilities.com/api/prefectures/index.json |
 
-ファイル名は、JIS都道府県コード（2桁）とローマ字を組み合わせた `01-hokkaido.csv` 〜 `47-okinawa.csv` です。47都道府県すべてのURLが常に存在します。
+ファイル名は、都道府県コード（JIS X 0401 の2桁・ゼロ埋め）の `01.csv`（北海道）〜 `47.csv`（沖縄県）です。47都道府県すべてのURLが常に存在します。
 
 ```bash
 # 東京都だけダウンロードする
-curl -O https://food.japan-facilities.com/api/prefectures/13-tokyo.csv
+curl -O https://food.japan-facilities.com/api/prefectures/13.csv
 ```
 
 ```python
 import pandas as pd
 
 df = pd.read_csv(
-    "https://food.japan-facilities.com/api/prefectures/13-tokyo.csv"
+    "https://food.japan-facilities.com/api/prefectures/13.csv"
 )
 ```
 
@@ -103,7 +103,7 @@ df = pd.read_csv(
   "columns": ["prefecture", "city", "..."],
   "unassigned": 0,
   "prefectures": [
-    { "code": "13", "name": "東京都", "romaji": "tokyo", "file": "13-tokyo.csv", "records": 123456, "bytes": 34567890 }
+    { "code": "13", "name": "東京都", "romaji": "tokyo", "file": "13.csv", "records": 123456, "bytes": 34567890 }
   ]
 }
 ```
