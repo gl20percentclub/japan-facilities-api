@@ -131,7 +131,12 @@ map.addSource("facilities", {
 
 - レイヤー名: `facilities`
 - 主な属性: `name` / `business_type` / `pref` / `city`
+- **z12（最大ズーム）だけが全施設の点です。** z6〜z11 では、同じ場所に重なって
+  区別できない同一業種の施設を1点にまとめています（代表点）。代表点は `name` を持たず、
+  まとめた件数が `count` に入ります。業種は残しているので、業種での絞り込みは
+  どのズームでも正しく効きます。施設名や1件ごとの点が必要な場合は z12 を使ってください
 - 詳細: [`api/tiles/metadata.json`](https://food.japan-facilities.com/api/tiles/metadata.json)
+  （まとめ方の設定は `thinning` に入っています）
 
 収録データは[地図ページ](https://gl20percentclub.github.io/japan-food-facilities/map.html)でも確認できます。
 

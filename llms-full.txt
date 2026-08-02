@@ -124,7 +124,12 @@ map.addSource("facilities", {
 
 - レイヤー名: `facilities`
 - 主な属性: `name` / `business_type` / `pref` / `city`
+- **z12（最大ズーム）だけが全施設の点です。** z6〜z11 では、同じ場所に重なって
+  区別できない同一業種の施設を1点にまとめています（代表点）。代表点は `name` を持たず、
+  まとめた件数が `count` に入ります。業種は残しているので、業種での絞り込みは
+  どのズームでも正しく効きます。施設名や1件ごとの点が必要な場合は z12 を使ってください
 - 詳細: [`api/tiles/metadata.json`](https://food.japan-facilities.com/api/tiles/metadata.json)
+  （まとめ方の設定は `thinning` に入っています）
 
 収録データは[地図ページ](https://gl20percentclub.github.io/japan-food-facilities/map.html)でも確認できます。
 
@@ -328,6 +333,12 @@ map.addLayer({
 
 - **ブラウザから数百MBの CSV を fetch しない。** 地図表示はタイル、データ抽出はサーバー側
   （または DuckDB-Wasm + HTTP range request）で行う。
+- **タイルの点数を施設数として数えない。** 全施設の点が入るのは最大ズーム(z12)だけで、
+  z6–11 は同じ地点・同じ業種の施設を 1 点にまとめた代表点になっている（低ズームで
+  数万点が同じ画素に重なり、間引かないと 1 タイル 38MB になるため）。代表点は
+  `name` を持たず、まとめた件数が `count` に入る。ポップアップに施設名を出したい、
+  1 件ずつの点が必要、といった用途では z12 を使う（業種は全ズームで残るので
+  `business_type` での絞り込みはどのズームでも正しい）。
 - CSV は UTF-8 **BOMなし**。gzip 圧縮版（.csv.gz）は配信していない。
 - `lat` / `lng` は座標を補完できなかった施設では空になる。地図利用時は必ず除外する。
 - `geocoding_level` が小さいほど座標は大まか（1=都道府県、2=市区町村、3=町丁目、8=街区・地番）。
