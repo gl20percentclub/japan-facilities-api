@@ -66,15 +66,31 @@ test('TILE_MIN_ZOOM / TILE_MAX_ZOOM が gen-tiles の既定ズーム範囲と一
   });
 });
 
-test('初期ズームがタイルの最小ズーム以上で、開いた直後から点が出る', () => {
-  // fitBounds で全国を収めると z5 以下になり、タイルが無くて点が1つも出ない。
-  // 初期ズームはタイルの最小ズームに合わせる（定数を直接使っていることも確認する）。
-  assert.ok(/zoom: TILE_MIN_ZOOM/.test(HTML), '初期ズームに TILE_MIN_ZOOM を使う');
-  assert.ok(!/fitBoundsOptions/.test(HTML), '全国 fitBounds で初期表示していない');
+test('点レイヤの下限ズームがタイルのズーム範囲に収まり、source にも使われている', () => {
+  // 低ズームのタイルは1枚が極端に重いため、点レイヤは POINT_MIN_ZOOM 以上でしか出さない。
+  // source の minzoom に同じ値を入れておかないと、MapLibre が重いタイルを取りに行く。
+  const pointMinZoom = Number(htmlValue(/POINT_MIN_ZOOM\s*=\s*(\d+)/, 'POINT_MIN_ZOOM'));
+  assert.ok(
+    /minzoom: POINT_MIN_ZOOM/.test(HTML),
+    'facilities source の minzoom に POINT_MIN_ZOOM を使う',
+  );
   withTiles({}, (meta) => {
-    const minZoom = Number(htmlValue(/TILE_MIN_ZOOM\s*=\s*(\d+)/, 'TILE_MIN_ZOOM'));
-    assert.ok(minZoom >= meta.minzoom, `初期ズーム(${minZoom}) がタイルの最小ズーム(${meta.minzoom})以上`);
+    assert.ok(
+      pointMinZoom >= meta.minzoom,
+      `POINT_MIN_ZOOM(${pointMinZoom}) がタイルの最小ズーム(${meta.minzoom})以上`,
+    );
+    assert.ok(
+      pointMinZoom <= meta.maxzoom,
+      `POINT_MIN_ZOOM(${pointMinZoom}) がタイルの最大ズーム(${meta.maxzoom})以下`,
+    );
   });
+});
+
+test('初期ズームが点レイヤの下限と一致し、開いた直後から点が出る', () => {
+  // fitBounds で全国を収めると点レイヤの下限を下回り、点が1つも出ない。
+  // 初期ズームは点レイヤの下限に合わせる（定数を直接使っていることも確認する）。
+  assert.ok(/zoom: POINT_MIN_ZOOM/.test(HTML), '初期ズームに POINT_MIN_ZOOM を使う');
+  assert.ok(!/fitBoundsOptions/.test(HTML), '全国 fitBounds で初期表示していない');
   // 初期中心が日本の範囲（タイルの bounds）に収まっていること。
   const center = htmlValue(/INITIAL_CENTER = \[([^\]]+)\]/, 'INITIAL_CENTER')
     .split(',').map((v) => Number(v.trim()));
@@ -82,6 +98,17 @@ test('初期ズームがタイルの最小ズーム以上で、開いた直後�
     .split(',').map((v) => Number(v.trim()));
   assert.ok(center[0] > bounds[0] && center[0] < bounds[2], `初期中心の経度(${center[0]}) が日本の範囲内`);
   assert.ok(center[1] > bounds[1] && center[1] < bounds[3], `初期中心の緯度(${center[1]}) が日本の範囲内`);
+});
+
+test('ズームヒントの出し分けが点レイヤの下限と同じ値を見ている', () => {
+  // 下限と違う値で判定すると、点が出ているのに案内が残る（または点が無いのに案内が
+  // 出ない）。どちらも「読み込まれていない」と受け取られるため、定数を共有させる。
+  const m = HTML.match(/function updateHint\(\)\s*\{[^}]*\}/);
+  assert.ok(m, 'map.html に updateHint がある');
+  assert.ok(
+    m[0].includes('POINT_MIN_ZOOM'),
+    'updateHint が POINT_MIN_ZOOM を基準にしている',
+  );
 });
 
 test('タイルURLテンプレートが「api/tiles/ + metadata.tiles[0]」の配置と一致する', () => {
