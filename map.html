@@ -195,7 +195,7 @@
     </p>
   </div>
 
-  <div class="hint" id="hint">🔍 ズームインすると施設ピンが表示されます</div>
+  <div class="hint" id="hint">🔍 街が見える範囲までズームインすると施設ピンが表示されます</div>
 
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script>
@@ -207,11 +207,21 @@
     // ベクトルタイルのズーム範囲（scripts/gen-tiles.js の設定と一致させる）
     const TILE_MIN_ZOOM = 6;
     const TILE_MAX_ZOOM = 12;
+    // 点レイヤを出す下限ズーム。**暫定の上限で、下げるのはタイルを軽くしてから**。
+    //
+    // 低ズームのタイルはその範囲の施設を1点も間引かずに持つため、1枚が極端に重い
+    // （実測: z6 の関東〜近畿タイルは 36.8MB / 724,758 点で、全点の 57% が1枚に入る）。
+    // z6 で開くと初期表示だけで約 57MB を読み、モバイル回線ではまず描画に至らない。
+    // 実測（都心＝最悪ケース、1タイルあたり gzip 後）は z9 2.7MB / z10 1.8MB /
+    // z11 1.2MB / z12 0.41MB で、初期表示の6枚が現実的な量に収まるのは z12 だけ。
+    // タイル側の間引きが入ったら、この値は下げられる。
+    const POINT_MIN_ZOOM = 12;
     // 日本のおおよその範囲 [west, south, east, north]
     const JAPAN_BOUNDS = [122, 20, 154, 46];
-    // 初期表示の中心（本州中央部あたり）。ズームはタイルの最小ズームに合わせるため、
-    // 全国を収める fitBounds ではなく中心＋ズーム指定で開く。
-    const INITIAL_CENTER = [138.2, 36.4];
+    // 初期表示の中心（東京駅）。ズームを POINT_MIN_ZOOM に合わせるため、全国を収める
+    // fitBounds ではなく中心＋ズーム指定で開く。市街地を中心にしないと、開いた直後の
+    // 画面に施設が1件も入らない（従来の本州中央部は山間部で点がほぼ無い）。
+    const INITIAL_CENTER = [139.767, 35.681];
 
     // 業種の分類は食品衛生法の定義に合わせる。
     //   営業許可 32業種（食品衛生法施行令 第35条。2021年6月施行）を法令の区分
@@ -357,7 +367,9 @@
           facilities: {
             type: 'vector',
             tiles: [`${API_BASE}/tiles/{z}/{x}/{y}.pbf`],
-            minzoom: TILE_MIN_ZOOM,
+            // 配信は z6 からあるが、重すぎる低ズームのタイルは要求しない
+            // （source の minzoom より下では MapLibre がタイルを取りに行かない）。
+            minzoom: POINT_MIN_ZOOM,
             maxzoom: TILE_MAX_ZOOM,
             bounds: JAPAN_BOUNDS,
             attribution:
@@ -389,10 +401,10 @@
           },
         ],
       },
-      // 開いた直後から施設の点が見えるよう、初期ズームをタイルの最小ズームに合わせる
-      // （全国を収める fitBounds だと z5 以下になり、タイルが無くて点が出ない）。
+      // 開いた直後から施設の点が見えるよう、初期ズームを点レイヤの下限に合わせる
+      // （これより引くと点が出ず、寄りすぎると全国データの雰囲気が伝わらない）。
       center: INITIAL_CENTER,
-      zoom: TILE_MIN_ZOOM,
+      zoom: POINT_MIN_ZOOM,
       minZoom: 3,
       maxZoom: 18,
       attributionControl: false,
@@ -408,11 +420,11 @@
       trackUserLocation: true,
     }), 'top-right');
 
-    // --- ヒントの表示制御（ズーム6未満では点が出ないため案内する）---
+    // --- ヒントの表示制御（点レイヤの下限ズーム未満では点が出ないため案内する）---
     const hintEl = $('hint');
-    /** ズームがタイルの最小ズーム未満のときだけヒントを見せる。 */
+    /** ズームが点レイヤの下限未満のときだけヒントを見せる。 */
     function updateHint() {
-      hintEl.classList.toggle('hidden', map.getZoom() >= TILE_MIN_ZOOM);
+      hintEl.classList.toggle('hidden', map.getZoom() >= POINT_MIN_ZOOM);
     }
     map.on('zoom', updateHint);
     map.on('load', updateHint);
